@@ -1,0 +1,20 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter M
+  \item \spxentry{module}
+    \subitem \spxentry{vipertools.parse}, \hyperpage{1}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{parse\_phenix()}\spxextra{in module vipertools.parse}, \hyperpage{1}
+
+  \indexspace
+  \bigletter V
+  \item \spxentry{vipertools.parse}
+    \subitem \spxentry{module}, \hyperpage{1}
+
+\end{sphinxtheindex}
