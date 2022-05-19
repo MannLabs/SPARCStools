@@ -1,4 +1,5 @@
 \babel@toc {english}{}\relax 
 \contentsline {chapter}{\numberline {1}parse}{1}{chapter.1}%
-\contentsline {chapter}{Python Module Index}{2}{section*.4}%
-\contentsline {chapter}{Index}{3}{section*.5}%
+\contentsline {chapter}{\numberline {2}stitch}{2}{chapter.2}%
+\contentsline {chapter}{Python Module Index}{4}{section*.7}%
+\contentsline {chapter}{Index}{5}{section*.8}%

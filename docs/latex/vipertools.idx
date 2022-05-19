@@ -1,3 +1,7 @@
 \indexentry{module@\spxentry{module}!vipertools.parse@\spxentry{vipertools.parse}|hyperpage}{1}
 \indexentry{vipertools.parse@\spxentry{vipertools.parse}!module@\spxentry{module}|hyperpage}{1}
 \indexentry{parse\_phenix() (in module vipertools.parse)@\spxentry{parse\_phenix()}\spxextra{in module vipertools.parse}|hyperpage}{1}
+\indexentry{module@\spxentry{module}!vipertools.stitch@\spxentry{vipertools.stitch}|hyperpage}{1}
+\indexentry{vipertools.stitch@\spxentry{vipertools.stitch}!module@\spxentry{module}|hyperpage}{1}
+\indexentry{generate\_stitched() (in module vipertools.stitch)@\spxentry{generate\_stitched()}\spxextra{in module vipertools.stitch}|hyperpage}{2}
+\indexentry{generate\_thumbnail() (in module vipertools.stitch)@\spxentry{generate\_thumbnail()}\spxextra{in module vipertools.stitch}|hyperpage}{2}
