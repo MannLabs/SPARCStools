@@ -2,7 +2,7 @@
 parse
 ====================================
 
-Contains functions to parse imaging data into a usable format
+Contains functions to parse imaging data into a usable formats for downstream pipelines.
 """
 
 import time
