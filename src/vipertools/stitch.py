@@ -216,7 +216,7 @@ def generate_stitched(input_dir,
     process_axis_flip(slide, flip_x=False, flip_y=True)
 
     #get dictionary position of channel
-    channel_id = list(slide.metadata.channel_map.values()).index(stitching_channel')
+    channel_id = list(slide.metadata.channel_map.values()).index(stitching_channel)
 
     #generate aligner to use specificed channel for stitching
     aligner = reg.EdgeAligner(slide, channel=channel_id, filter_sigma=0, verbose=True, do_make_thumbnail=False)
