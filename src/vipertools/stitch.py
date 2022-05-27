@@ -182,7 +182,7 @@ def generate_stitched(input_dir,
                       stitching_channel = "Alexa488",
                       crop = {'top':0, 'bottom':0, 'left':0, 'right':0},
                       plot_QC = False,
-                      filetype = ".tif"):
+                      filetype = [".tif"]):
     
     """
     Function to generate a scaled down thumbnail of stitched image. Can be used for example to 
@@ -255,7 +255,7 @@ def generate_stitched(input_dir,
     positions = aligner.positions
     np.savetxt(os.path.join(outdir, slidename + "_tile_positions.tsv"), positions, delimiter="\t")
 
-    if filetype == ".tif":
+    if ".tif" in filetype:
         print("writing results to one large tif.")
 
         mosaics = []
@@ -288,13 +288,13 @@ def generate_stitched(input_dir,
                 im = Image.fromarray(merged_array[i].astype('uint16'))#ensure that type is uint16
                 im.save(os.path.join(outdir, slidename + "_"+channel+'.tif'))
     
-    elif filetype == "ome.tif":
+    elif "ome.tif" in filetype:
         print("writing results to ome.tif")
         path = os.path.join(outdir, slidename + ".ome.tiff")
         writer = PyramidWriter([mosaic], path, scale=5, tile_size=1024, peak_size=1024, verbose=True)
         writer.run()
 
-    elif filetype == ".ome.zarr":
+    elif "ome.zarr" in filetype:
         print("writing results to ome.zarr")
         mosaics = []
         for channel in tqdm(mosaic.channels):
