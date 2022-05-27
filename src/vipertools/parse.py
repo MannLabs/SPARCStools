@@ -91,7 +91,7 @@ def parse_phenix(phenix_dir,
     rows = [int(x[0:3].replace('r', '')) for x in images]
     wells = [int(x[3:6].replace('c', '')) for x in images]
     channels = [x.split('-')[1][2:3] for x in images]
-    zstack = [int(x[9:12].replace('p', '')) for x in images]
+    zstack = [int(x.split("p")[1][0:2]) for x in images]
 
     df = pd.DataFrame({"Image_files": images,
                        "Row": rows,
