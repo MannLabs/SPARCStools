@@ -311,7 +311,7 @@ def generate_stitched(input_dir,
 
         group.attrs["omero"] = {
             "name":slidename + ".ome.zarr",
-            "channels": [{"label":channel, "color":channel_colors[i], "active":True} for i, channel in enumerate(mosaic.channels)]
+            "channels": [{"label":channel, "color":channel_colors[i], "active":True} for i, channel in enumerate(slide.metadata.channel_map.values())]
         }
 
         write_image(np.array(mosaics), group = group, axes = axes, storage_options=dict(chunks=(1, 1024, 1024)))
