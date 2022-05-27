@@ -288,13 +288,13 @@ def generate_stitched(input_dir,
                 im = Image.fromarray(merged_array[i].astype('uint16'))#ensure that type is uint16
                 im.save(os.path.join(outdir, slidename + "_"+channel+'.tif'))
     
-    elif "ome.tif" in filetype:
+    if "ome.tif" in filetype:
         print("writing results to ome.tif")
         path = os.path.join(outdir, slidename + ".ome.tiff")
         writer = PyramidWriter([mosaic], path, scale=5, tile_size=1024, peak_size=1024, verbose=True)
         writer.run()
 
-    elif "ome.zarr" in filetype:
+    if "ome.zarr" in filetype:
         print("writing results to ome.zarr")
 
         if 'mosaics' not in locals():
