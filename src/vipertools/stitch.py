@@ -26,6 +26,14 @@ import random
 from tqdm import tqdm
 from joblib import Parallel, delayed
 
+#for export to ome.zarr
+import zarr
+from ome_zarr.io import parse_url
+from ome_zarr.writer import write_image
+
+#for export to ome.tif
+from ashlar.reg import PyramidWriter
+
 
 #define custom FilePatternReaderRescale to use with Ashlar to allow for custom modifications to images before performing stitching
 class FilePatternReaderRescale(filepattern.FilePatternReader):
@@ -173,7 +181,8 @@ def generate_stitched(input_dir,
                       overlap,
                       stitching_channel = "Alexa488",
                       crop = {'top':0, 'bottom':0, 'left':0, 'right':0},
-                      plot_QC = False):
+                      plot_QC = False,
+                      filetype = ".tif"):
     
     """
     Function to generate a scaled down thumbnail of stitched image. Can be used for example to 
@@ -246,36 +255,64 @@ def generate_stitched(input_dir,
     positions = aligner.positions
     np.savetxt(os.path.join(outdir, slidename + "_tile_positions.tsv"), positions, delimiter="\t")
 
-    mosaics = []
-    for channel in tqdm(mosaic.channels):
-        mosaics.append(mosaic.assemble_channel(channel = channel))
+    if filetype == ".tif":
+        print("writing results to one large tif.")
+
+        mosaics = []
+        for channel in tqdm(mosaic.channels):
+            mosaics.append(mosaic.assemble_channel(channel = channel))
+            
+        #actually perform cropping
+        if np.sum(list(crop.values())) > 0:
+            print('Merged image will be cropped to the specified cropping parameters: ', crop)
+            merged_array = np.array(mosaics)
+
+            cropping_factor = 20.00   #this is based on the scale that was used in the thumbnail generation
+            _, x, y = merged_array.shape
+            top = int(crop['top'] * cropping_factor)
+            bottom = int(crop['bottom'] * cropping_factor)
+            left = int(crop['left'] * cropping_factor)
+            right = int(crop['right'] * cropping_factor)
+            cropped = merged_array[:, slice(top, x-bottom), slice(left, y-right)]
+
+            #return(merged_array, cropped)
+            #write to tif for each channel
+            for i, channel in enumerate(slide.metadata.channel_map.values()):
+                (print('writing to file: ', channel))
+                im = Image.fromarray(cropped[i].astype('uint16'))#ensure that type is uint16
+                im.save(os.path.join(outdir, slidename + "_"+channel+'_cropped.tif'))
         
-    #actually perform cropping
-    if np.sum(list(crop.values())) > 0:
-        print('Merged image will be cropped to the specified cropping parameters: ', crop)
-        merged_array = np.array(mosaics)
-
-        cropping_factor = 20.00   #this is based on the scale that was used in the thumbnail generation
-        _, x, y = merged_array.shape
-        top = int(crop['top'] * cropping_factor)
-        bottom = int(crop['bottom'] * cropping_factor)
-        left = int(crop['left'] * cropping_factor)
-        right = int(crop['right'] * cropping_factor)
-        cropped = merged_array[:, slice(top, x-bottom), slice(left, y-right)]
-
-        #return(merged_array, cropped)
-        #write to tif for each channel
-        for i, channel in enumerate(slide.metadata.channel_map.values()):
-            (print('writing to file: ', channel))
-            im = Image.fromarray(cropped[i].astype('uint16'))#ensure that type is uint16
-            im.save(os.path.join(outdir, slidename + "_"+channel+'_cropped.tif'))
+        else:
+            merged_array = np.array(mosaics)
+            for i, channel in enumerate(slide.metadata.channel_map.values()):
+                im = Image.fromarray(merged_array[i].astype('uint16'))#ensure that type is uint16
+                im.save(os.path.join(outdir, slidename + "_"+channel+'.tif'))
     
-    else:
-        merged_array = np.array(mosaics)
-        for i, channel in enumerate(slide.metadata.channel_map.values()):
-            im = Image.fromarray(merged_array[i].astype('uint16'))#ensure that type is uint16
-            im.save(os.path.join(outdir, slidename + "_"+channel+'.tif'))
+    elif filetype == "ome.tif":
+        print("writing results to ome.tif")
+        path = os.path.join(outdir, slidename + ".ome.tiff")
+        writer = PyramidWriter([mosaic], path, scale=5, tile_size=1024, peak_size=1024, verbose=True)
+        writer.run()
 
+    elif filetype == ".ome.zarr":
+        print("writing results to ome.zarr")
+        mosaics = []
+        for channel in tqdm(mosaic.channels):
+            mosaics.append(mosaic.assemble_channel(channel = channel))
+
+        
+        loc = parse_url(path, mode="w").store
+        group = zarr.group(store = loc)
+        axes = {"c", "y", "x"}
+
+        channel_colors = ["00cc00", "002db3", "ff9900", "d60f0f"]
+
+        group.attrs["omero"] = {
+            "name":slidename + ".ome.zarr",
+            "channels": [{"label":channel, "color":channel_colors[i], "active":True} for i, channel in enumerate(mosaic.channels)]
+        }
+
+        write_image(np.array(mosaics), group = group, axes = axes, storage_options=dict(chunks=(1, 1024, 1024)))
     
     end_time = time.time() - start_time
     print('Merging Pipeline completed in ', str(end_time/60) , "minutes.")
