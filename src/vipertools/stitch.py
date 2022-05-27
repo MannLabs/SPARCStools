@@ -97,7 +97,7 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
             else:
                 return self.rescale_p1_p99(img)  
 
-def generate_thumbnail(input_dir, pattern, outdir, overlap, name, export_examples = False):
+def generate_thumbnail(input_dir, pattern, outdir, overlap, name, stitching_channel = "DAPI", export_examples = False):
     """
     Function to generate a scaled down thumbnail of stitched image. Can be used for example to 
     get a low resolution overview of the scanned region to select areas for exporting high resolution 
@@ -132,10 +132,10 @@ def generate_thumbnail(input_dir, pattern, outdir, overlap, name, export_example
     process_axis_flip(slide, flip_x=False, flip_y=True)
 
     #generate stitched thumbnail on which to determine cropping params
-    _thumbnail = thumbnail.make_thumbnail(slide, channel='DAPI', scale=0.05)
+    _thumbnail = thumbnail.make_thumbnail(slide, channel=stitching_channel, scale=0.05)
 
     _thumbnail = Image.fromarray(_thumbnail)
-    _thumbnail.save(os.path.join(outdir, name + '_thumbnail_DAPI.tif'))
+    _thumbnail.save(os.path.join(outdir, name + '_thumbnail_'+stitching_channel+'.tif'))
     
     end_time = time.time() - start_time
     print("Thumbnail generated for channel DAPI, pipeline completed in ", str(end_time/60), "minutes.")
@@ -153,12 +153,12 @@ def generate_thumbnail(input_dir, pattern, outdir, overlap, name, export_example
             os.makedirs(outdir_examples)
 
         #get 10 randomly selected DAPI files
-        _files = [x for x in all_files if 'DAPI' in x]
+        _files = [x for x in all_files if stitching_channel in x]
         _files = random.sample(_files, 10)
 
         for channel in channels:
             for file in _files:
-                file = file.replace('DAPI', channel)
+                file = file.replace(stitching_channel, channel)
                 img = Image.open(os.path.join(input_dir, file))
                 corrected = slide.rescale_p1_p99(img)
                 imsave(os.path.join(outdir_examples, file), corrected)
