@@ -132,7 +132,8 @@ def generate_thumbnail(input_dir, pattern, outdir, overlap, name, stitching_chan
     process_axis_flip(slide, flip_x=False, flip_y=True)
 
     #generate stitched thumbnail on which to determine cropping params
-    _thumbnail = thumbnail.make_thumbnail(slide, channel=stitching_channel, scale=0.05)
+    channel_id = list(slide.metadata.channel_map.values()).index(stitching_channel)
+    _thumbnail = thumbnail.make_thumbnail(slide, channel=channel_id, scale=0.05)
 
     _thumbnail = Image.fromarray(_thumbnail)
     _thumbnail.save(os.path.join(outdir, name + '_thumbnail_'+stitching_channel+'.tif'))
