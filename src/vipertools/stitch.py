@@ -296,11 +296,12 @@ def generate_stitched(input_dir,
 
     elif "ome.zarr" in filetype:
         print("writing results to ome.zarr")
-        mosaics = []
-        for channel in tqdm(mosaic.channels):
-            mosaics.append(mosaic.assemble_channel(channel = channel))
 
-        
+        if 'mosaics' not in locals():
+            mosaics = []
+            for channel in tqdm(mosaic.channels):
+                mosaics.append(mosaic.assemble_channel(channel = channel))
+
         loc = parse_url(path, mode="w").store
         group = zarr.group(store = loc)
         axes = {"c", "y", "x"}
