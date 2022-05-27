@@ -302,6 +302,7 @@ def generate_stitched(input_dir,
             for channel in tqdm(mosaic.channels):
                 mosaics.append(mosaic.assemble_channel(channel = channel))
 
+        path = os.path.join(outdir, slidename + ".ome.zarr")
         loc = parse_url(path, mode="w").store
         group = zarr.group(store = loc)
         axes = {"c", "y", "x"}
