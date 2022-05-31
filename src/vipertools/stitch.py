@@ -211,6 +211,11 @@ def generate_stitched(input_dir,
         dictionary of the form {'top':0, 'bottom':0, 'left':0, 'right':0} indicating how many pixels (based on a generated thumbnail, 
         see vipertools.stitch.generate_thumbnail) should be cropped from the final image in each indicated dimension. Leave this set to default 
         if no cropping should be performed.
+    plot_QC
+        boolean value indicating if QC plots should be generated
+    filetype
+        list containing any of [".tif", ".ome.zarr", ".ome.tif"] defining to which type of file the stiched results should be written. If more than one 
+        element all export types will be generated in the same output directory.
 
     """
 
