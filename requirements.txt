@@ -1,2 +1,10 @@
 pandas
 tqdm
+ashlar
+zarr
+numpy
+matplotlib
+tifffile
+pillow
+scikit-image
+ome_zarr
