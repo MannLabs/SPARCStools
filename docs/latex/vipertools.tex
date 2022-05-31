@@ -61,7 +61,7 @@
 
 
 \title{vipertools}
-\date{May 19, 2022}
+\date{May 31, 2022}
 \release{0.0.1}
 \author{Sophia Maedler}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -118,7 +118,7 @@ Collection of functions to perform stitching of parsed image Tiffs.
 \index{generate\_stitched() (in module vipertools.stitch)@\spxentry{generate\_stitched()}\spxextra{in module vipertools.stitch}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:vipertools.stitch.generate_stitched}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_stitched}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{slidename}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}Alexa488\textquotesingle{}}}, \emph{\DUrole{n}{crop}\DUrole{o}{=}\DUrole{default_value}{\{\textquotesingle{}bottom\textquotesingle{}: 0, \textquotesingle{}left\textquotesingle{}: 0, \textquotesingle{}right\textquotesingle{}: 0, \textquotesingle{}top\textquotesingle{}: 0\}}}, \emph{\DUrole{n}{plot\_QC}\DUrole{o}{=}\DUrole{default_value}{False}}}{}
+\phantomsection\label{\detokenize{index:vipertools.stitch.generate_stitched}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_stitched}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{slidename}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}Alexa488\textquotesingle{}}}, \emph{\DUrole{n}{crop}\DUrole{o}{=}\DUrole{default_value}{\{\textquotesingle{}bottom\textquotesingle{}: 0, \textquotesingle{}left\textquotesingle{}: 0, \textquotesingle{}right\textquotesingle{}: 0, \textquotesingle{}top\textquotesingle{}: 0\}}}, \emph{\DUrole{n}{plot\_QC}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{filetype}\DUrole{o}{=}\DUrole{default_value}{{[}\textquotesingle{}.tif\textquotesingle{}{]}}}}{}
 \sphinxAtStartPar
 Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
@@ -159,6 +159,15 @@ passed to the other channels.
 see vipertools.stitch.generate\_thumbnail) should be cropped from the final image in each indicated dimension. Leave this set to default
 if no cropping should be performed.
 
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{plot\_QC}} \textendash{} boolean value indicating if QC plots should be generated
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{filetype}} \textendash{} list containing any of {[}“.tif”, “.ome.zarr”, “.ome.tif”{]} defining to which type of file the stiched results should be written. If more than one
+element all export types will be generated in the same output directory.
+
 \end{itemize}
 
 \end{description}\end{quote}
@@ -168,7 +177,7 @@ if no cropping should be performed.
 \index{generate\_thumbnail() (in module vipertools.stitch)@\spxentry{generate\_thumbnail()}\spxextra{in module vipertools.stitch}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{index:vipertools.stitch.generate_thumbnail}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_thumbnail}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{name}}, \emph{\DUrole{n}{export\_examples}\DUrole{o}{=}\DUrole{default_value}{False}}}{}
+\phantomsection\label{\detokenize{index:vipertools.stitch.generate_thumbnail}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_thumbnail}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{name}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}DAPI\textquotesingle{}}}, \emph{\DUrole{n}{export\_examples}\DUrole{o}{=}\DUrole{default_value}{False}}}{}
 \sphinxAtStartPar
 Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
