@@ -2,7 +2,12 @@
 Modules
 *******************
 
-parse
-================
+.. automodule:: vipertools.parse
+    :members:
 
-.. automodule:: vipertools
+.. automodule:: vipertools.stitch
+    :members:
+
+.. toctree::
+   :maxdepth: 5
+   :caption: Contents:

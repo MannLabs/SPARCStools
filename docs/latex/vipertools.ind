@@ -6,23 +6,23 @@
 
   \bigletter G
   \item \spxentry{generate\_stitched()}\spxextra{in module vipertools.stitch}, \hyperpage{2}
-  \item \spxentry{generate\_thumbnail()}\spxextra{in module vipertools.stitch}, \hyperpage{2}
+  \item \spxentry{generate\_thumbnail()}\spxextra{in module vipertools.stitch}, \hyperpage{3}
 
   \indexspace
   \bigletter M
   \item \spxentry{module}
-    \subitem \spxentry{vipertools.parse}, \hyperpage{1}
-    \subitem \spxentry{vipertools.stitch}, \hyperpage{1}
+    \subitem \spxentry{vipertools.parse}, \hyperpage{2}
+    \subitem \spxentry{vipertools.stitch}, \hyperpage{2}
 
   \indexspace
   \bigletter P
-  \item \spxentry{parse\_phenix()}\spxextra{in module vipertools.parse}, \hyperpage{1}
+  \item \spxentry{parse\_phenix()}\spxextra{in module vipertools.parse}, \hyperpage{2}
 
   \indexspace
   \bigletter V
   \item \spxentry{vipertools.parse}
-    \subitem \spxentry{module}, \hyperpage{1}
+    \subitem \spxentry{module}, \hyperpage{2}
   \item \spxentry{vipertools.stitch}
-    \subitem \spxentry{module}, \hyperpage{1}
+    \subitem \spxentry{module}, \hyperpage{2}
 
 \end{sphinxtheindex}

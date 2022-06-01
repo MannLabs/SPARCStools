@@ -6,18 +6,18 @@
 Welcome to vipertools's documentation!
 ======================================
 
-.. automodule:: vipertools.parse
-    :members:
-
-.. automodule:: vipertools.stitch
-    :members:
+Welcome the documentation of VIPERTOOLS!
 
 .. toctree::
-   :maxdepth: 5
-   :caption: Contents:
+   :maxdepth: 2
+   :caption: Modules:
+   
+   pages/modules.rst
+   
+.. toctree::
+   :maxdepth: 2
+   :numbered:
+   :caption: Tutorials:
+   
+   pages/tutorials
 
-
-Tutorials
-=========
-
-pages/tutorials
