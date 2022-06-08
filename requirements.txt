@@ -9,3 +9,4 @@ pillow
 scikit-image
 ome_zarr
 imagecodecs
+yattag

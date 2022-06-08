@@ -104,6 +104,55 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
                 return self.correct_illumination(img)
             else:
                 return self.rescale_p1_p99(img)  
+from yattag import Doc, indent
+
+def _write_xml(path, 
+              channels, 
+              slidename, 
+              cropped = False):
+    """ Helper function to generate an XML for import of stitched .tifs into BIAS.
+
+    Parameters
+    ----------
+    path 
+        path to where the exported images are written
+    channels
+        list of the channel names written out
+    slidename
+        string indicating the name underwhich the files were written out
+    cropped
+        boolean value indicating if the stitched images were written out cropped or not.
+    """
+
+    if cropped:
+        image_paths = [os.path.join(path, slidename + "_"+x+'_cropped.tif') for x in channels]
+    else:
+        image_paths = [os.path.join(path, slidename + "_"+x+'.tif') for x in channels]
+
+    doc, tag, text = Doc().tagtext()
+
+    with tag("BIAS", version = "1.0"):
+        with tag("channels"):
+            for i, channel in enumerate(channels):
+                with tag("channel", id = str(i)):
+                    with tag("name"):
+                        text(channel)
+        with tag("images"):
+            for i, image_path in enumerate(image_paths):
+                with tag("image", url=str(image_path)):
+                    with tag("channel"):
+                        text(str(i))
+
+    result = indent(
+        doc.getvalue(),
+        indentation = ' '*4,
+        newline = '\r\n'
+    )
+
+    #write to file
+    write_path = os.path.join(path, slidename + ".XML")
+    with open(write_path, mode ="w") as f:
+        f.write(result)
 
 def generate_thumbnail(input_dir, 
                        pattern, 
@@ -192,7 +241,8 @@ def generate_stitched(input_dir,
                       crop = {'top':0, 'bottom':0, 'left':0, 'right':0},
                       plot_QC = False,
                       filetype = [".tif"],
-                      do_intensity_rescale = True):
+                      do_intensity_rescale = True,
+                      export_XML = True):
     
     """
     Function to generate a scaled down thumbnail of stitched image. Can be used for example to 
@@ -297,12 +347,18 @@ def generate_stitched(input_dir,
                 (print('writing to file: ', channel))
                 im = Image.fromarray(cropped[i].astype('uint16'))#ensure that type is uint16
                 im.save(os.path.join(outdir, slidename + "_"+channel+'_cropped.tif'))
+            
+            if export_XML:
+                _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = True)
         
         else:
             merged_array = np.array(mosaics)
             for i, channel in enumerate(slide.metadata.channel_map.values()):
                 im = Image.fromarray(merged_array[i].astype('uint16'))#ensure that type is uint16
                 im.save(os.path.join(outdir, slidename + "_"+channel+'.tif'))
+
+            if export_XML:
+                _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = False)
     
     if "ome.tif" in filetype:
         print("writing results to ome.tif")
