@@ -125,23 +125,25 @@ def _write_xml(path,
     """
 
     if cropped:
-        image_paths = [os.path.join(path, slidename + "_"+x+'_cropped.tif') for x in channels]
+        image_paths = [slidename + "_"+x+'_cropped.tif' for x in channels]
     else:
-        image_paths = [os.path.join(path, slidename + "_"+x+'.tif') for x in channels]
+        image_paths = [slidename + "_"+x+'.tif' for x in channels]
 
     doc, tag, text = Doc().tagtext()
-
+    
+    xml_header = '<?xml version="1.0" encoding="UTF-8"?>'
+    doc.asis(xml_header)
     with tag("BIAS", version = "1.0"):
         with tag("channels"):
             for i, channel in enumerate(channels):
-                with tag("channel", id = str(i)):
+                with tag("channel", id = str(i+1)):
                     with tag("name"):
                         text(channel)
         with tag("images"):
             for i, image_path in enumerate(image_paths):
                 with tag("image", url=str(image_path)):
                     with tag("channel"):
-                        text(str(i))
+                        text(str(i+1))
 
     result = indent(
         doc.getvalue(),
@@ -153,6 +155,7 @@ def _write_xml(path,
     write_path = os.path.join(path, slidename + ".XML")
     with open(write_path, mode ="w") as f:
         f.write(result)
+ 
 
 def generate_thumbnail(input_dir, 
                        pattern, 
@@ -278,6 +281,8 @@ def generate_stitched(input_dir,
         element all export types will be generated in the same output directory.
     do_intensity_rescale
         boolean value indicating if the rescale_p1_P99 function should be applied before stitching or not.
+    export_XML
+        boolean value. If true than an xml is exported when writing to .tif which allows for the import into BIAS.
     """
 
     start_time = time.time()
