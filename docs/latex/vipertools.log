@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.19)  1 JUN 2022 16:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.19)  10 JUN 2022 11:55
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -787,16 +787,16 @@ File: ts1qtm.fd 2009/09/25 v1.2 font definition file for TS1/qtm
 ] [3]
 Chapter 2.
 Package hyperref Info: bookmark level for unknown literalblock defaults to 0 on
- input line 238.
+ input line 259.
 LaTeX Font Info:    Font shape `T1/txtt/m/it' in size <10> not available
-(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 239.
+(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 260.
 LaTeX Font Info:    Trying to load font information for TS1+txtt on input line 
-268.
+290.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/txfonts/ts1txtt.fd
 File: ts1txtt.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `TS1/txtt/m/it' in size <10> not available
-(Font)              Font shape `TS1/txtt/m/sl' tried instead on input line 269.
+(Font)              Font shape `TS1/txtt/m/sl' tried instead on input line 291.
 
  [4
 
@@ -821,7 +821,7 @@ Here is how much of TeX's memory you used:
  32386 multiletter control sequences out of 15000+600000
  521238 words of font info for 74 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 70i,11n,76p,954b,610s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 70i,11n,76p,1183b,610s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/tex-gyre/q-ec.enc}{/usr/l
 ocal/texlive/2022/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/texlive/20
 22/texmf-dist/fonts/enc/dvips/tex-gyre/q-ts1.enc}</usr/local/texlive/2022/texmf
@@ -837,7 +837,7 @@ t.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/t1xtt.pfb>
 </usr/local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/t1xtt.pfb></usr/
 local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/tcxtt.pfb></usr/local/
 texlive/2022/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on vipertools.pdf (9 pages, 188305 bytes).
+Output written on vipertools.pdf (9 pages, 191420 bytes).
 PDF statistics:
  171 PDF objects out of 1000 (max. 8388607)
  136 compressed objects within 2 object streams

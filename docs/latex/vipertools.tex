@@ -61,7 +61,7 @@
 
 
 \title{vipertools}
-\date{Jun 01, 2022}
+\date{Jun 10, 2022}
 \release{0.0.1}
 \author{Sophia Maedler}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -91,7 +91,7 @@ Contains functions to parse imaging data into a usable formats for downstream pi
 \index{parse\_phenix() (in module vipertools.parse)@\spxentry{parse\_phenix()}\spxextra{in module vipertools.parse}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.parse.parse_phenix}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.parse.}}\sphinxbfcode{\sphinxupquote{parse\_phenix}}}{\emph{\DUrole{n}{phenix\_dir}}, \emph{\DUrole{n}{flatfield\_exported}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{parallel}\DUrole{o}{=}\DUrole{default_value}{False}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.parse.parse_phenix}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.parse.}}\sphinxbfcode{\sphinxupquote{parse\_phenix}}}{\emph{\DUrole{n}{phenix\_dir}}, \emph{\DUrole{n}{flatfield\_exported}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{parallel}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{WGAbackground}\DUrole{o}{=}\DUrole{default_value}{False}}}{}
 \sphinxAtStartPar
 Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
 Example of an exported file name: “Row\{\#\}\_Well\{\#\}\_\{channel\}\_zstack\{\#\}\_r\{\#\}\_c\{\#\}.tif”
@@ -109,6 +109,11 @@ Example of an exported file name: “Row\{\#\}\_Well\{\#\}\_\{channel\}\_zstack\
 \sphinxAtStartPar
 \sphinxstyleliteralstrong{\sphinxupquote{parallel}} \textendash{} boolean value indicating if the data parsing should be performed with parallelization or without (CURRENTLY NOT FUNCTIONAL ONLY USE AS FALSE)
 
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{WGAbackground}} \textendash{} export second copy of WGA stains for background correction to improve segmentation. If set to False not performed. Else enter value of the channel
+that should be copied and contains the WGA stain.
+
 \end{itemize}
 
 \end{description}\end{quote}
@@ -124,7 +129,7 @@ Collection of functions to perform stitching of parsed image Tiffs.
 \index{generate\_stitched() (in module vipertools.stitch)@\spxentry{generate\_stitched()}\spxextra{in module vipertools.stitch}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_stitched}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_stitched}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{slidename}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}Alexa488\textquotesingle{}}}, \emph{\DUrole{n}{crop}\DUrole{o}{=}\DUrole{default_value}{\{\textquotesingle{}bottom\textquotesingle{}: 0, \textquotesingle{}left\textquotesingle{}: 0, \textquotesingle{}right\textquotesingle{}: 0, \textquotesingle{}top\textquotesingle{}: 0\}}}, \emph{\DUrole{n}{plot\_QC}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{filetype}\DUrole{o}{=}\DUrole{default_value}{{[}\textquotesingle{}.tif\textquotesingle{}{]}}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_stitched}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_stitched}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{slidename}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}Alexa488\textquotesingle{}}}, \emph{\DUrole{n}{crop}\DUrole{o}{=}\DUrole{default_value}{\{\textquotesingle{}bottom\textquotesingle{}: 0, \textquotesingle{}left\textquotesingle{}: 0, \textquotesingle{}right\textquotesingle{}: 0, \textquotesingle{}top\textquotesingle{}: 0\}}}, \emph{\DUrole{n}{plot\_QC}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{filetype}\DUrole{o}{=}\DUrole{default_value}{{[}\textquotesingle{}.tif\textquotesingle{}{]}}}, \emph{\DUrole{n}{WGAchannel}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{do\_intensity\_rescale}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{export\_XML}\DUrole{o}{=}\DUrole{default_value}{True}}}{}
 \sphinxAtStartPar
 Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
@@ -174,6 +179,18 @@ if no cropping should be performed.
 \sphinxstyleliteralstrong{\sphinxupquote{filetype}} \textendash{} list containing any of {[}“.tif”, “.ome.zarr”, “.ome.tif”{]} defining to which type of file the stiched results should be written. If more than one
 element all export types will be generated in the same output directory.
 
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{WGAchannel}} \textendash{} string indicating the name of the WGA channel in case an illumination correction should be performed on this cahhenl
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{do\_intensity\_rescale}} \textendash{} boolean value indicating if the rescale\_p1\_P99 function should be applied before stitching or not.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{export\_XML}} \textendash{} boolean value. If true than an xml is exported when writing to .tif which allows for the import into BIAS.
+
 \end{itemize}
 
 \end{description}\end{quote}
@@ -183,7 +200,7 @@ element all export types will be generated in the same output directory.
 \index{generate\_thumbnail() (in module vipertools.stitch)@\spxentry{generate\_thumbnail()}\spxextra{in module vipertools.stitch}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_thumbnail}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_thumbnail}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{name}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}DAPI\textquotesingle{}}}, \emph{\DUrole{n}{export\_examples}\DUrole{o}{=}\DUrole{default_value}{False}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_thumbnail}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_thumbnail}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{name}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}DAPI\textquotesingle{}}}, \emph{\DUrole{n}{export\_examples}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{do\_intensity\_rescale}\DUrole{o}{=}\DUrole{default_value}{True}}}{}
 \sphinxAtStartPar
 Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
@@ -217,6 +234,10 @@ All values in \{\} indicate thos which are matched by regex to find all matching
 \sphinxAtStartPar
 \sphinxstyleliteralstrong{\sphinxupquote{export\_examples}} \textendash{} boolean value indicating if individual example tiles should be exported in addition to performing thumbnail generation.
 
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{do\_intensity\_rescale}} \textendash{} boolean value indicating if the rescale\_p1\_P99 function should be applied before stitching or not.
+
 \end{itemize}
 
 \end{description}\end{quote}
@@ -238,7 +259,8 @@ Then you can run the following script to parses and stitch your data.
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{c+c1}{\PYGZsh{}import relevant libraries}
 \PYG{k+kn}{import} \PYG{n+nn}{os}
-\PYG{k+kn}{from} \PYG{n+nn}{vipertools}\PYG{n+nn}{.}\PYG{n+nn}{parse} \PYG{k+kn}{import} \PYG{n}{parse\PYGZus{}phenix}\PYG{p}{,} \PYG{n}{generate\PYGZus{}stitched}
+\PYG{k+kn}{from} \PYG{n+nn}{vipertools}\PYG{n+nn}{.}\PYG{n+nn}{parse} \PYG{k+kn}{import} \PYG{n}{parse\PYGZus{}phenix}
+\PYG{k+kn}{from} \PYG{n+nn}{vipertools}\PYG{n+nn}{.}\PYG{n+nn}{stitch} \PYG{k+kn}{import} \PYG{n}{generate\PYGZus{}stitched}
 
 \PYG{c+c1}{\PYGZsh{}parse image data}
 \PYG{n}{path} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{path to exported harmony project without any spaces}\PYG{l+s+s2}{\PYGZdq{}}
