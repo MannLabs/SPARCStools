@@ -14,7 +14,8 @@ import shutil
 
 def parse_phenix(phenix_dir,
                  flatfield_exported = True,
-                 parallel = False):
+                 parallel = False,
+                 WGAbackground = False):
 
     """
     Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
@@ -28,6 +29,9 @@ def parse_phenix(phenix_dir,
         boolean indicating if the data was exported from harmony with or without flatfield correction.
     parallel
         boolean value indicating if the data parsing should be performed with parallelization or without (CURRENTLY NOT FUNCTIONAL ONLY USE AS FALSE)
+    WGAbackground
+        export second copy of WGA stains for background correction to improve segmentation. If set to False not performed. Else enter value of the channel
+        that should be copied and contains the WGA stain.
     """
 
     #start timer
@@ -158,3 +162,21 @@ def parse_phenix(phenix_dir,
 
     endtime = time.time() - start_time
     print("Parsing Phenix data completed, total time was ", str(endtime/60), "minutes.")
+
+    if WGAbackground != False:
+
+        print("starting WGAbackground export.")
+
+        #start timer
+        start_time = time.time()
+
+        for file_name in os.listdir(outdir):
+            # construct full file path
+            if WGAbackground in file_name:
+                source = os.path.join(outdir, file_name)
+                destination = os.path.join(outdir, file_name.replace(WGAbackground, "WGAbackground"))
+                # copy only files
+                if os.path.isfile(source):
+                    shutil.copy(source, destination)
+
+        print("Parsing Alexa488 data completed, total time was ", str(endtime/60), "minutes.")
