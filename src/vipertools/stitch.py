@@ -392,7 +392,7 @@ def generate_stitched(input_dir,
         group = zarr.group(store = loc)
         axes = {"c", "y", "x"}
 
-        channel_colors = ["00cc00", "002db3", "ff9900", "d60f0f"]
+        channel_colors = ["00cc00", "002db3", "ff9900", "d60f0f", "d60f0f"]
 
         group.attrs["omero"] = {
             "name":slidename + ".ome.zarr",
