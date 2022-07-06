@@ -38,10 +38,11 @@ from ashlar.reg import PyramidWriter
 #define custom FilePatternReaderRescale to use with Ashlar to allow for custom modifications to images before performing stitching
 class FilePatternReaderRescale(filepattern.FilePatternReader):
 
-    def __init__(self, path, pattern, overlap, pixel_size=1, do_rescale=False, WGAchannel = None):
+    def __init__(self, path, pattern, overlap, pixel_size=1, do_rescale=False, WGAchannel = None, rescale_Channels = []):
         super().__init__(path, pattern, overlap, pixel_size=pixel_size)
         self.do_rescale = do_rescale
         self.WGAchannel = WGAchannel
+        self.rescale_channels = rescale_Channels
 
     @staticmethod
     def rescale_p1_p99(img):
@@ -100,6 +101,11 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
         img = super().read(series, c)
         if not self.do_rescale:
             return img
+        if self.do_rescale == "partial":
+            if c in self.rescale_channels:
+                return self.rescale_p1_p99(img) 
+            else:
+                return img
         else:
             if c == self.WGAchannel:
                 return self.correct_illumination(img)
@@ -245,6 +251,7 @@ def generate_stitched(input_dir,
                       outdir,
                       overlap,
                       stitching_channel = "Alexa488",
+                      rescale_channels = ["mCherry", "DAPI"],
                       crop = {'top':0, 'bottom':0, 'left':0, 'right':0},
                       plot_QC = False,
                       filetype = [".tif"],
@@ -287,7 +294,8 @@ def generate_stitched(input_dir,
     WGAchannel
         string indicating the name of the WGA channel in case an illumination correction should be performed on this cahhenl
     do_intensity_rescale
-        boolean value indicating if the rescale_p1_P99 function should be applied before stitching or not.
+        boolean value indicating if the rescale_p1_P99 function should be applied before stitching or not. Alternatively partial then it will only
+        rescale those channels provided as a list in rescale_channels
     export_XML
         boolean value. If true than an xml is exported when writing to .tif which allows for the import into BIAS.
     """
