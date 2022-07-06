@@ -101,8 +101,10 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
         img = super().read(series, c)
         if not self.do_rescale:
             return img
-        if self.do_rescale == "partial":
+        elif self.do_rescale == "partial":
+            print("performing parial rescale")
             if c in self.rescale_channels:
+                print("rescaling ", c)
                 return self.rescale_p1_p99(img) 
             else:
                 return img
