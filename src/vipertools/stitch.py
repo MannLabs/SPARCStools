@@ -38,11 +38,11 @@ from ashlar.reg import PyramidWriter
 #define custom FilePatternReaderRescale to use with Ashlar to allow for custom modifications to images before performing stitching
 class FilePatternReaderRescale(filepattern.FilePatternReader):
 
-    def __init__(self, path, pattern, overlap, pixel_size=1, do_rescale=False, WGAchannel = None, rescale_Channels = []):
+    def __init__(self, path, pattern, overlap, pixel_size=1, do_rescale=False, WGAchannel = None, no_rescale_channel = "Alexa488"):
         super().__init__(path, pattern, overlap, pixel_size=pixel_size)
         self.do_rescale = do_rescale
         self.WGAchannel = WGAchannel
-        self.rescale_channels = rescale_Channels
+        self.no_rescale_channel = no_rescale_channel
 
     @staticmethod
     def rescale_p1_p99(img):
@@ -103,7 +103,7 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
             return img
         elif self.do_rescale == "partial":
             print("performing parial rescale")
-            if c in self.rescale_channels:
+            if c != self.no_rescale_channel:
                 print("rescaling ", c)
                 return self.rescale_p1_p99(img) 
             else:
@@ -253,7 +253,7 @@ def generate_stitched(input_dir,
                       outdir,
                       overlap,
                       stitching_channel = "Alexa488",
-                      rescale_channels = ["mCherry", "DAPI"],
+                      no_rescale_channel = "Alexa488",
                       crop = {'top':0, 'bottom':0, 'left':0, 'right':0},
                       plot_QC = False,
                       filetype = [".tif"],
