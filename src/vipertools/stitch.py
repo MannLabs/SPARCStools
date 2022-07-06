@@ -302,6 +302,8 @@ def generate_stitched(input_dir,
         boolean value. If true than an xml is exported when writing to .tif which allows for the import into BIAS.
     """
 
+    print("performing stitching on " , stitching_channel)
+
     start_time = time.time()
     
     #read data 
@@ -310,7 +312,6 @@ def generate_stitched(input_dir,
     # Turn on the rescaling
     slide.do_rescale = do_intensity_rescale
     slide.WGAchannel = WGAchannel
-
     no_rescale_channel_id = list(slide.metadata.channel_map.values()).index(no_rescale_channel)
     slide.no_rescale_channel = no_rescale_channel_id
     
