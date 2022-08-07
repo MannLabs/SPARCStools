@@ -96,11 +96,14 @@ def parse_phenix(phenix_dir,
     wells = [int(x[3:6].replace('c', '')) for x in images]
     channels = [x.split('-')[1][2:3] for x in images]
     zstack = [int(x.split("p")[1][0:2]) for x in images]
+    timepoint = [int(x.split("f")[1].split("p")[0]) for x in images]
+
 
     df = pd.DataFrame({"Image_files": images,
                        "Row": rows,
                        "Well": wells,
                        "Zstack":zstack,
+                       "Timepoint":timepoint,
                        "X": x_positions,
                        "Y": y_positions,
                        "X_pos": None,
@@ -133,7 +136,7 @@ def parse_phenix(phenix_dir,
     #generate new file names
     for i in range(df.shape[0]):
         _row = df.loc[i, :]
-        name = "Row{}_Well{}_{}_zstack{}_r{}_c{}.tif".format(
+        name = "Timepoint{}_Row{}_Well{}_{}_zstack{}_r{}_c{}.tif".format(_row.Timepoint,
             _row.Row, _row.Well, _row.Channel,_row.Zstack, _row.Y_pos, _row.X_pos)
         name = name
         df.loc[i, 'new_file_name'] = name
