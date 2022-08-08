@@ -61,7 +61,7 @@
 
 
 \title{vipertools}
-\date{Jun 10, 2022}
+\date{Aug 08, 2022}
 \release{0.0.1}
 \author{Sophia Maedler}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -94,7 +94,7 @@ Contains functions to parse imaging data into a usable formats for downstream pi
 \phantomsection\label{\detokenize{pages/modules:vipertools.parse.parse_phenix}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.parse.}}\sphinxbfcode{\sphinxupquote{parse\_phenix}}}{\emph{\DUrole{n}{phenix\_dir}}, \emph{\DUrole{n}{flatfield\_exported}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{parallel}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{WGAbackground}\DUrole{o}{=}\DUrole{default_value}{False}}}{}
 \sphinxAtStartPar
 Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
-Example of an exported file name: “Row\{\#\}\_Well\{\#\}\_\{channel\}\_zstack\{\#\}\_r\{\#\}\_c\{\#\}.tif”
+Example of an exported file name: “Timepoint\{\#\}\_Row\{\#\}\_Well\{\#\}\_\{channel\}\_zstack\{\#\}\_r\{\#\}\_c\{\#\}.tif”
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
@@ -129,7 +129,7 @@ Collection of functions to perform stitching of parsed image Tiffs.
 \index{generate\_stitched() (in module vipertools.stitch)@\spxentry{generate\_stitched()}\spxextra{in module vipertools.stitch}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_stitched}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_stitched}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{slidename}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}Alexa488\textquotesingle{}}}, \emph{\DUrole{n}{crop}\DUrole{o}{=}\DUrole{default_value}{\{\textquotesingle{}bottom\textquotesingle{}: 0, \textquotesingle{}left\textquotesingle{}: 0, \textquotesingle{}right\textquotesingle{}: 0, \textquotesingle{}top\textquotesingle{}: 0\}}}, \emph{\DUrole{n}{plot\_QC}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{filetype}\DUrole{o}{=}\DUrole{default_value}{{[}\textquotesingle{}.tif\textquotesingle{}{]}}}, \emph{\DUrole{n}{WGAchannel}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{do\_intensity\_rescale}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{export\_XML}\DUrole{o}{=}\DUrole{default_value}{True}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_stitched}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_stitched}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{slidename}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}Alexa488\textquotesingle{}}}, \emph{\DUrole{n}{no\_rescale\_channel}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{crop}\DUrole{o}{=}\DUrole{default_value}{\{\textquotesingle{}bottom\textquotesingle{}: 0, \textquotesingle{}left\textquotesingle{}: 0, \textquotesingle{}right\textquotesingle{}: 0, \textquotesingle{}top\textquotesingle{}: 0\}}}, \emph{\DUrole{n}{plot\_QC}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{filetype}\DUrole{o}{=}\DUrole{default_value}{{[}\textquotesingle{}.tif\textquotesingle{}{]}}}, \emph{\DUrole{n}{WGAchannel}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{do\_intensity\_rescale}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{export\_XML}\DUrole{o}{=}\DUrole{default_value}{True}}}{}
 \sphinxAtStartPar
 Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
@@ -185,7 +185,8 @@ element all export types will be generated in the same output directory.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{do\_intensity\_rescale}} \textendash{} boolean value indicating if the rescale\_p1\_P99 function should be applied before stitching or not.
+\sphinxstyleliteralstrong{\sphinxupquote{do\_intensity\_rescale}} \textendash{} boolean value indicating if the rescale\_p1\_P99 function should be applied before stitching or not. Alternatively partial then it will only
+rescale those channels provided as a list in rescale\_channels
 
 \item {} 
 \sphinxAtStartPar
@@ -281,6 +282,7 @@ Then you can run the following script to parses and stitch your data.
 \PYG{n}{row} \PYG{o}{=} \PYG{l+m+mi}{1}
 \PYG{n}{well} \PYG{o}{=} \PYG{l+m+mi}{1}
 \PYG{n}{zstack\PYGZus{}value} \PYG{o}{=} \PYG{l+m+mi}{1}
+\PYG{n}{timepoint} \PYG{o}{=} \PYG{l+m+mi}{1}
 
 \PYG{c+c1}{\PYGZsh{}define on which channel should be stitched}
 \PYG{n}{stitching\PYGZus{}channel} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Alexa647}\PYG{l+s+s2}{\PYGZdq{}}
@@ -297,7 +299,7 @@ Then you can run the following script to parses and stitch your data.
 \PYG{c+c1}{\PYGZsh{}define patter to recognize which slide should be stitched}
 \PYG{c+c1}{\PYGZsh{}remember to adjust the zstack value if you aquired zstacks and want to stitch a speciifc one in the parameters above}
 
-\PYG{n}{pattern} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Row}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{row}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Well}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{well}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+si}{\PYGZob{}channel\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{zstack}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{zstack\PYGZus{}value}\PYG{p}{)}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}r}\PYG{l+s+si}{\PYGZob{}row:03\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}c}\PYG{l+s+si}{\PYGZob{}col:03\PYGZcb{}}\PYG{l+s+s2}{.tif}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{n}{pattern} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Timepoint}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{timepoint}\PYG{p}{)}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}Row}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{row}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Well}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{well}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+si}{\PYGZob{}channel\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{zstack}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{zstack\PYGZus{}value}\PYG{p}{)}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}r}\PYG{l+s+si}{\PYGZob{}row:03\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}c}\PYG{l+s+si}{\PYGZob{}col:03\PYGZcb{}}\PYG{l+s+s2}{.tif}\PYG{l+s+s2}{\PYGZdq{}}
 \PYG{n}{generate\PYGZus{}stitched}\PYG{p}{(}\PYG{n}{input\PYGZus{}dir}\PYG{p}{,}
                     \PYG{n}{slidename}\PYG{p}{,}
                     \PYG{n}{pattern}\PYG{p}{,}

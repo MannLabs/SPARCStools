@@ -35,6 +35,7 @@ Then you can run the following script to parses and stitch your data.
     row = 1
     well = 1
     zstack_value = 1
+    timepoint = 1
 
     #define on which channel should be stitched
     stitching_channel = "Alexa647"
@@ -51,7 +52,7 @@ Then you can run the following script to parses and stitch your data.
     #define patter to recognize which slide should be stitched
     #remember to adjust the zstack value if you aquired zstacks and want to stitch a speciifc one in the parameters above 
 
-    pattern = "Row"+ str(row) + "_" + "Well" + str(well) + "_{channel}_"+"zstack"+str(zstack_value)+"_r{row:03}_c{col:03}.tif"
+    pattern = "Timepoint"+str(timepoint)+"_Row"+ str(row) + "_" + "Well" + str(well) + "_{channel}_"+"zstack"+str(zstack_value)+"_r{row:03}_c{col:03}.tif"
     generate_stitched(input_dir, 
                         slidename,
                         pattern,

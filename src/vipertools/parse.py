@@ -19,7 +19,7 @@ def parse_phenix(phenix_dir,
 
     """
     Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
-    Example of an exported file name: "Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif"
+    Example of an exported file name: "Timepoint{#}_Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif"
 
     Parameters
     ----------
