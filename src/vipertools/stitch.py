@@ -34,7 +34,7 @@ from ome_zarr.writer import write_image
 #for export to ome.tif
 from ashlar.reg import PyramidWriter
 
-from _custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality
+from vipertools._custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality
 
 
 #define custom FilePatternReaderRescale to use with Ashlar to allow for custom modifications to images before performing stitching
@@ -280,6 +280,8 @@ def generate_stitched(input_dir,
         path indicating where the stitched images should be written out
     overlap
         value between 0 and 1 indicating the degree of overlap that was used while recording data at the microscope.
+    max_shift
+        value indicating the maximum threshold for tile shifts. Default value in ashlar is 15.
     name
         string indicating the slidename that is added to the stitched images generated
     stitching_channel
