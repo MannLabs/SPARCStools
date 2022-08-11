@@ -299,12 +299,10 @@ def generate_stitched(input_dir,
     export_XML
         boolean value. If true than an xml is exported when writing to .tif which allows for the import into BIAS.
     """
-
-    print("performing stitching on " , stitching_channel)
-
     start_time = time.time()
     
     #read data 
+    print("performing stichting with ", str(overlap), " overlap.")
     slide = FilePatternReaderRescale(path = input_dir, pattern = pattern, overlap = overlap)
     
     # Turn on the rescaling
@@ -409,7 +407,7 @@ def generate_stitched(input_dir,
         path = os.path.join(outdir, slidename + ".ome.zarr")
         loc = parse_url(path, mode="w").store
         group = zarr.group(store = loc)
-        axes = {"c", "y", "x"}
+        axes = "cyx"
 
         channel_colors = ["#e60049", "#0bb4ff", "#50e991", "#e6d800", "#9b19f5", "#ffa300", "#dc0ab4", "#b3d4ff", "#00bfa0"]
         #chek if length of colors is enough for all channels in slide otherwise loop through n times
@@ -420,7 +418,7 @@ def generate_stitched(input_dir,
             "name":slidename + ".ome.zarr",
             "channels": [{"label":channel, "color":channel_colors[i], "active":True} for i, channel in enumerate(slide.metadata.channel_map.values())]
         }
-
+        print(np.array(mosaics).shape)    
         write_image(np.array(mosaics), group = group, axes = axes, storage_options=dict(chunks=(1, 1024, 1024)))
     
     end_time = time.time() - start_time
