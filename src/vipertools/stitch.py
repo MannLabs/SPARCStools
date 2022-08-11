@@ -34,6 +34,8 @@ from ome_zarr.writer import write_image
 #for export to ome.tif
 from ashlar.reg import PyramidWriter
 
+from _custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality
+
 
 #define custom FilePatternReaderRescale to use with Ashlar to allow for custom modifications to images before performing stitching
 class FilePatternReaderRescale(filepattern.FilePatternReader):
@@ -249,11 +251,12 @@ def generate_stitched(input_dir,
                       slidename,
                       pattern,
                       outdir,
-                      overlap,
+                      overlap = 0.1,
+                      max_shift = 30, 
                       stitching_channel = "Alexa488",
                       no_rescale_channel = None,
                       crop = {'top':0, 'bottom':0, 'left':0, 'right':0},
-                      plot_QC = False,
+                      plot_QC = True,
                       filetype = [".tif"],
                       WGAchannel = None,
                       do_intensity_rescale = True,
@@ -324,16 +327,19 @@ def generate_stitched(input_dir,
 
     #generate aligner to use specificed channel for stitching
     print("performing stitching on channel ", stitching_channel, "with id number ", str(channel_id))
-    aligner = reg.EdgeAligner(slide, channel=channel_id, filter_sigma=0, verbose=True, do_make_thumbnail=False)
+    aligner = reg.EdgeAligner(slide, channel=channel_id, filter_sigma=0, verbose=True, do_make_thumbnail=False, max_shift = max_shift)
     aligner.run()  
-    aligner.reader._cache = {} #need to empty cache for some reason
 
     #generate some QC plots
     if plot_QC:
-        reg.plot_edge_scatter(aligner, save_fig = True)
-        reg.plot_edge_quality(aligner, save_fig = True)
+        plot_edge_scatter(aligner, outdir)
+        plot_edge_quality(aligner, outdir)
         #reg.plot_edge_scatter(aligner)
         print("need to implement this here. TODO")
+
+    aligner.reader._cache = {} #need to empty cache for some reason
+
+
 
     #generate stitched file
     mosaic_args = {}
