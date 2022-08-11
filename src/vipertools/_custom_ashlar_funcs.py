@@ -33,7 +33,7 @@ def plot_edge_quality(
     else:
         nrows, ncols = 1, 1
     
-    fig = plt.figure(figsize = (20, 20))
+    fig = plt.figure(figsize = (100, 100))
     ax = plt.subplot(nrows, ncols, 1)
     draw_mosaic_image(ax, aligner, img, **im_kwargs)
     error = np.array([aligner._cache[tuple(sorted(e))][1]
@@ -71,7 +71,7 @@ def plot_edge_quality(
             **final_nx_kwargs
         )
     fig.set_facecolor('black')
-
+    fig.tight_layout()
     fig.savefig(os.path.join(outdir, "QC_edge_quality.pdf"))
 
 def plot_edge_scatter(aligner, outdir, annotate=True):
