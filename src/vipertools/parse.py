@@ -11,6 +11,7 @@ import subprocess
 import pandas as pd
 from tqdm import tqdm
 import shutil
+import glob
 
 def parse_phenix(phenix_dir,
                  flatfield_exported = True,
@@ -97,6 +98,10 @@ def parse_phenix(phenix_dir,
     channels = [x.split('-')[1][2:3] for x in images]
     zstack = [int(x.split("p")[1][0:2]) for x in images]
     timepoint = [int(x.split("sk")[1].split("fk")[0]) for x in images]
+
+    #fill up time point and zstack with leading 0s so that alphabetical sorting works correctly
+    zstack = [str(x).zfill(3) for x in zstack]
+    timepoint = [str(x).zfill(3) for x in timepoint]
 
     df = pd.DataFrame({"Image_files": images,
                        "Row": rows,
@@ -186,3 +191,51 @@ def parse_phenix(phenix_dir,
                     shutil.copy(source, destination)
 
         print("Parsing Alexa488 data completed, total time was ", str(endtime/60), "minutes.")
+
+def sort_timepoints(parsed_dir):
+    """
+    Additionally sort generated timecourse images according to well and tile position. Function 
+    generates a new folder called timecourse_sorted which contains a unqiue folder for each unique tile
+    position containing all imaging data (i.e. zstacks, timepoints, channels) of that tile.
+    This function is meant for quick sorting of generated images for simple import of e.g. timecourse 
+    experiments into FIJI. 
+
+    Parameters
+    ----------
+    parsed_dir
+        filepath to parsed images folder generated with the function parse_phenix.
+    """
+
+    outdir = parsed_dir.replace("parsed_images", "timecourse_sorted")
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+
+    images = os.listdir(parsed_dir)
+
+    rows = list(set([x.split("_")[1] for x in images]))
+    wells = list(set([x.split("_")[2] for x in images]))
+    tiles = list(set([x.split(".tif")[0].split("_zstack")[1][4:] for x in images]))
+
+    print("Found the following image specs: ")
+    print("\t Rows: ", rows)
+    print("\t Wells: ", wells)
+    print("\t Tiles: ", tiles)
+    
+    for row in rows:
+        for well in wells:
+            _outdir = os.path.join(outdir, row + "_" + well)
+            for tile in tiles:
+                
+                __outdir = os.path.join(_outdir + "_" + tile)
+                
+                #create outdir if not already existing
+                if not os.path.exists(__outdir):
+                    os.mkdir(__outdir)
+
+                #copy all files that match this folder
+
+                expression = f"*_{row}_{well}_*_{tile}.tif"
+
+                for file in glob.glob(os.path.join(parsed_dir, expression)):
+                    shutil.copy(file, os.path.join(__outdir, os.path.basename(file)))
+                print("completed export for " + row + "_" + well + "_" + tile)
