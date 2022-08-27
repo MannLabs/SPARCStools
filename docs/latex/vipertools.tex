@@ -61,7 +61,7 @@
 
 
 \title{vipertools}
-\date{Aug 08, 2022}
+\date{Aug 27, 2022}
 \release{0.0.1}
 \author{Sophia Maedler}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -120,6 +120,25 @@ that should be copied and contains the WGA stain.
 
 \end{fulllineitems}
 
+\index{sort\_timepoints() (in module vipertools.parse)@\spxentry{sort\_timepoints()}\spxextra{in module vipertools.parse}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{pages/modules:vipertools.parse.sort_timepoints}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.parse.}}\sphinxbfcode{\sphinxupquote{sort\_timepoints}}}{\emph{\DUrole{n}{parsed\_dir}}}{}
+\sphinxAtStartPar
+Additionally sort generated timecourse images according to well and tile position. Function
+generates a new folder called timecourse\_sorted which contains a unqiue folder for each unique tile
+position containing all imaging data (i.e. zstacks, timepoints, channels) of that tile.
+This function is meant for quick sorting of generated images for simple import of e.g. timecourse
+experiments into FIJI.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{parsed\_dir}} \textendash{} filepath to parsed images folder generated with the function parse\_phenix.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
 \phantomsection\label{\detokenize{pages/modules:module-vipertools.stitch}}\index{module@\spxentry{module}!vipertools.stitch@\spxentry{vipertools.stitch}}\index{vipertools.stitch@\spxentry{vipertools.stitch}!module@\spxentry{module}}
 
 \section{stitch}
@@ -129,7 +148,7 @@ Collection of functions to perform stitching of parsed image Tiffs.
 \index{generate\_stitched() (in module vipertools.stitch)@\spxentry{generate\_stitched()}\spxextra{in module vipertools.stitch}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_stitched}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_stitched}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{slidename}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}Alexa488\textquotesingle{}}}, \emph{\DUrole{n}{no\_rescale\_channel}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{crop}\DUrole{o}{=}\DUrole{default_value}{\{\textquotesingle{}bottom\textquotesingle{}: 0, \textquotesingle{}left\textquotesingle{}: 0, \textquotesingle{}right\textquotesingle{}: 0, \textquotesingle{}top\textquotesingle{}: 0\}}}, \emph{\DUrole{n}{plot\_QC}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{filetype}\DUrole{o}{=}\DUrole{default_value}{{[}\textquotesingle{}.tif\textquotesingle{}{]}}}, \emph{\DUrole{n}{WGAchannel}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{do\_intensity\_rescale}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{export\_XML}\DUrole{o}{=}\DUrole{default_value}{True}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_stitched}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_stitched}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{slidename}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}\DUrole{o}{=}\DUrole{default_value}{0.1}}, \emph{\DUrole{n}{max\_shift}\DUrole{o}{=}\DUrole{default_value}{30}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}Alexa488\textquotesingle{}}}, \emph{\DUrole{n}{no\_rescale\_channel}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{crop}\DUrole{o}{=}\DUrole{default_value}{\{\textquotesingle{}bottom\textquotesingle{}: 0, \textquotesingle{}left\textquotesingle{}: 0, \textquotesingle{}right\textquotesingle{}: 0, \textquotesingle{}top\textquotesingle{}: 0\}}}, \emph{\DUrole{n}{plot\_QC}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{filetype}\DUrole{o}{=}\DUrole{default_value}{{[}\textquotesingle{}.tif\textquotesingle{}{]}}}, \emph{\DUrole{n}{WGAchannel}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{do\_intensity\_rescale}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{export\_XML}\DUrole{o}{=}\DUrole{default_value}{True}}}{}
 \sphinxAtStartPar
 Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
@@ -154,6 +173,10 @@ All values in \{\} indicate thos which are matched by regex to find all matching
 \item {} 
 \sphinxAtStartPar
 \sphinxstyleliteralstrong{\sphinxupquote{overlap}} \textendash{} value between 0 and 1 indicating the degree of overlap that was used while recording data at the microscope.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{max\_shift}} \textendash{} value indicating the maximum threshold for tile shifts. Default value in ashlar is 15.
 
 \item {} 
 \sphinxAtStartPar

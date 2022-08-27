@@ -19,6 +19,10 @@
   \item \spxentry{parse\_phenix()}\spxextra{in module vipertools.parse}, \hyperpage{2}
 
   \indexspace
+  \bigletter S
+  \item \spxentry{sort\_timepoints()}\spxextra{in module vipertools.parse}, \hyperpage{2}
+
+  \indexspace
   \bigletter V
   \item \spxentry{vipertools.parse}
     \subitem \spxentry{module}, \hyperpage{2}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.19)  8 AUG 2022 15:22
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.19)  27 AUG 2022 15:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -785,43 +785,44 @@ File: ts1qtm.fd 2009/09/25 v1.2 font definition file for TS1/qtm
 ) [2
 
 ] [3]
+[4]
 Chapter 2.
 Package hyperref Info: bookmark level for unknown literalblock defaults to 0 on
- input line 260.
+ input line 283.
 LaTeX Font Info:    Font shape `T1/txtt/m/it' in size <10> not available
-(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 261.
+(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 284.
 LaTeX Font Info:    Trying to load font information for TS1+txtt on input line 
-292.
+315.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/txfonts/ts1txtt.fd
 File: ts1txtt.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `TS1/txtt/m/it' in size <10> not available
-(Font)              Font shape `TS1/txtt/m/sl' tried instead on input line 293.
+(Font)              Font shape `TS1/txtt/m/sl' tried instead on input line 316.
 
- [4
+ [5
 
-] [5]
-[6
+] [6]
+[7
 
 
 
-] (./vipertools.ind [7
+] (./vipertools.ind [8
 
 
 
 
 ]) (./vipertools.aux)
 Package rerunfilecheck Info: File `vipertools.out' has not changed.
-(rerunfilecheck)             Checksum: 4E3E2CE641BCED3B701A54657CC206CB;835.
+(rerunfilecheck)             Checksum: FB1787481A9FAF206B00F413F1BD8F08;835.
  ) 
 Here is how much of TeX's memory you used:
- 14569 strings out of 478268
- 233021 string characters out of 5846347
- 608712 words of memory out of 5000000
- 32386 multiletter control sequences out of 15000+600000
+ 14572 strings out of 478268
+ 233085 string characters out of 5846347
+ 608745 words of memory out of 5000000
+ 32387 multiletter control sequences out of 15000+600000
  521238 words of font info for 74 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 70i,11n,76p,1265b,612s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 70i,11n,76p,1374b,612s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/tex-gyre/q-ec.enc}{/usr/l
 ocal/texlive/2022/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/texlive/20
 22/texmf-dist/fonts/enc/dvips/tex-gyre/q-ts1.enc}</usr/local/texlive/2022/texmf
@@ -837,10 +838,10 @@ t.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/t1xtt.pfb>
 </usr/local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/t1xtt.pfb></usr/
 local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/tcxtt.pfb></usr/local/
 texlive/2022/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on vipertools.pdf (9 pages, 191705 bytes).
+Output written on vipertools.pdf (10 pages, 197659 bytes).
 PDF statistics:
- 171 PDF objects out of 1000 (max. 8388607)
- 136 compressed objects within 2 object streams
- 23 named destinations out of 1000 (max. 500000)
+ 178 PDF objects out of 1000 (max. 8388607)
+ 142 compressed objects within 2 object streams
+ 25 named destinations out of 1000 (max. 500000)
  77 words of extra memory for PDF output out of 10000 (max. 10000000)
 

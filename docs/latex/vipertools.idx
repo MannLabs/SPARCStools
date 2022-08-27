@@ -1,6 +1,7 @@
 \indexentry{module@\spxentry{module}!vipertools.parse@\spxentry{vipertools.parse}|hyperpage}{2}
 \indexentry{vipertools.parse@\spxentry{vipertools.parse}!module@\spxentry{module}|hyperpage}{2}
 \indexentry{parse\_phenix() (in module vipertools.parse)@\spxentry{parse\_phenix()}\spxextra{in module vipertools.parse}|hyperpage}{2}
+\indexentry{sort\_timepoints() (in module vipertools.parse)@\spxentry{sort\_timepoints()}\spxextra{in module vipertools.parse}|hyperpage}{2}
 \indexentry{module@\spxentry{module}!vipertools.stitch@\spxentry{vipertools.stitch}|hyperpage}{2}
 \indexentry{vipertools.stitch@\spxentry{vipertools.stitch}!module@\spxentry{module}|hyperpage}{2}
 \indexentry{generate\_stitched() (in module vipertools.stitch)@\spxentry{generate\_stitched()}\spxextra{in module vipertools.stitch}|hyperpage}{2}
