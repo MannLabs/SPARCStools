@@ -98,7 +98,6 @@ def parse_phenix(phenix_dir,
     zstack = [int(x.split("p")[1][0:2]) for x in images]
     timepoint = [int(x.split("sk")[1].split("fk")[0]) for x in images]
 
-
     df = pd.DataFrame({"Image_files": images,
                        "Row": rows,
                        "Well": wells,
@@ -161,7 +160,11 @@ def parse_phenix(phenix_dir,
                          total = len(df.new_file_name.tolist())):
             old_path = os.path.join(input_dir, old)
             new_path = os.path.join(outdir, new)
-            shutil.copyfile(old_path, new_path)
+            #check if old path exists
+            if os.path.exists(old_path):
+                shutil.copyfile(old_path, new_path)
+            else:
+                print("Error: ", old_path, "not found.")
 
     endtime = time.time() - start_time
     print("Parsing Phenix data completed, total time was ", str(endtime/60), "minutes.")
