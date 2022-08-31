@@ -6,3 +6,7 @@
 \indexentry{vipertools.stitch@\spxentry{vipertools.stitch}!module@\spxentry{module}|hyperpage}{2}
 \indexentry{generate\_stitched() (in module vipertools.stitch)@\spxentry{generate\_stitched()}\spxextra{in module vipertools.stitch}|hyperpage}{2}
 \indexentry{generate\_thumbnail() (in module vipertools.stitch)@\spxentry{generate\_thumbnail()}\spxextra{in module vipertools.stitch}|hyperpage}{3}
+\indexentry{module@\spxentry{module}!vipertools.image\_processing@\spxentry{vipertools.image\_processing}|hyperpage}{4}
+\indexentry{vipertools.image\_processing@\spxentry{vipertools.image\_processing}!module@\spxentry{module}|hyperpage}{4}
+\indexentry{downsample\_folder() (in module vipertools.image\_processing)@\spxentry{downsample\_folder()}\spxextra{in module vipertools.image\_processing}|hyperpage}{4}
+\indexentry{downsample\_img() (in module vipertools.image\_processing)@\spxentry{downsample\_img()}\spxextra{in module vipertools.image\_processing}|hyperpage}{4}

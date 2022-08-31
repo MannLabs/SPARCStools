@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.19)  27 AUG 2022 15:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.19)  31 AUG 2022 10:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -788,16 +788,16 @@ File: ts1qtm.fd 2009/09/25 v1.2 font definition file for TS1/qtm
 [4]
 Chapter 2.
 Package hyperref Info: bookmark level for unknown literalblock defaults to 0 on
- input line 283.
+ input line 332.
 LaTeX Font Info:    Font shape `T1/txtt/m/it' in size <10> not available
-(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 284.
+(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 333.
 LaTeX Font Info:    Trying to load font information for TS1+txtt on input line 
-315.
+364.
 (/usr/local/texlive/2022/texmf-dist/tex/latex/txfonts/ts1txtt.fd
 File: ts1txtt.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `TS1/txtt/m/it' in size <10> not available
-(Font)              Font shape `TS1/txtt/m/sl' tried instead on input line 316.
+(Font)              Font shape `TS1/txtt/m/sl' tried instead on input line 365.
 
  [5
 
@@ -806,20 +806,32 @@ LaTeX Font Info:    Font shape `TS1/txtt/m/it' in size <10> not available
 
 
 
-] (./vipertools.ind [8
+] (./vipertools.ind
+Underfull \hbox (badness 10000) in paragraph at lines 8--10
+[]\T1/txtt/m/n/10 downsample_folder() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 in mod-ul
+e viper-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 10--12
+[]\T1/txtt/m/n/10 downsample_img() \T1/qtm/m/n/10 (\T1/qtm/m/it/10 in mod-ule v
+iper-
+ []
+
+[8
 
 
 
 
 ]) (./vipertools.aux)
 Package rerunfilecheck Info: File `vipertools.out' has not changed.
-(rerunfilecheck)             Checksum: FB1787481A9FAF206B00F413F1BD8F08;835.
+(rerunfilecheck)             Checksum: 26411D1306E7217AB926009660AC1C5A;974.
  ) 
 Here is how much of TeX's memory you used:
- 14572 strings out of 478268
- 233085 string characters out of 5846347
- 608745 words of memory out of 5000000
- 32387 multiletter control sequences out of 15000+600000
+ 14581 strings out of 478268
+ 233345 string characters out of 5846347
+ 608906 words of memory out of 5000000
+ 32392 multiletter control sequences out of 15000+600000
  521238 words of font info for 74 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
  70i,11n,76p,1374b,612s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -838,10 +850,10 @@ t.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/t1xtt.pfb>
 </usr/local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/t1xtt.pfb></usr/
 local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/tcxtt.pfb></usr/local/
 texlive/2022/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on vipertools.pdf (10 pages, 197659 bytes).
+Output written on vipertools.pdf (10 pages, 200241 bytes).
 PDF statistics:
- 178 PDF objects out of 1000 (max. 8388607)
- 142 compressed objects within 2 object streams
- 25 named destinations out of 1000 (max. 500000)
- 77 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 191 PDF objects out of 1000 (max. 8388607)
+ 155 compressed objects within 2 object streams
+ 29 named destinations out of 1000 (max. 500000)
+ 85 words of extra memory for PDF output out of 10000 (max. 10000000)
 

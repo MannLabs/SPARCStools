@@ -61,7 +61,7 @@
 
 
 \title{vipertools}
-\date{Aug 27, 2022}
+\date{Aug 31, 2022}
 \release{0.0.1}
 \author{Sophia Maedler}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -268,6 +268,55 @@ All values in \{\} indicate thos which are matched by regex to find all matching
 
 \end{fulllineitems}
 
+\phantomsection\label{\detokenize{pages/modules:module-vipertools.image_processing}}\index{module@\spxentry{module}!vipertools.image\_processing@\spxentry{vipertools.image\_processing}}\index{vipertools.image\_processing@\spxentry{vipertools.image\_processing}!module@\spxentry{module}}
+
+\section{image processing}
+\label{\detokenize{pages/modules:image-processing}}
+\sphinxAtStartPar
+Contains functions to perform standard image processing steps, e.g. downsampling.
+\index{downsample\_folder() (in module vipertools.image\_processing)@\spxentry{downsample\_folder()}\spxextra{in module vipertools.image\_processing}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{pages/modules:vipertools.image_processing.downsample_folder}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.image\_processing.}}\sphinxbfcode{\sphinxupquote{downsample\_folder}}}{\emph{\DUrole{n}{folder\_path}}, \emph{\DUrole{n}{num\_threads}\DUrole{o}{=}\DUrole{default_value}{20}}, \emph{\DUrole{n}{file\_ending}\DUrole{o}{=}\DUrole{default_value}{(\textquotesingle{}.tif\textquotesingle{}, \textquotesingle{}.tiff\textquotesingle{})}}}{}
+\sphinxAtStartPar
+Multi\sphinxhyphen{}Threaded Function to downsample image equivalent to 2x2 binning. Overwrites original images! Do not run multiple times.
+Output is saved as uint16.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{folder\_path}} \textendash{} string indicating the folder containing all the image files that should be downsampled
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{num\_threads}} \textendash{} int, number of threads for multithreading
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{file\_ending}} \textendash{} string or tuple of strings indicating which file ending the script should filter for in the indicated folder
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{downsample\_img() (in module vipertools.image\_processing)@\spxentry{downsample\_img()}\spxextra{in module vipertools.image\_processing}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{pages/modules:vipertools.image_processing.downsample_img}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.image\_processing.}}\sphinxbfcode{\sphinxupquote{downsample\_img}}}{\emph{\DUrole{n}{img\_path}}}{}
+\sphinxAtStartPar
+Function to downsample a single image equivalent to 2x2 binning using the mean between pixels.
+Overwrites the original image(!), do not run multiple times on the same image.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{img\_path}} \textendash{} string indicating the file path to the .tif file which should be downsampled.
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
 
 
 \chapter{Tutorials}
@@ -338,6 +387,7 @@ Then you can run the following script to parses and stitch your data.
 \begin{sphinxtheindex}
 \let\bigletter\sphinxstyleindexlettergroup
 \bigletter{v}
+\item\relax\sphinxstyleindexentry{vipertools.image\_processing}\sphinxstyleindexpageref{pages/modules:\detokenize{module-vipertools.image_processing}}
 \item\relax\sphinxstyleindexentry{vipertools.parse}\sphinxstyleindexpageref{pages/modules:\detokenize{module-vipertools.parse}}
 \item\relax\sphinxstyleindexentry{vipertools.stitch}\sphinxstyleindexpageref{pages/modules:\detokenize{module-vipertools.stitch}}
 \end{sphinxtheindex}

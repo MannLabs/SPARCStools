@@ -4,6 +4,13 @@
 \let\spxentry \sphinxstyleindexentry
 \let\spxextra \sphinxstyleindexextra
 
+  \bigletter D
+  \item \spxentry{downsample\_folder()}\spxextra{in module vipertools.image\_processing}, 
+		\hyperpage{4}
+  \item \spxentry{downsample\_img()}\spxextra{in module vipertools.image\_processing}, 
+		\hyperpage{4}
+
+  \indexspace
   \bigletter G
   \item \spxentry{generate\_stitched()}\spxextra{in module vipertools.stitch}, \hyperpage{2}
   \item \spxentry{generate\_thumbnail()}\spxextra{in module vipertools.stitch}, \hyperpage{3}
@@ -11,6 +18,7 @@
   \indexspace
   \bigletter M
   \item \spxentry{module}
+    \subitem \spxentry{vipertools.image\_processing}, \hyperpage{4}
     \subitem \spxentry{vipertools.parse}, \hyperpage{2}
     \subitem \spxentry{vipertools.stitch}, \hyperpage{2}
 
@@ -24,6 +32,8 @@
 
   \indexspace
   \bigletter V
+  \item \spxentry{vipertools.image\_processing}
+    \subitem \spxentry{module}, \hyperpage{4}
   \item \spxentry{vipertools.parse}
     \subitem \spxentry{module}, \hyperpage{2}
   \item \spxentry{vipertools.stitch}
