@@ -11,3 +11,7 @@ ome_zarr
 imagecodecs
 yattag
 seaborn
+skimage
+xarray
+functools
+concurrent
