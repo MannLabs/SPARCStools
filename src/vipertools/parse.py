@@ -12,11 +12,13 @@ import pandas as pd
 from tqdm import tqdm
 import shutil
 import glob
+from datetime import datetime
 
 def parse_phenix(phenix_dir,
                  flatfield_exported = True,
                  parallel = False,
-                 WGAbackground = False):
+                 WGAbackground = False,
+                 export_meta = True):
 
     """
     Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
@@ -33,6 +35,8 @@ def parse_phenix(phenix_dir,
     WGAbackground
         export second copy of WGA stains for background correction to improve segmentation. If set to False not performed. Else enter value of the channel
         that should be copied and contains the WGA stain.
+    export_meta
+        boolean value indicating if a metadata file containing, tile positions, exact time of measurement etc. should be written out.
     """
 
     #start timer
@@ -49,6 +53,7 @@ def parse_phenix(phenix_dir,
     lookuppath = os.path.join(input_dir, 'lookup.csv')
     outfile = os.path.join(input_dir, 'parsed_index.txt')
     outdir = os.path.join(phenix_dir, 'parsed_images')
+    metadata_file = os.path.join(outdir, "metadata.csv")
 
     #if output directory does not exist create
     if not os.path.exists(outdir):
@@ -75,6 +80,8 @@ def parse_phenix(phenix_dir,
     images = []
     x_positions = []
     y_positions = []
+    times = []
+    time_offset = []
 
     with open(outfile) as fp:
         Lines = fp.readlines()
@@ -89,8 +96,20 @@ def parse_phenix(phenix_dir,
                 x_positions.append(float(_line))
             elif line.strip().startswith("<PositionY"):
                 y_positions.append(float(_line))
+            elif line.strip().startswith("<AbsTime"): #relevant for time course experiments
+                times.append(_line)
+            elif line.strip().startswith("<MeasurementTimeOffset"): #relevant for time course experiments
+                time_offset.append(_line)
             else:
                 print('error')
+    #convert date/time into useful format   
+    dates = [x.split("T")[0] for x in times]
+    _times = [x.split("T")[1] for x in times]
+    _times = [x.split(".")[0] + ":" + str(x.split(".")[1].split("+")[0]).zfill(3) + "+" + x.split("+")[-1].replace(":", "") for x in _times]
+    time_final = [ x + " " + y for x, y in zip(dates, _times)]
+    datetime_format = "%Y-%m-%d %H:%M:%S:%f%z"
+    time_unix = [datetime.strptime(x, datetime_format) for x in time_final]
+    time_unix = [datetime.timestamp(x) for x in time_final]
 
     #get plate and well Ids as well as channel information
     rows = [int(x[0:3].replace('r', '')) for x in images]
@@ -110,8 +129,11 @@ def parse_phenix(phenix_dir,
                        "Timepoint":timepoint,
                        "X": x_positions,
                        "Y": y_positions,
-                       "X_pos": None,
-                       "Y_pos": None,
+                       "X_pos":None,
+                       "Y_pos":None,
+                       "date": dates,
+                       "time": _times,
+                       "unix_time": time_unix,
                        "Channel": channels,
                        "new_file_name": None})
 
@@ -170,6 +192,10 @@ def parse_phenix(phenix_dir,
                 shutil.copyfile(old_path, new_path)
             else:
                 print("Error: ", old_path, "not found.")
+    #export meta data if requested
+    if export_meta:
+        print("Metadata file was exported.")
+        df.to_csv(metadata_file)
 
     endtime = time.time() - start_time
     print("Parsing Phenix data completed, total time was ", str(endtime/60), "minutes.")
@@ -239,3 +265,4 @@ def sort_timepoints(parsed_dir):
                 for file in glob.glob(os.path.join(parsed_dir, expression)):
                     shutil.copy(file, os.path.join(__outdir, os.path.basename(file)))
                 print("completed export for " + row + "_" + well + "_" + tile)
+
