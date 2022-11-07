@@ -73,7 +73,7 @@ def parse_phenix(phenix_dir,
     channel_names = channel_names[0:len(channel_ids)]
 
     #Parse Phenix XML file to get file name information
-    cmd = """grep -E '<URL>|<PositionX Unit="m">|<PositionY Unit="m">' '""" + \
+    cmd = """grep -E '<URL>|<PositionX Unit="m">|<PositionY Unit="m">|<AbsTime>' '""" + \
         index_file + """' > '""" + outfile + """'"""
     subprocess.check_output(cmd, shell=True)
 
@@ -81,7 +81,6 @@ def parse_phenix(phenix_dir,
     x_positions = []
     y_positions = []
     times = []
-    time_offset = []
 
     with open(outfile) as fp:
         Lines = fp.readlines()
@@ -98,18 +97,19 @@ def parse_phenix(phenix_dir,
                 y_positions.append(float(_line))
             elif line.strip().startswith("<AbsTime"): #relevant for time course experiments
                 times.append(_line)
-            elif line.strip().startswith("<MeasurementTimeOffset"): #relevant for time course experiments
-                time_offset.append(_line)
             else:
                 print('error')
+
     #convert date/time into useful format   
+    print(times)
     dates = [x.split("T")[0] for x in times]
     _times = [x.split("T")[1] for x in times]
-    _times = [x.split(".")[0] + ":" + str(x.split(".")[1].split("+")[0]).zfill(3) + "+" + x.split("+")[-1].replace(":", "") for x in _times]
+    _times = [(x.split(".")[0] + ":" + str(x.split(".")[1].split("+")[0]).zfill(3) + "+" + x.split("+")[1].replace(":", "")) if ("." in x)  else (x.split("+")[0] + ":" + str(0).zfill(3) + "+" + x.split("+")[1].replace(":", ""))for x in _times] #really complicated statement because timeformat is inconsistent in harmony output
     time_final = [ x + " " + y for x, y in zip(dates, _times)]
+
     datetime_format = "%Y-%m-%d %H:%M:%S:%f%z"
     time_unix = [datetime.strptime(x, datetime_format) for x in time_final]
-    time_unix = [datetime.timestamp(x) for x in time_final]
+    time_unix = [datetime.timestamp(x) for x in time_unix]
 
     #get plate and well Ids as well as channel information
     rows = [int(x[0:3].replace('r', '')) for x in images]
