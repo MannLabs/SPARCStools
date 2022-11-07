@@ -18,7 +18,8 @@ def parse_phenix(phenix_dir,
                  flatfield_exported = True,
                  parallel = False,
                  WGAbackground = False,
-                 export_meta = True):
+                 export_meta = True,
+                 export_as_symlink = False):
 
     """
     Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
@@ -37,6 +38,9 @@ def parse_phenix(phenix_dir,
         that should be copied and contains the WGA stain.
     export_meta
         boolean value indicating if a metadata file containing, tile positions, exact time of measurement etc. should be written out.
+    export_as_symlink
+        boolean value indicating if the parsed files should be copied or symlinked. If set to true can lead to issues when accessing remote filesystems 
+        from differentoperating systems
     """
 
     #start timer
@@ -183,13 +187,22 @@ def parse_phenix(phenix_dir,
         print('parallel processing currently not implemented please rerun with parallel = False')
        # Parallel(n_jobs = 10)(delayed(shutil.copyfile(os.path.join(input_dir, old), os.path.join(outdir, new)))) for old, new in zip(df.Image_files.tolist(), df.new_file_name.tolist())
     else:
+        #define copy function (i.e. if it should generate symlinks or not)
+        
+        if export_as_symlink:
+            def copyfunction(input, output):
+                os.symlink(input, output)
+        else:
+            def copyfunction(input, output):
+                shutil.copyfile(input, output)
+
         for old, new in tqdm(zip(df.Image_files.tolist(), df.new_file_name.tolist()), 
                          total = len(df.new_file_name.tolist())):
             old_path = os.path.join(input_dir, old)
             new_path = os.path.join(outdir, new)
             #check if old path exists
             if os.path.exists(old_path):
-                shutil.copyfile(old_path, new_path)
+                copyfunction(old_path, new_path)
             else:
                 print("Error: ", old_path, "not found.")
     #export meta data if requested
