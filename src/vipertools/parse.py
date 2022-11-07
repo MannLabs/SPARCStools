@@ -108,10 +108,10 @@ def parse_phenix(phenix_dir,
     print(times)
     dates = [x.split("T")[0] for x in times]
     _times = [x.split("T")[1] for x in times]
-    _times = [(x.split(".")[0] + ":" + str(x.split(".")[1].split("+")[0]).zfill(3) + "+" + x.split("+")[1].replace(":", "")) if ("." in x)  else (x.split("+")[0] + ":" + str(0).zfill(3) + "+" + x.split("+")[1].replace(":", ""))for x in _times] #really complicated statement because timeformat is inconsistent in harmony output
+    _times = [(x.split("+")[0].split(".")[0] + "+" + x.split("+")[1].replace(":", "")) for x in _times]
     time_final = [ x + " " + y for x, y in zip(dates, _times)]
 
-    datetime_format = "%Y-%m-%d %H:%M:%S:%f%z"
+    datetime_format = "%Y-%m-%d %H:%M:%S%z"
     time_unix = [datetime.strptime(x, datetime_format) for x in time_final]
     time_unix = [datetime.timestamp(x) for x in time_unix]
 
@@ -205,6 +205,7 @@ def parse_phenix(phenix_dir,
                 copyfunction(old_path, new_path)
             else:
                 print("Error: ", old_path, "not found.")
+                
     #export meta data if requested
     if export_meta:
         print("Metadata file was exported.")
