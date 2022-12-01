@@ -113,7 +113,7 @@ def parse_phenix(phenix_dir,
 
     datetime_format = "%Y-%m-%d %H:%M:%S%z"
     time_unix = [datetime.strptime(x, datetime_format) for x in time_final]
-    time_unix = [datetime.timestamp(x) for x in time_unix]
+    time_unix = [datestime.timestamp(x) for x in time_unix]
 
     #get plate and well Ids as well as channel information
     rows = [int(x[0:3].replace('r', '')) for x in images]
@@ -232,14 +232,13 @@ def parse_phenix(phenix_dir,
 
         print("Parsing Alexa488 data completed, total time was ", str(endtime/60), "minutes.")
 
-def sort_timepoints(parsed_dir):
+def sort_timepoints(parsed_dir, use_symlink = False):
     """
     Additionally sort generated timecourse images according to well and tile position. Function 
     generates a new folder called timecourse_sorted which contains a unqiue folder for each unique tile
     position containing all imaging data (i.e. zstacks, timepoints, channels) of that tile.
     This function is meant for quick sorting of generated images for simple import of e.g. timecourse 
     experiments into FIJI. 
-
     Parameters
     ----------
     parsed_dir
@@ -276,7 +275,15 @@ def sort_timepoints(parsed_dir):
 
                 expression = f"*_{row}_{well}_*_{tile}.tif"
 
+                if use_symlink:
+                    print("Generating Symlinks.")
+                    def copyfunction(input, output):
+                        os.symlink(input, output)
+                else:
+                    def copyfunction(input, output):
+                        shutil.copyfile(input, output)
+
                 for file in glob.glob(os.path.join(parsed_dir, expression)):
-                    shutil.copy(file, os.path.join(__outdir, os.path.basename(file)))
+                    copyfunction(file, os.path.join(__outdir, os.path.basename(file)))
                 print("completed export for " + row + "_" + well + "_" + tile)
 
