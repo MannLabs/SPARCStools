@@ -113,7 +113,7 @@ def parse_phenix(phenix_dir,
 
     datetime_format = "%Y-%m-%d %H:%M:%S%z"
     time_unix = [datetime.strptime(x, datetime_format) for x in time_final]
-    time_unix = [datestime.timestamp(x) for x in time_unix]
+    time_unix = [datetime.timestamp(x) for x in time_unix]
 
     #get plate and well Ids as well as channel information
     rows = [int(x[0:3].replace('r', '')) for x in images]
