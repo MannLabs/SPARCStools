@@ -250,7 +250,7 @@ def sort_timepoints(parsed_dir, use_symlink = False):
         os.mkdir(outdir)
 
     images = os.listdir(parsed_dir)
-    images = [x for x in images if x.endswith([".tiff", ".tif"])]
+    images = [x for x in images if x.endswith((".tiff", ".tif"))]
 
     rows = list(set([x.split("_")[1] for x in images]))
     wells = list(set([x.split("_")[2] for x in images]))
