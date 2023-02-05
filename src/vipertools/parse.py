@@ -123,6 +123,8 @@ def parse_phenix(phenix_dir,
     timepoint = [int(x.split("sk")[1].split("fk")[0]) for x in images]
 
     #fill up time point and zstack with leading 0s so that alphabetical sorting works correctly
+    rows = [str(x).zfill(2) for x in rows] #need to add this since otherwise we wont be able to correctly match to wells with more than 1 digit id
+    wells = [str(x).zfill(2) for x in wells]
     zstack = [str(x).zfill(3) for x in zstack]
     timepoint = [str(x).zfill(3) for x in timepoint]
 
@@ -277,7 +279,6 @@ def sort_timepoints(parsed_dir, use_symlink = False):
                 expression = f"*_{row}_{well}_*_{tile}.tif"
 
                 if use_symlink:
-                    print("Generating Symlinks.")
                     def copyfunction(input, output):
                         os.symlink(input, output)
                 else:
