@@ -25,6 +25,7 @@ import time
 import random
 from tqdm import tqdm
 from joblib import Parallel, delayed
+import h5py
 
 #for export to ome.zarr
 import zarr
@@ -33,6 +34,7 @@ from ome_zarr.writer import write_image
 
 #for export to ome.tif
 from ashlar.reg import PyramidWriter
+
 
 from vipertools._custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality
 
@@ -341,8 +343,6 @@ def generate_stitched(input_dir,
 
     aligner.reader._cache = {} #need to empty cache for some reason
 
-
-
     #generate stitched file
     mosaic_args = {}
     mosaic_args['verbose'] = True
@@ -355,11 +355,28 @@ def generate_stitched(input_dir,
 
     mosaic.dtype = np.uint16
 
-    #write out positions to csv
-    positions = aligner.positions
-    np.savetxt(os.path.join(outdir, slidename + "_tile_positions.tsv"), positions, delimiter="\t")
+    if "return_array" in filetype:
+        print("not saving positions")
+    else:
+        #write out positions to csv
+        positions = aligner.positions
+        np.savetxt(os.path.join(outdir, slidename + "_tile_positions.tsv"), positions, delimiter="\t")
 
-    if ".tif" in filetype:
+    if "return_array" in filetype:
+
+        print("Returning array instead of saving to file.")
+        mosaics = []
+        for channel in tqdm(mosaic.channels):
+            mosaics.append(mosaic.assemble_channel(channel = channel))
+        merged_array = np.array(mosaics)
+        merged_array = merged_array.astype("uint16")
+
+        end_time = time.time() - start_time
+        print('Merging Pipeline completed in ', str(end_time/60) , "minutes.")
+
+        return(merged_array)
+
+    elif ".tif" in filetype:
         print("writing results to one large tif.")
 
         mosaics = []
@@ -398,13 +415,13 @@ def generate_stitched(input_dir,
             if export_XML:
                 _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = False)
     
-    if "ome.tif" in filetype:
+    elif "ome.tif" in filetype:
         print("writing results to ome.tif")
         path = os.path.join(outdir, slidename + ".ome.tiff")
         writer = PyramidWriter([mosaic], path, scale=5, tile_size=1024, peak_size=1024, verbose=True)
         writer.run()
 
-    if "ome.zarr" in filetype:
+    elif "ome.zarr" in filetype:
         print("writing results to ome.zarr")
 
         if 'mosaics' not in locals():

@@ -192,8 +192,14 @@ def parse_phenix(phenix_dir,
         #define copy function (i.e. if it should generate symlinks or not)
         
         if export_as_symlink:
-            def copyfunction(input, output):
-                os.symlink(input, output)
+            if use_symlink:
+                def copyfunction(input, output):
+                    try:
+                        os.symlink(input, output)
+                    except OSError as e:
+                        if e.errno == errno.EEXIST:
+                            os.remove(output)
+                            os.symlink(input, output)
         else:
             def copyfunction(input, output):
                 shutil.copyfile(input, output)
@@ -280,7 +286,12 @@ def sort_timepoints(parsed_dir, use_symlink = False):
 
                 if use_symlink:
                     def copyfunction(input, output):
-                        os.symlink(input, output)
+                        try:
+                            os.symlink(input, output)
+                        except OSError as e:
+                            if e.errno == errno.EEXIST:
+                                os.remove(output)
+                                os.symlink(input, output)
                 else:
                     def copyfunction(input, output):
                         shutil.copyfile(input, output)
