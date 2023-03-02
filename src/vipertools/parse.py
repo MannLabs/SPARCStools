@@ -192,14 +192,11 @@ def parse_phenix(phenix_dir,
         #define copy function (i.e. if it should generate symlinks or not)
         
         if export_as_symlink:
-            if use_symlink:
-                def copyfunction(input, output):
-                    try:
-                        os.symlink(input, output)
-                    except OSError as e:
-                        if e.errno == errno.EEXIST:
-                            os.remove(output)
-                            os.symlink(input, output)
+            def copyfunction(input, output):
+                try:
+                    os.symlink(input, output)
+                except:
+                    return()
         else:
             def copyfunction(input, output):
                 shutil.copyfile(input, output)
