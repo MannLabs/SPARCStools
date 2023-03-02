@@ -105,7 +105,6 @@ def parse_phenix(phenix_dir,
                 print('error')
 
     #convert date/time into useful format   
-    print(times)
     dates = [x.split("T")[0] for x in times]
     _times = [x.split("T")[1] for x in times]
     _times = [(x.split("+")[0].split(".")[0] + "+" + x.split("+")[1].replace(":", "")) for x in _times]
