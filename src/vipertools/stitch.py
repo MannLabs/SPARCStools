@@ -366,15 +366,18 @@ def generate_stitched(input_dir,
 
         print("Returning array instead of saving to file.")
         mosaics = []
+        channels = []
         for channel in tqdm(mosaic.channels):
             mosaics.append(mosaic.assemble_channel(channel = channel))
+            channels.append(channel)
+
         merged_array = np.array(mosaics)
         merged_array = merged_array.astype("uint16")
 
         end_time = time.time() - start_time
         print('Merging Pipeline completed in ', str(end_time/60) , "minutes.")
 
-        return(merged_array)
+        return(merged_array, channels)
 
     elif ".tif" in filetype:
         print("writing results to one large tif.")
