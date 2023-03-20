@@ -296,3 +296,57 @@ def sort_timepoints(parsed_dir, use_symlink = False):
                     copyfunction(file, os.path.join(__outdir, os.path.basename(file)))
                 print("completed export for " + row + "_" + well + "_" + tile)
 
+def sort_wells(parsed_dir, use_symlink = False):
+    """
+    Sort aquired phenix images into unique folders for each well. 
+
+    Parameters
+    ----------
+    parsed_dir
+        filepath to parsed images folder generated with the function parse_phenix.
+    """
+
+    outdir = parsed_dir.replace("parsed_images", "well_sorted")
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+
+    images = os.listdir(parsed_dir)
+    images = [x for x in images if x.endswith((".tiff", ".tif"))]
+
+    rows = list(set([x.split("_")[1] for x in images]))
+    wells = list(set([x.split("_")[2] for x in images]))
+    tiles = list(set([x.split(".tif")[0].split("_zstack")[1][4:] for x in images]))
+
+    print("Found the following image specs: ")
+    print("\t Rows: ", rows)
+    print("\t Wells: ", wells)
+    print("\t Tiles: ", tiles)
+    
+    for row in rows:
+        for well in wells:
+            _outdir = os.path.join(outdir, row + "_" + well)
+            
+            #create outdir if not already existing
+            if not os.path.exists(_outdir):
+                os.mkdir(_outdir)
+
+            #copy all files that match this folder
+
+            expression = f"*_{row}_{well}_*.tif"
+
+            if use_symlink:
+                def copyfunction(input, output):
+                    try:
+                        os.symlink(input, output)
+                    except OSError as e:
+                        if e.errno == erro.EEXIST:
+                            os.remove(output)
+                            os.symlink(input, output)
+            else:
+                def copyfunction(input, output):
+                    shutil.copyfile(input, output)
+
+            for file in glob.glob(os.path.join(parsed_dir, expression)):
+                copyfunction(file, os.path.join(_outdir, os.path.basename(file)))
+            print("completed export for " + row + "_" + well)
+
