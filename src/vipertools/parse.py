@@ -9,6 +9,8 @@ import time
 import os
 import subprocess
 import pandas as pd
+import random
+import numpy as np
 from tqdm import tqdm
 import shutil
 import glob
@@ -296,7 +298,7 @@ def sort_timepoints(parsed_dir, use_symlink = False):
                     copyfunction(file, os.path.join(__outdir, os.path.basename(file)))
                 print("completed export for " + row + "_" + well + "_" + tile)
 
-def sort_wells(parsed_dir, use_symlink = False):
+def sort_wells(parsed_dir, use_symlink = False, assign_random_id = False):
     """
     Sort aquired phenix images into unique folders for each well. 
 
@@ -304,6 +306,10 @@ def sort_wells(parsed_dir, use_symlink = False):
     ----------
     parsed_dir
         filepath to parsed images folder generated with the function parse_phenix.
+    use_symlink
+        boolean value indicating if the images should be copied as symlinks to their new destination
+    assign_random_id
+        boolean value indicating if the images in the sorted wells folder should be prepended with a random id.
     """
 
     outdir = parsed_dir.replace("parsed_images", "well_sorted")
@@ -345,8 +351,18 @@ def sort_wells(parsed_dir, use_symlink = False):
             else:
                 def copyfunction(input, output):
                     shutil.copyfile(input, output)
+            files = glob.glob(os.path.join(parsed_dir, expression))
+            files = np.sort(files)
 
-            for file in glob.glob(os.path.join(parsed_dir, expression)):
-                copyfunction(file, os.path.join(_outdir, os.path.basename(file)))
+            if assign_random_id:
+                random.seed(16)
+                random.shuffle(files)
+                for i, file in enumerate(files):
+                    outfile_name = str(i) + "_" + os.path.basename(file)
+                    copyfunction(file, os.path.join(_outdir, outfile_name))
+            else:
+                for file in files:
+                    copyfunction(file, os.path.join(_outdir, os.path.basename(file)))
+                    
             print("completed export for " + row + "_" + well)
 
