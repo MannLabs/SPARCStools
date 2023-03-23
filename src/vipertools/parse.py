@@ -249,7 +249,7 @@ def sort_timepoints(parsed_dir, use_symlink = False):
         filepath to parsed images folder generated with the function parse_phenix.
     """
 
-    outdir = parsed_dir.replace("parsed_images", "timecourse_sorted")
+    outdir = parsed_dir.replace(os.path.basename(parsed_dir), "timecourse_sorted")
     if not os.path.exists(outdir):
         os.mkdir(outdir)
 
