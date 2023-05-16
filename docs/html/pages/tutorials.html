@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>1. Tutorials &mdash; vipertools 0.0.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -10,10 +11,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -25,11 +27,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html" class="icon icon-home"> vipertools
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            vipertools
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -39,6 +45,15 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#parse">parse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.parse.parse_phenix"><code class="docutils literal notranslate"><span class="pre">parse_phenix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.parse.sort_timepoints"><code class="docutils literal notranslate"><span class="pre">sort_timepoints()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.parse.sort_wells"><code class="docutils literal notranslate"><span class="pre">sort_wells()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#stitch">stitch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.stitch.generate_stitched"><code class="docutils literal notranslate"><span class="pre">generate_stitched()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.stitch.generate_thumbnail"><code class="docutils literal notranslate"><span class="pre">generate_thumbnail()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#image-processing">image processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.image_processing.downsample_folder"><code class="docutils literal notranslate"><span class="pre">downsample_folder()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.image_processing.downsample_img"><code class="docutils literal notranslate"><span class="pre">downsample_img()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -63,8 +78,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li><span class="section-number">1. </span>Tutorials</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">1. </span>Tutorials</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/pages/tutorials.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -74,11 +89,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <div class="section" id="tutorials">
-<h1><span class="section-number">1. </span>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline"></a></h1>
-<div class="section" id="parsing-and-stitching-data-from-opera-phenix">
-<h2><span class="section-number">1.1. </span>Parsing and Stitching Data from Opera Phenix<a class="headerlink" href="#parsing-and-stitching-data-from-opera-phenix" title="Permalink to this headline"></a></h2>
-<p>First you need to export your data from harmony and rename the path to eliminate any spaces in the name.
+  <section id="tutorials">
+<h1><span class="section-number">1. </span>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this heading"></a></h1>
+<section id="parsing-and-stitching-data-from-opera-phenix">
+<h2><span class="section-number">1.1. </span>Parsing and Stitching Data from Opera Phenix<a class="headerlink" href="#parsing-and-stitching-data-from-opera-phenix" title="Permalink to this heading"></a></h2>
+<p>First you need to export your data from Harmony and rename the path to eliminate any spaces in the name.
 Then you can run the following script to parses and stitch your data.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">example script for parsing and stitching phenix data</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
@@ -89,13 +104,13 @@ Then you can run the following script to parses and stitch your data.</p>
 
 <span class="c1">#parse image data</span>
 <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;path to exported harmony project without any spaces&quot;</span>
-<span class="n">parse_phenix</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">flatfield_exported</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">parallel</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">parse_phenix</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">flatfield_exported</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">export_as_symlink</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="c1">#export as symlink true enabled for better speed and to not duplicate data, set to False if you want to work with hardcopies or plan on accessing the data from multiple OS</span>
 
 <span class="c1">#define important information for your slide that you want to stitch</span>
 
 <span class="c1"># the code below needs to be run for each slide contained in the imaging experiment!</span>
 <span class="c1"># Can be put into a loop for example to automate this or also can be subset to seperate</span>
-<span class="c1"># jobs to run on for example the hpc</span>
+<span class="c1"># jobs when running on a HPC</span>
 
 <span class="n">input_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;parsed_images&quot;</span><span class="p">)</span>
 <span class="n">slidename</span> <span class="o">=</span> <span class="s2">&quot;Slide1&quot;</span>
@@ -114,16 +129,16 @@ Then you can run the following script to parses and stitch your data.</p>
 
 <span class="c1">#adjust cropping parameter</span>
 <span class="n">crop</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;top&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;bottom&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span>  <span class="c1">#this does no cropping</span>
-<span class="c1">#crop = {&#39;top&#39;:72, &#39;bottom&#39;:52, &#39;left&#39;:48, &#39;right&#39;:58} #this is good default values for an entire PPS slide with cell culture samples imaged with my protocol</span>
+<span class="c1">#crop = {&#39;top&#39;:72, &#39;bottom&#39;:52, &#39;left&#39;:48, &#39;right&#39;:58} #this is good default values for an entire PPS slide with cell culture samples imaged with the SPARCSpy protocol</span>
 
 <span class="c1">#create output directory if it does not exist</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outdir</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
 
-<span class="c1">#define patter to recognize which slide should be stitched</span>
+<span class="c1">#define pattern to recognize which slide should be stitched</span>
 <span class="c1">#remember to adjust the zstack value if you aquired zstacks and want to stitch a speciifc one in the parameters above</span>
 
-<span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;Timepoint&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">timepoint</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;_Row&quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="s2">&quot;Well&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">well</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">{channel}</span><span class="s2">_&quot;</span><span class="o">+</span><span class="s2">&quot;zstack&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">zstack_value</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;_r</span><span class="si">{row:03}</span><span class="s2">_c</span><span class="si">{col:03}</span><span class="s2">.tif&quot;</span>
+<span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;Timepoint&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">timepoint</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span><span class="s2">&quot;_Row&quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="s2">&quot;Well&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">well</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">{channel}</span><span class="s2">_&quot;</span><span class="o">+</span><span class="s2">&quot;zstack&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">zstack_value</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;_r</span><span class="si">{row:03}</span><span class="s2">_c</span><span class="si">{col:03}</span><span class="s2">.tif&quot;</span>
 <span class="n">generate_stitched</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span>
                     <span class="n">slidename</span><span class="p">,</span>
                     <span class="n">pattern</span><span class="p">,</span>
@@ -135,8 +150,8 @@ Then you can run the following script to parses and stitch your data.</p>
 </pre></div>
 </div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

@@ -10,6 +10,9 @@
 %% let collapsible pdf bookmarks panel have high depth per default
 \PassOptionsToPackage{bookmarksdepth=5}{hyperref}
 
+\PassOptionsToPackage{booktabs}{sphinx}
+\PassOptionsToPackage{colorrows}{sphinx}
+
 \PassOptionsToPackage{warn}{textcomp}
 \usepackage[utf8]{inputenc}
 \ifdefined\DeclareUnicodeCharacter
@@ -61,13 +64,18 @@
 
 
 \title{vipertools}
-\date{Aug 31, 2022}
+\date{May 16, 2023}
 \release{0.0.1}
 \author{Sophia Maedler}
 \newcommand{\sphinxlogo}{\vbox{}}
 \renewcommand{\releasename}{Release}
 \makeindex
 \begin{document}
+
+\ifdefined\shorthandoff
+  \ifnum\catcode`\=\string=\active\shorthandoff{=}\fi
+  \ifnum\catcode`\"=\active\shorthandoff{"}\fi
+\fi
 
 \pagestyle{empty}
 \sphinxmaketitle
@@ -78,7 +86,60 @@
 
 
 \sphinxAtStartPar
-Welcome the documentation of VIPERTOOLS!
+This python module contains useful wrapper functions to perform stitching with the \sphinxtitleref{Ashlar API \textless{}https://labsyspharm.github.io/ashlar/\textgreater{}} directly in python. In addition it contains
+useful data parsing functions to make imaging data aquired with the \sphinxtitleref{Perkinelmer Opera Phenix Microscope \textless{}https://www.perkinelmer.com/uk/product/opera\sphinxhyphen{}phenix\sphinxhyphen{}plus\sphinxhyphen{}system\sphinxhyphen{}hh14001000\textgreater{}} accessible to the Ashlar API to perform stitching
+or also to other downstream applications.
+
+\sphinxAtStartPar
+A stitching workflow which stitches imaging data aquired from one well on the OperaPhenix would e.g. look like this:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{from} \PYG{n+nn}{vipertools}\PYG{n+nn}{.}\PYG{n+nn}{parse} \PYG{k+kn}{import} \PYG{n}{parse\PYGZus{}phenix}
+
+\PYG{c+c1}{\PYGZsh{}after exporting data from Harmony perform image parsing}
+\PYG{n}{phenix\PYGZus{}dir} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{path/to/exported/data}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{n}{parse\PYGZus{}phenix}\PYG{p}{(}\PYG{n}{phenix\PYGZus{}dir}\PYG{p}{,} \PYG{n}{WGAbackground} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Alexa488}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{export\PYGZus{}as\PYGZus{}symlink} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}the parsed results are written to \PYGZdq{}path/to/exported/data/parsed\PYGZus{}images\PYGZdq{}}
+\PYG{c+c1}{\PYGZsh{} after this has completed stitching can be performed}
+
+\PYG{n}{input\PYGZus{}stitching} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{phenix\PYGZus{}dir}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{parsed\PYGZus{}images}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{outdir\PYGZus{}sample} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{outdir}\PYG{p}{,} \PYG{n}{slidename}\PYG{p}{)}
+\PYG{n}{outdir\PYGZus{}merged} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{outdir\PYGZus{}sample}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{merged\PYGZus{}files}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}create output directory if it does not already exist}
+\PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{exists}\PYG{p}{(}\PYG{n}{outdir\PYGZus{}sample}\PYG{p}{)}\PYG{p}{:}
+   \PYG{n}{os}\PYG{o}{.}\PYG{n}{makedirs}\PYG{p}{(}\PYG{n}{outdir\PYGZus{}sample}\PYG{p}{)}
+\PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{exists}\PYG{p}{(}\PYG{n}{outdir\PYGZus{}merged}\PYG{p}{)}\PYG{p}{:}
+   \PYG{n}{os}\PYG{o}{.}\PYG{n}{makedirs}\PYG{p}{(}\PYG{n}{outdir\PYGZus{}merged}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}define parameters specific to experiment}
+\PYG{n}{RowID} \PYG{o}{=} \PYG{l+m+mi}{1}
+\PYG{n}{WellID} \PYG{o}{=} \PYG{l+m+mi}{1}
+\PYG{n}{zstack\PYGZus{}value} \PYG{o}{=} \PYG{l+m+mi}{1} \PYG{c+c1}{\PYGZsh{}since we only took 1 zstack!}
+\PYG{n}{overlap} \PYG{o}{=} \PYG{l+m+mf}{0.1} \PYG{c+c1}{\PYGZsh{}fraction indicating with how much overlap the image tiles were acquired}
+
+\PYG{c+c1}{\PYGZsh{}define file pattern for reading}
+\PYG{n}{pattern} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Timepoint001\PYGZus{}Row}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{RowID}\PYG{p}{)}\PYG{o}{.}\PYG{n}{zfill}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Well}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{WellID}\PYG{p}{)}\PYG{o}{.}\PYG{n}{zfill}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+si}{\PYGZob{}channel\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{zstack}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{zstack\PYGZus{}value}\PYG{p}{)}\PYG{o}{.}\PYG{n}{zfill}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}r}\PYG{l+s+si}{\PYGZob{}row:03\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}c}\PYG{l+s+si}{\PYGZob{}col:03\PYGZcb{}}\PYG{l+s+s2}{.tif}\PYG{l+s+s2}{\PYGZdq{}}
+
+\PYG{n}{generate\PYGZus{}stitched}\PYG{p}{(}\PYG{n}{input\PYGZus{}stitching}\PYG{p}{,}
+               \PYG{n}{slidename}\PYG{p}{,}
+               \PYG{n}{pattern}\PYG{p}{,}
+               \PYG{n}{outdir\PYGZus{}merged}\PYG{p}{,}
+               \PYG{n}{overlap}\PYG{p}{,}
+               \PYG{n}{stitching\PYGZus{}channel} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Alexa488}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}
+               \PYG{n}{crop} \PYG{o}{=} \PYG{n+nb}{eval}\PYG{p}{(}\PYG{n}{crop}\PYG{p}{)}\PYG{p}{,}
+               \PYG{n}{plot\PYGZus{}QC} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{,}
+               \PYG{n}{filetype} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{.tif}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ome.zarr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{,}
+               \PYG{n}{WGAchannel} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Alexa488}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}
+               \PYG{n}{do\PYGZus{}intensity\PYGZus{}rescale} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{,}
+               \PYG{n}{export\PYGZus{}XML} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+\sphinxAtStartPar
+The generated stitched images can then be used for downstream processing for example using the \sphinxhref{linkURL}{SPARCSpy} pipeline or also using \sphinxtitleref{BIAS \textless{}https://single\sphinxhyphen{}cell\sphinxhyphen{}technologies.com/bias\sphinxhyphen{}2/\textgreater{}}.
+
+\sphinxstepscope
 
 
 \chapter{Modules}
@@ -91,28 +152,36 @@ Contains functions to parse imaging data into a usable formats for downstream pi
 \index{parse\_phenix() (in module vipertools.parse)@\spxentry{parse\_phenix()}\spxextra{in module vipertools.parse}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.parse.parse_phenix}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.parse.}}\sphinxbfcode{\sphinxupquote{parse\_phenix}}}{\emph{\DUrole{n}{phenix\_dir}}, \emph{\DUrole{n}{flatfield\_exported}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{parallel}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{WGAbackground}\DUrole{o}{=}\DUrole{default_value}{False}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.parse.parse_phenix}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.parse.}}\sphinxbfcode{\sphinxupquote{parse\_phenix}}}{\sphinxparam{\DUrole{n,n}{phenix\_dir}}, \sphinxparam{\DUrole{n,n}{flatfield\_exported}\DUrole{o,o}{=}\DUrole{default_value}{True}}, \sphinxparam{\DUrole{n,n}{WGAbackground}\DUrole{o,o}{=}\DUrole{default_value}{False}}, \sphinxparam{\DUrole{n,n}{export\_meta}\DUrole{o,o}{=}\DUrole{default_value}{True}}, \sphinxparam{\DUrole{n,n}{export\_as\_symlink}\DUrole{o,o}{=}\DUrole{default_value}{False}}}{}
+\pysigstopsignatures
 \sphinxAtStartPar
 Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
 Example of an exported file name: “Timepoint\{\#\}\_Row\{\#\}\_Well\{\#\}\_\{channel\}\_zstack\{\#\}\_r\{\#\}\_c\{\#\}.tif”
 \begin{quote}\begin{description}
-\item[{Parameters}] \leavevmode\begin{itemize}
+\sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
 \sphinxstyleliteralstrong{\sphinxupquote{phenix\_dir}} \textendash{} Path indicating the exported harmony files to parse.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{flatfield\_exported}} \textendash{} boolean indicating if the data was exported from harmony with or without flatfield correction.
-
-\item {} 
-\sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{parallel}} \textendash{} boolean value indicating if the data parsing should be performed with parallelization or without (CURRENTLY NOT FUNCTIONAL ONLY USE AS FALSE)
+\sphinxstyleliteralstrong{\sphinxupquote{flatfield\_exported}} (\sphinxstyleliteralemphasis{\sphinxupquote{bool}}) \textendash{} boolean indicating if the data was exported from harmony with or without flatfield correction.
 
 \item {} 
 \sphinxAtStartPar
 \sphinxstyleliteralstrong{\sphinxupquote{WGAbackground}} \textendash{} export second copy of WGA stains for background correction to improve segmentation. If set to False not performed. Else enter value of the channel
 that should be copied and contains the WGA stain.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{export\_meta}} \textendash{} boolean value indicating if a metadata file containing, tile positions, exact time of measurement etc. should be written out.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{export\_as\_symlink}} \textendash{} boolean value indicating if the parsed files should be copied or symlinked. If set to true can lead to issues when accessing remote filesystems
+from differentoperating systems
 
 \end{itemize}
 
@@ -123,7 +192,10 @@ that should be copied and contains the WGA stain.
 \index{sort\_timepoints() (in module vipertools.parse)@\spxentry{sort\_timepoints()}\spxextra{in module vipertools.parse}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.parse.sort_timepoints}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.parse.}}\sphinxbfcode{\sphinxupquote{sort\_timepoints}}}{\emph{\DUrole{n}{parsed\_dir}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.parse.sort_timepoints}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.parse.}}\sphinxbfcode{\sphinxupquote{sort\_timepoints}}}{\sphinxparam{\DUrole{n,n}{parsed\_dir}}, \sphinxparam{\DUrole{n,n}{use\_symlink}\DUrole{o,o}{=}\DUrole{default_value}{False}}}{}
+\pysigstopsignatures
 \sphinxAtStartPar
 Additionally sort generated timecourse images according to well and tile position. Function
 generates a new folder called timecourse\_sorted which contains a unqiue folder for each unique tile
@@ -131,9 +203,46 @@ position containing all imaging data (i.e. zstacks, timepoints, channels) of tha
 This function is meant for quick sorting of generated images for simple import of e.g. timecourse
 experiments into FIJI.
 \begin{quote}\begin{description}
-\item[{Parameters}] \leavevmode
+\sphinxlineitem{Parameters}\begin{itemize}
+\item {} 
 \sphinxAtStartPar
 \sphinxstyleliteralstrong{\sphinxupquote{parsed\_dir}} \textendash{} filepath to parsed images folder generated with the function parse\_phenix.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{use\_symlonks}} (\sphinxstyleliteralemphasis{\sphinxupquote{bool}}) \textendash{} boolean value indicating if the images should be copied as symlinks or as regular files. Symlinks can potentially cause issues if using the data on
+different OS but is signficiantly faster and does not produce as much data overhead.
+
+\end{itemize}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{sort\_wells() (in module vipertools.parse)@\spxentry{sort\_wells()}\spxextra{in module vipertools.parse}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{pages/modules:vipertools.parse.sort_wells}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.parse.}}\sphinxbfcode{\sphinxupquote{sort\_wells}}}{\sphinxparam{\DUrole{n,n}{parsed\_dir}}, \sphinxparam{\DUrole{n,n}{use\_symlink}\DUrole{o,o}{=}\DUrole{default_value}{False}}, \sphinxparam{\DUrole{n,n}{assign\_random\_id}\DUrole{o,o}{=}\DUrole{default_value}{False}}}{}
+\pysigstopsignatures
+\sphinxAtStartPar
+Sort acquired phenix images into unique folders for each well.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parameters}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{parsed\_dir}} \textendash{} filepath to parsed images folder generated with the function parse\_phenix.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{use\_symlink}} \textendash{} boolean value indicating if the images should be copied as symlinks to their new destination
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{assign\_random\_id}} \textendash{} boolean value indicating if the images in the sorted wells folder should be prepended with a random id.
+
+\end{itemize}
 
 \end{description}\end{quote}
 
@@ -148,43 +257,47 @@ Collection of functions to perform stitching of parsed image Tiffs.
 \index{generate\_stitched() (in module vipertools.stitch)@\spxentry{generate\_stitched()}\spxextra{in module vipertools.stitch}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_stitched}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_stitched}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{slidename}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}\DUrole{o}{=}\DUrole{default_value}{0.1}}, \emph{\DUrole{n}{max\_shift}\DUrole{o}{=}\DUrole{default_value}{30}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}Alexa488\textquotesingle{}}}, \emph{\DUrole{n}{no\_rescale\_channel}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{crop}\DUrole{o}{=}\DUrole{default_value}{\{\textquotesingle{}bottom\textquotesingle{}: 0, \textquotesingle{}left\textquotesingle{}: 0, \textquotesingle{}right\textquotesingle{}: 0, \textquotesingle{}top\textquotesingle{}: 0\}}}, \emph{\DUrole{n}{plot\_QC}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{filetype}\DUrole{o}{=}\DUrole{default_value}{{[}\textquotesingle{}.tif\textquotesingle{}{]}}}, \emph{\DUrole{n}{WGAchannel}\DUrole{o}{=}\DUrole{default_value}{None}}, \emph{\DUrole{n}{do\_intensity\_rescale}\DUrole{o}{=}\DUrole{default_value}{True}}, \emph{\DUrole{n}{export\_XML}\DUrole{o}{=}\DUrole{default_value}{True}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_stitched}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_stitched}}}{\sphinxparam{\DUrole{n,n}{input\_dir}}, \sphinxparam{\DUrole{n,n}{slidename}}, \sphinxparam{\DUrole{n,n}{pattern}}, \sphinxparam{\DUrole{n,n}{outdir}}, \sphinxparam{\DUrole{n,n}{overlap}\DUrole{o,o}{=}\DUrole{default_value}{0.1}}, \sphinxparam{\DUrole{n,n}{max\_shift}\DUrole{o,o}{=}\DUrole{default_value}{30}}, \sphinxparam{\DUrole{n,n}{stitching\_channel}\DUrole{o,o}{=}\DUrole{default_value}{\textquotesingle{}Alexa488\textquotesingle{}}}, \sphinxparam{\DUrole{n,n}{crop}\DUrole{o,o}{=}\DUrole{default_value}{\{\textquotesingle{}bottom\textquotesingle{}: 0, \textquotesingle{}left\textquotesingle{}: 0, \textquotesingle{}right\textquotesingle{}: 0, \textquotesingle{}top\textquotesingle{}: 0\}}}, \sphinxparam{\DUrole{n,n}{plot\_QC}\DUrole{o,o}{=}\DUrole{default_value}{True}}, \sphinxparam{\DUrole{n,n}{filetype}\DUrole{o,o}{=}\DUrole{default_value}{{[}\textquotesingle{}.tif\textquotesingle{}{]}}}, \sphinxparam{\DUrole{n,n}{WGAchannel}\DUrole{o,o}{=}\DUrole{default_value}{None}}, \sphinxparam{\DUrole{n,n}{do\_intensity\_rescale}\DUrole{o,o}{=}\DUrole{default_value}{True}}, \sphinxparam{\DUrole{n,n}{no\_rescale\_channel}\DUrole{o,o}{=}\DUrole{default_value}{None}}, \sphinxparam{\DUrole{n,n}{export\_XML}\DUrole{o,o}{=}\DUrole{default_value}{True}}}{}
+\pysigstopsignatures
 \sphinxAtStartPar
 Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
 stitched images.
 \begin{quote}\begin{description}
-\item[{Parameters}] \leavevmode\begin{itemize}
+\sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{input\_dir}} \textendash{} Path to the folder containing exported TIF files named with the following nameing convention: “Row\{\#\}\_Well\{\#\}\_\{channel\}\_zstack\{\#\}\_r\{\#\}\_c\{\#\}.tif”.
+\sphinxstyleliteralstrong{\sphinxupquote{input\_dir}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Path to the folder containing exported TIF files named with the following nameing convention: “Row\{\#\}\_Well\{\#\}\_\{channel\}\_zstack\{\#\}\_r\{\#\}\_c\{\#\}.tif”.
 These images can be generated for example by running the vipertools.parse.parse\_phenix() function.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{pattern}} \textendash{} Regex string to identify the naming pattern of the TIFs that should be stitched together.
+\sphinxstyleliteralstrong{\sphinxupquote{slidename}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} string indicating the slidename that is added to the stitched images generated
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Regex string to identify the naming pattern of the TIFs that should be stitched together.
 For example: “Row1\_Well2\_\{channel\}\_zstack3\_r\{row:03\}\_c\{col:03\}.tif”.
-All values in \{\} indicate thos which are matched by regex to find all matching tifs.
+All values in \{\} indicate those which are matched by regex to find all matching tifs.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{outdir}} \textendash{} path indicating where the stitched images should be written out
+\sphinxstyleliteralstrong{\sphinxupquote{outdir}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} path indicating where the stitched images should be written out
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{overlap}} \textendash{} value between 0 and 1 indicating the degree of overlap that was used while recording data at the microscope.
+\sphinxstyleliteralstrong{\sphinxupquote{overlap}} (\sphinxstyleliteralemphasis{\sphinxupquote{float between 0 and 1}}) \textendash{} value between 0 and 1 indicating the degree of overlap that was used while recording data at the microscope.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{max\_shift}} \textendash{} value indicating the maximum threshold for tile shifts. Default value in ashlar is 15.
+\sphinxstyleliteralstrong{\sphinxupquote{max\_shift}} (\sphinxstyleliteralemphasis{\sphinxupquote{int}}) \textendash{} value indicating the maximum threshold for tile shifts. Default value in ashlar is 15. In general this parameter does not need to be adjusted but it is provided
+to give more control.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{name}} \textendash{} string indicating the slidename that is added to the stitched images generated
-
-\item {} 
-\sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{stitching\_channel}} \textendash{} string indicating the channel name on which the stitching should be calculated. the positions for each tile calculated in this channel will be
+\sphinxstyleliteralstrong{\sphinxupquote{stitching\_channel}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} string indicating the channel name on which the stitching should be calculated. the positions for each tile calculated in this channel will be
 passed to the other channels.
 
 \item {} 
@@ -195,25 +308,29 @@ if no cropping should be performed.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{plot\_QC}} \textendash{} boolean value indicating if QC plots should be generated
+\sphinxstyleliteralstrong{\sphinxupquote{plot\_QC}} (\sphinxstyleliteralemphasis{\sphinxupquote{bool}}) \textendash{} boolean value indicating if QC plots should be generated
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{filetype}} \textendash{} list containing any of {[}“.tif”, “.ome.zarr”, “.ome.tif”{]} defining to which type of file the stiched results should be written. If more than one
-element all export types will be generated in the same output directory.
+\sphinxstyleliteralstrong{\sphinxupquote{filetype}} (\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} list containing any of {[}“.tif”, “.ome.zarr”, “.ome.tif”{]} defining to which type of file the stiched results should be written. If more than one
+element is present in the list all export types will be generated in the same output directory.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{WGAchannel}} \textendash{} string indicating the name of the WGA channel in case an illumination correction should be performed on this cahhenl
+\sphinxstyleliteralstrong{\sphinxupquote{WGAchannel}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} string indicating the name of the WGA channel in case an illumination correction should be performed on this channel
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{do\_intensity\_rescale}} \textendash{} boolean value indicating if the rescale\_p1\_P99 function should be applied before stitching or not. Alternatively partial then it will only
-rescale those channels provided as a list in rescale\_channels
+\sphinxstyleliteralstrong{\sphinxupquote{do\_intensity\_rescale}} (\sphinxstyleliteralemphasis{\sphinxupquote{bool}}) \textendash{} boolean value indicating if the rescale\_p1\_P99 function should be applied before stitching or not. Alternatively partial then those channels listed in no\_rescale\_channel will
+not be rescaled.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{export\_XML}} \textendash{} boolean value. If true than an xml is exported when writing to .tif which allows for the import into BIAS.
+\sphinxstyleliteralstrong{\sphinxupquote{no\_rescale\_channel}} (\sphinxstyleliteralemphasis{\sphinxupquote{None}}\sphinxstyleliteralemphasis{\sphinxupquote{ | }}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} either None or a list of channel strings on which no rescaling before stitching should be performed.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{export\_XML}} \textendash{} boolean value. If true then an xml is exported when writing to .tif which allows for the import into BIAS.
 
 \end{itemize}
 
@@ -224,23 +341,26 @@ rescale those channels provided as a list in rescale\_channels
 \index{generate\_thumbnail() (in module vipertools.stitch)@\spxentry{generate\_thumbnail()}\spxextra{in module vipertools.stitch}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_thumbnail}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_thumbnail}}}{\emph{\DUrole{n}{input\_dir}}, \emph{\DUrole{n}{pattern}}, \emph{\DUrole{n}{outdir}}, \emph{\DUrole{n}{overlap}}, \emph{\DUrole{n}{name}}, \emph{\DUrole{n}{stitching\_channel}\DUrole{o}{=}\DUrole{default_value}{\textquotesingle{}DAPI\textquotesingle{}}}, \emph{\DUrole{n}{export\_examples}\DUrole{o}{=}\DUrole{default_value}{False}}, \emph{\DUrole{n}{do\_intensity\_rescale}\DUrole{o}{=}\DUrole{default_value}{True}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.stitch.generate_thumbnail}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.stitch.}}\sphinxbfcode{\sphinxupquote{generate\_thumbnail}}}{\sphinxparam{\DUrole{n,n}{input\_dir}}, \sphinxparam{\DUrole{n,n}{pattern}}, \sphinxparam{\DUrole{n,n}{outdir}}, \sphinxparam{\DUrole{n,n}{overlap}}, \sphinxparam{\DUrole{n,n}{name}}, \sphinxparam{\DUrole{n,n}{stitching\_channel}\DUrole{o,o}{=}\DUrole{default_value}{\textquotesingle{}DAPI\textquotesingle{}}}, \sphinxparam{\DUrole{n,n}{export\_examples}\DUrole{o,o}{=}\DUrole{default_value}{False}}, \sphinxparam{\DUrole{n,n}{do\_intensity\_rescale}\DUrole{o,o}{=}\DUrole{default_value}{True}}}{}
+\pysigstopsignatures
 \sphinxAtStartPar
 Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
 stitched images.
 \begin{quote}\begin{description}
-\item[{Parameters}] \leavevmode\begin{itemize}
+\sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{input\_dir}} \textendash{} Path to the folder containing exported TIF files named with the following nameing convention: “Row\{\#\}\_Well\{\#\}\_\{channel\}\_zstack\{\#\}\_r\{\#\}\_c\{\#\}.tif”.
+\sphinxstyleliteralstrong{\sphinxupquote{input\_dir}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Path to the folder containing exported TIF files named with the following nameing convention: “Row\{\#\}\_Well\{\#\}\_\{channel\}\_zstack\{\#\}\_r\{\#\}\_c\{\#\}.tif”.
 These images can be generated for example by running the vipertools.parse.parse\_phenix() function.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{pattern}} \textendash{} Regex string to identify the naming pattern of the TIFs that should be stitched together.
+\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Regex string to identify the naming pattern of the TIFs that should be stitched together.
 For example: “Row1\_Well2\_\{channel\}\_zstack3\_r\{row:03\}\_c\{col:03\}.tif”.
-All values in \{\} indicate thos which are matched by regex to find all matching tifs.
+All values in \{\} indicate those which are matched by regex to find all matching tifs.
 
 \item {} 
 \sphinxAtStartPar
@@ -277,23 +397,30 @@ Contains functions to perform standard image processing steps, e.g. downsampling
 \index{downsample\_folder() (in module vipertools.image\_processing)@\spxentry{downsample\_folder()}\spxextra{in module vipertools.image\_processing}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.image_processing.downsample_folder}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.image\_processing.}}\sphinxbfcode{\sphinxupquote{downsample\_folder}}}{\emph{\DUrole{n}{folder\_path}}, \emph{\DUrole{n}{num\_threads}\DUrole{o}{=}\DUrole{default_value}{20}}, \emph{\DUrole{n}{file\_ending}\DUrole{o}{=}\DUrole{default_value}{(\textquotesingle{}.tif\textquotesingle{}, \textquotesingle{}.tiff\textquotesingle{})}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.image_processing.downsample_folder}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.image\_processing.}}\sphinxbfcode{\sphinxupquote{downsample\_folder}}}{\sphinxparam{\DUrole{n,n}{folder\_path}}, \sphinxparam{\DUrole{n,n}{num\_threads}\DUrole{o,o}{=}\DUrole{default_value}{20}}, \sphinxparam{\DUrole{n,n}{file\_ending}\DUrole{o,o}{=}\DUrole{default_value}{(\textquotesingle{}.tif\textquotesingle{}, \textquotesingle{}.tiff\textquotesingle{})}}, \sphinxparam{\DUrole{n,n}{N}\DUrole{o,o}{=}\DUrole{default_value}{2}}}{}
+\pysigstopsignatures
 \sphinxAtStartPar
 Multi\sphinxhyphen{}Threaded Function to downsample image equivalent to 2x2 binning. Overwrites original images! Do not run multiple times.
 Output is saved as uint16.
 \begin{quote}\begin{description}
-\item[{Parameters}] \leavevmode\begin{itemize}
+\sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{folder\_path}} \textendash{} string indicating the folder containing all the image files that should be downsampled
+\sphinxstyleliteralstrong{\sphinxupquote{folder\_path}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} string indicating the folder containing all the image files that should be downsampled
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{num\_threads}} \textendash{} int, number of threads for multithreading
+\sphinxstyleliteralstrong{\sphinxupquote{num\_threads}} (\sphinxstyleliteralemphasis{\sphinxupquote{int}}) \textendash{} number of threads for multithreading
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{file\_ending}} \textendash{} string or tuple of strings indicating which file ending the script should filter for in the indicated folder
+\sphinxstyleliteralstrong{\sphinxupquote{file\_ending}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{ | }}\sphinxstyleliteralemphasis{\sphinxupquote{(}}\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{)}}) \textendash{} string or tuple of strings indicating which file ending the script should filter for in the indicated folder
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{N}} (\sphinxstyleliteralemphasis{\sphinxupquote{int}}) \textendash{} number of pixels that should be binned together
 
 \end{itemize}
 
@@ -304,19 +431,31 @@ Output is saved as uint16.
 \index{downsample\_img() (in module vipertools.image\_processing)@\spxentry{downsample\_img()}\spxextra{in module vipertools.image\_processing}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{pages/modules:vipertools.image_processing.downsample_img}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.image\_processing.}}\sphinxbfcode{\sphinxupquote{downsample\_img}}}{\emph{\DUrole{n}{img\_path}}}{}
+\phantomsection\label{\detokenize{pages/modules:vipertools.image_processing.downsample_img}}
+\pysigstartsignatures
+\pysiglinewithargsret{\sphinxcode{\sphinxupquote{vipertools.image\_processing.}}\sphinxbfcode{\sphinxupquote{downsample\_img}}}{\sphinxparam{\DUrole{n,n}{img\_path}}, \sphinxparam{\DUrole{n,n}{N}\DUrole{o,o}{=}\DUrole{default_value}{2}}}{}
+\pysigstopsignatures
 \sphinxAtStartPar
-Function to downsample a single image equivalent to 2x2 binning using the mean between pixels.
+Function to downsample a single image equivalent to NxN binning using the mean between pixels.
 Overwrites the original image(!), do not run multiple times on the same image.
 \begin{quote}\begin{description}
-\item[{Parameters}] \leavevmode
+\sphinxlineitem{Parameters}\begin{itemize}
+\item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{img\_path}} \textendash{} string indicating the file path to the .tif file which should be downsampled.
+\sphinxstyleliteralstrong{\sphinxupquote{img\_path}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} string indicating the file path to the .tif file which should be downsampled.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{N}} (\sphinxstyleliteralemphasis{\sphinxupquote{int}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{default = 2}}) \textendash{} number of pixels that should be binned together using mean between pixels
+
+\end{itemize}
 
 \end{description}\end{quote}
 
 \end{fulllineitems}
 
+
+\sphinxstepscope
 
 
 \chapter{Tutorials}
@@ -325,7 +464,7 @@ Overwrites the original image(!), do not run multiple times on the same image.
 \section{Parsing and Stitching Data from Opera Phenix}
 \label{\detokenize{pages/tutorials:parsing-and-stitching-data-from-opera-phenix}}
 \sphinxAtStartPar
-First you need to export your data from harmony and rename the path to eliminate any spaces in the name.
+First you need to export your data from Harmony and rename the path to eliminate any spaces in the name.
 Then you can run the following script to parses and stitch your data.
 \sphinxSetupCaptionForVerbatim{example script for parsing and stitching phenix data}
 \def\sphinxLiteralBlockLabel{\label{\detokenize{pages/tutorials:id1}}}
@@ -337,13 +476,13 @@ Then you can run the following script to parses and stitch your data.
 
 \PYG{c+c1}{\PYGZsh{}parse image data}
 \PYG{n}{path} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{path to exported harmony project without any spaces}\PYG{l+s+s2}{\PYGZdq{}}
-\PYG{n}{parse\PYGZus{}phenix}\PYG{p}{(}\PYG{n}{path}\PYG{p}{,} \PYG{n}{flatfield\PYGZus{}exported} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{parallel} \PYG{o}{=} \PYG{k+kc}{False}\PYG{p}{)}
+\PYG{n}{parse\PYGZus{}phenix}\PYG{p}{(}\PYG{n}{path}\PYG{p}{,} \PYG{n}{flatfield\PYGZus{}exported} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{,} \PYG{n}{export\PYGZus{}as\PYGZus{}symlink} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{)} \PYG{c+c1}{\PYGZsh{}export as symlink true enabled for better speed and to not duplicate data, set to False if you want to work with hardcopies or plan on accessing the data from multiple OS}
 
 \PYG{c+c1}{\PYGZsh{}define important information for your slide that you want to stitch}
 
 \PYG{c+c1}{\PYGZsh{} the code below needs to be run for each slide contained in the imaging experiment!}
 \PYG{c+c1}{\PYGZsh{} Can be put into a loop for example to automate this or also can be subset to seperate}
-\PYG{c+c1}{\PYGZsh{} jobs to run on for example the hpc}
+\PYG{c+c1}{\PYGZsh{} jobs when running on a HPC}
 
 \PYG{n}{input\PYGZus{}dir} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{path}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{parsed\PYGZus{}images}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
 \PYG{n}{slidename} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Slide1}\PYG{l+s+s2}{\PYGZdq{}}
@@ -362,16 +501,16 @@ Then you can run the following script to parses and stitch your data.
 
 \PYG{c+c1}{\PYGZsh{}adjust cropping parameter}
 \PYG{n}{crop} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{top}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{bottom}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{left}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{right}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+m+mi}{0}\PYG{p}{\PYGZcb{}}  \PYG{c+c1}{\PYGZsh{}this does no cropping}
-\PYG{c+c1}{\PYGZsh{}crop = \PYGZob{}\PYGZsq{}top\PYGZsq{}:72, \PYGZsq{}bottom\PYGZsq{}:52, \PYGZsq{}left\PYGZsq{}:48, \PYGZsq{}right\PYGZsq{}:58\PYGZcb{} \PYGZsh{}this is good default values for an entire PPS slide with cell culture samples imaged with my protocol}
+\PYG{c+c1}{\PYGZsh{}crop = \PYGZob{}\PYGZsq{}top\PYGZsq{}:72, \PYGZsq{}bottom\PYGZsq{}:52, \PYGZsq{}left\PYGZsq{}:48, \PYGZsq{}right\PYGZsq{}:58\PYGZcb{} \PYGZsh{}this is good default values for an entire PPS slide with cell culture samples imaged with the SPARCSpy protocol}
 
 \PYG{c+c1}{\PYGZsh{}create output directory if it does not exist}
 \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{exists}\PYG{p}{(}\PYG{n}{outdir}\PYG{p}{)}\PYG{p}{:}
     \PYG{n}{os}\PYG{o}{.}\PYG{n}{makedirs}\PYG{p}{(}\PYG{n}{outdir}\PYG{p}{)}
 
-\PYG{c+c1}{\PYGZsh{}define patter to recognize which slide should be stitched}
+\PYG{c+c1}{\PYGZsh{}define pattern to recognize which slide should be stitched}
 \PYG{c+c1}{\PYGZsh{}remember to adjust the zstack value if you aquired zstacks and want to stitch a speciifc one in the parameters above}
 
-\PYG{n}{pattern} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Timepoint}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{timepoint}\PYG{p}{)}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}Row}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{row}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Well}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{well}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+si}{\PYGZob{}channel\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{zstack}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{zstack\PYGZus{}value}\PYG{p}{)}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}r}\PYG{l+s+si}{\PYGZob{}row:03\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}c}\PYG{l+s+si}{\PYGZob{}col:03\PYGZcb{}}\PYG{l+s+s2}{.tif}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{n}{pattern} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Timepoint}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{timepoint}\PYG{o}{.}\PYG{n}{zfill}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)} \PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}Row}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{row}\PYG{p}{)}\PYG{o}{.}\PYG{n}{zfill}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Well}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{well}\PYG{p}{)}\PYG{o}{.}\PYG{n}{zfill}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+si}{\PYGZob{}channel\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{zstack}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{zstack\PYGZus{}value}\PYG{p}{)}\PYG{o}{.}\PYG{n}{zfill}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}r}\PYG{l+s+si}{\PYGZob{}row:03\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}c}\PYG{l+s+si}{\PYGZob{}col:03\PYGZcb{}}\PYG{l+s+s2}{.tif}\PYG{l+s+s2}{\PYGZdq{}}
 \PYG{n}{generate\PYGZus{}stitched}\PYG{p}{(}\PYG{n}{input\PYGZus{}dir}\PYG{p}{,}
                     \PYG{n}{slidename}\PYG{p}{,}
                     \PYG{n}{pattern}\PYG{p}{,}
