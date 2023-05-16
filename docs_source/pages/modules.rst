@@ -2,13 +2,13 @@
 Modules
 *******************
 
-.. automodule:: vipertools.parse
+.. automodule:: sparcstools.parse
     :members:
 
-.. automodule:: vipertools.stitch
+.. automodule:: sparcstools.stitch
     :members:
 
-.. automodule:: vipertools.image_processing
+.. automodule:: sparcstools.image_processing
     :members:
 
 .. toctree::

@@ -12,9 +12,9 @@ if os.path.isfile(requirementPath):
         install_requires = f.read().splitlines()
 
 
-setup(name='vipertools',
+setup(name='sparcstools',
       version="0.0.1",
-      description="Set of tools to complete tasks associated with pyLMD pipeline including stitching and flat field correction.",
+      description="Set of tools to complete tasks associated with SPARCSpy pipeline including stitching and data parsing.",
       long_description="",
       classifiers=[  # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
           'Development Status :: 1 - Beta',

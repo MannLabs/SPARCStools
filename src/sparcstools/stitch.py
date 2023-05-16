@@ -36,7 +36,7 @@ from ome_zarr.writer import write_image
 from ashlar.reg import PyramidWriter
 
 
-from vipertools._custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality
+from sparcstools._custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality
 
 
 #define custom FilePatternReaderRescale to use with Ashlar to allow for custom modifications to images before performing stitching
@@ -188,7 +188,7 @@ def generate_thumbnail(input_dir,
     ----------
     input_dir : str
         Path to the folder containing exported TIF files named with the following nameing convention: "Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif". 
-        These images can be generated for example by running the vipertools.parse.parse_phenix() function.
+        These images can be generated for example by running the sparcstools.parse.parse_phenix() function.
     pattern : str
         Regex string to identify the naming pattern of the TIFs that should be stitched together. 
         For example: "Row1_Well2_{channel}_zstack3_r{row:03}_c{col:03}.tif". 
@@ -273,7 +273,7 @@ def generate_stitched(input_dir,
     ----------
     input_dir : str
         Path to the folder containing exported TIF files named with the following nameing convention: "Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif". 
-        These images can be generated for example by running the vipertools.parse.parse_phenix() function.
+        These images can be generated for example by running the sparcstools.parse.parse_phenix() function.
     slidename : str
         string indicating the slidename that is added to the stitched images generated
     pattern : str
@@ -292,7 +292,7 @@ def generate_stitched(input_dir,
         passed to the other channels. 
     crop
         dictionary of the form {'top':0, 'bottom':0, 'left':0, 'right':0} indicating how many pixels (based on a generated thumbnail, 
-        see vipertools.stitch.generate_thumbnail) should be cropped from the final image in each indicated dimension. Leave this set to default 
+        see sparcstools.stitch.generate_thumbnail) should be cropped from the final image in each indicated dimension. Leave this set to default 
         if no cropping should be performed.
     plot_QC : bool
         boolean value indicating if QC plots should be generated

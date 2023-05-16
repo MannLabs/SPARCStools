@@ -2,13 +2,11 @@
 segmentation_viz: visualization of segmentation results
 ====================================
 
-Collection of functions to easily check quality of segmentation results
+Collection of functions to easily check quality of segmentation results.
 """
 
 #import library
 import numpy as np
-import tifffile
-import random
 import zarr
 from ome_zarr.io import parse_url
 from ome_zarr.writer import write_image
@@ -143,9 +141,9 @@ def add_additional_seg(segmentation,  #list of all sets you want to visualize
         print(label_grp)
         write_image(seg, label_grp, axes="cyx")
     
-def viper_add_seg(stitched_path, seg_path, nuclei = True, cytosol = True):
+def sparcspy_add_seg(stitched_path, seg_path, nuclei = True, cytosol = True):
     """
-    Custom function to easily add finished segmentation to input stitching results within the viper framework.
+    Custom function to easily add finished segmentation to input stitching results within the SPARCSpy framework.
 
     Parameters
     ----------
@@ -153,7 +151,7 @@ def viper_add_seg(stitched_path, seg_path, nuclei = True, cytosol = True):
         path indicating the location of the ome.zarr file of the stitched data.
 
     seg_path
-        string indicating the location of the viper project folder (it will select the segmentation itself)
+        string indicating the location of the SPARCSpy project folder (it will select the segmentation itself)
     nuclei
         boolean value if the segmentation contains a nuclear segmentation and this should be appended to the ome.zarr
     cytosol
