@@ -1,13 +1,13 @@
 \indexentry{module@\spxentry{module}!sparcstools.parse@\spxentry{sparcstools.parse}|hyperpage}{2}
 \indexentry{sparcstools.parse@\spxentry{sparcstools.parse}!module@\spxentry{module}|hyperpage}{2}
 \indexentry{parse\_phenix() (in module sparcstools.parse)@\spxentry{parse\_phenix()}\spxextra{in module sparcstools.parse}|hyperpage}{2}
-\indexentry{sort\_timepoints() (in module sparcstools.parse)@\spxentry{sort\_timepoints()}\spxextra{in module sparcstools.parse}|hyperpage}{2}
-\indexentry{sort\_wells() (in module sparcstools.parse)@\spxentry{sort\_wells()}\spxextra{in module sparcstools.parse}|hyperpage}{2}
+\indexentry{sort\_timepoints() (in module sparcstools.parse)@\spxentry{sort\_timepoints()}\spxextra{in module sparcstools.parse}|hyperpage}{3}
+\indexentry{sort\_wells() (in module sparcstools.parse)@\spxentry{sort\_wells()}\spxextra{in module sparcstools.parse}|hyperpage}{3}
 \indexentry{module@\spxentry{module}!sparcstools.stitch@\spxentry{sparcstools.stitch}|hyperpage}{3}
 \indexentry{sparcstools.stitch@\spxentry{sparcstools.stitch}!module@\spxentry{module}|hyperpage}{3}
 \indexentry{generate\_stitched() (in module sparcstools.stitch)@\spxentry{generate\_stitched()}\spxextra{in module sparcstools.stitch}|hyperpage}{3}
 \indexentry{generate\_thumbnail() (in module sparcstools.stitch)@\spxentry{generate\_thumbnail()}\spxextra{in module sparcstools.stitch}|hyperpage}{4}
 \indexentry{module@\spxentry{module}!sparcstools.image\_processing@\spxentry{sparcstools.image\_processing}|hyperpage}{4}
 \indexentry{sparcstools.image\_processing@\spxentry{sparcstools.image\_processing}!module@\spxentry{module}|hyperpage}{4}
-\indexentry{downsample\_folder() (in module sparcstools.image\_processing)@\spxentry{downsample\_folder()}\spxextra{in module sparcstools.image\_processing}|hyperpage}{4}
-\indexentry{downsample\_img() (in module sparcstools.image\_processing)@\spxentry{downsample\_img()}\spxextra{in module sparcstools.image\_processing}|hyperpage}{4}
+\indexentry{downsample\_folder() (in module sparcstools.image\_processing)@\spxentry{downsample\_folder()}\spxextra{in module sparcstools.image\_processing}|hyperpage}{5}
+\indexentry{downsample\_img() (in module sparcstools.image\_processing)@\spxentry{downsample\_img()}\spxextra{in module sparcstools.image\_processing}|hyperpage}{5}

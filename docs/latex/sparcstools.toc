@@ -1,9 +1,10 @@
 \babel@toc {english}{}\relax 
-\contentsline {chapter}{\numberline {1}Modules}{2}{chapter.1}%
-\contentsline {section}{\numberline {1.1}parse}{2}{section.1.1}%
-\contentsline {section}{\numberline {1.2}stitch}{3}{section.1.2}%
-\contentsline {section}{\numberline {1.3}image processing}{4}{section.1.3}%
-\contentsline {chapter}{\numberline {2}Tutorials}{6}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Parsing and Stitching Data from Opera Phenix}{6}{section.2.1}%
-\contentsline {chapter}{Python Module Index}{8}{section*.12}%
-\contentsline {chapter}{Index}{9}{section*.13}%
+\contentsline {chapter}{\numberline {1}Installation}{2}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Modules}{2}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}parse}{2}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}stitch}{3}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}image processing}{5}{subsection.1.1.3}%
+\contentsline {section}{\numberline {1.2}Tutorials}{5}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Parsing and Stitching Data from Opera Phenix}{5}{subsection.1.2.1}%
+\contentsline {chapter}{Python Module Index}{7}{section*.12}%
+\contentsline {chapter}{Index}{8}{section*.13}%

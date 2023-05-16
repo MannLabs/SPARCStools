@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.19)  16 MAY 2023 12:21
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.19)  16 MAY 2023 12:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -840,89 +840,88 @@ cstools.toc)
 
 
 
-]
-LaTeX Font Info:    Trying to load font information for T1+txtt on input line 9
-6.
- (/usr/local/texlive/2022/texmf-dist/tex/latex/txfonts/t1txtt.fd
-File: t1txtt.fd 2000/12/15 v3.1
-)
-LaTeX Font Info:    Font shape `T1/txtt/b/n' in size <10> not available
-(Font)              Font shape `T1/txtt/bx/n' tried instead on input line 97.
-LaTeX Font Info:    Font shape `T1/txtt/m/it' in size <10> not available
-(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 99.
-LaTeX Font Info:    Trying to load font information for TS1+txtt on input line 
-108.
-
-(/usr/local/texlive/2022/texmf-dist/tex/latex/txfonts/ts1txtt.fd
-File: ts1txtt.fd 2000/12/15 v3.1
-) [1
+] [1
 
 ]
 Chapter 1.
+LaTeX Font Info:    Trying to load font information for T1+txtt on input line 1
+05.
+(/usr/local/texlive/2022/texmf-dist/tex/latex/txfonts/t1txtt.fd
+File: t1txtt.fd 2000/12/15 v3.1
+)
+LaTeX Font Info:    Font shape `T1/txtt/b/n' in size <10> not available
+(Font)              Font shape `T1/txtt/bx/n' tried instead on input line 147.
 LaTeX Font Info:    Trying to load font information for TS1+qtm on input line 1
-66.
+54.
+
 (/usr/local/texlive/2022/texmf-dist/tex/latex/tex-gyre/ts1qtm.fd
 File: ts1qtm.fd 2009/09/25 v1.2 font definition file for TS1/qtm
 )
-Underfull \hbox (badness 5787) in paragraph at lines 210--212
-[]\T1/txtt/bx/n/10 parsed_dir \T1/qtm/m/n/10 ^^U filepath to parsed im-ages fol
-der gen-er-ated with the func-tion
- []
-
-
-Underfull \hbox (badness 5787) in paragraph at lines 236--238
-[]\T1/txtt/bx/n/10 parsed_dir \T1/qtm/m/n/10 ^^U filepath to parsed im-ages fol
-der gen-er-ated with the func-tion
- []
-
-[2
+LaTeX Font Info:    Font shape `T1/txtt/m/it' in size <10> not available
+(Font)              Font shape `T1/txtt/m/sl' tried instead on input line 160.
+ [2
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 273--276
+Underfull \hbox (badness 5787) in paragraph at lines 198--200
+[]\T1/txtt/bx/n/10 parsed_dir \T1/qtm/m/n/10 ^^U filepath to parsed im-ages fol
+der gen-er-ated with the func-tion
+ []
+
+
+Underfull \hbox (badness 5787) in paragraph at lines 224--226
+[]\T1/txtt/bx/n/10 parsed_dir \T1/qtm/m/n/10 ^^U filepath to parsed im-ages fol
+der gen-er-ated with the func-tion
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 261--264
 \T1/qtm/m/n/10 These im-ages can be gen-er-ated for ex-am-ple by run-ning the s
 parc-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 282--286
+Underfull \hbox (badness 10000) in paragraph at lines 270--274
 []\T1/txtt/bx/n/10 pattern \T1/qtm/m/n/10 (\T1/txtt/m/sl/10 str\T1/qtm/m/n/10 )
  ^^U Regex string to iden-tify the nam-ing pat-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 282--286
+Underfull \hbox (badness 10000) in paragraph at lines 270--274
 \T1/qtm/m/n/10 tern of the TIFs that should be stitched to-gether. For ex-am-pl
 e:
  []
 
 [3]
-Underfull \hbox (badness 10000) in paragraph at lines 357--360
+Underfull \hbox (badness 10000) in paragraph at lines 345--348
 \T1/qtm/m/n/10 These im-ages can be gen-er-ated for ex-am-ple by run-ning the s
 parc-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 362--366
+Underfull \hbox (badness 10000) in paragraph at lines 350--354
 []\T1/txtt/bx/n/10 pattern \T1/qtm/m/n/10 (\T1/txtt/m/sl/10 str\T1/qtm/m/n/10 )
  ^^U Regex string to iden-tify the nam-ing pat-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 362--366
+Underfull \hbox (badness 10000) in paragraph at lines 350--354
 \T1/qtm/m/n/10 tern of the TIFs that should be stitched to-gether. For ex-am-pl
 e:
  []
 
-[4] [5]
-Chapter 2.
+[4]
 Package hyperref Info: bookmark level for unknown literalblock defaults to 0 on
- input line 473.
+ input line 461.
+LaTeX Font Info:    Trying to load font information for TS1+txtt on input line 
+493.
+ (/usr/local/texlive/2022/texmf-dist/tex/latex/txfonts/ts1txtt.fd
+File: ts1txtt.fd 2000/12/15 v3.1
+)
 LaTeX Font Info:    Font shape `TS1/txtt/m/it' in size <10> not available
-(Font)              Font shape `TS1/txtt/m/sl' tried instead on input line 506.
+(Font)              Font shape `TS1/txtt/m/sl' tried instead on input line 494.
 
-[6
-
-] [7] [8
+ [5]
+[6] [7
 
 
 
@@ -944,23 +943,23 @@ Underfull \hbox (badness 10000) in paragraph at lines 16--17
 le sparc-
  []
 
-[9
+[8
 
 
 
 
 ]) (./sparcstools.aux)
 Package rerunfilecheck Info: File `sparcstools.out' has not changed.
-(rerunfilecheck)             Checksum: C84E73C3D119EF6BBD77AE256D5A647A;974.
+(rerunfilecheck)             Checksum: E4AE9F33594E1F4465E8E98FF6A3D495;1127.
  ) 
 Here is how much of TeX's memory you used:
- 15977 strings out of 478268
- 268200 string characters out of 5846347
- 636680 words of memory out of 5000000
- 33762 multiletter control sequences out of 15000+600000
- 521238 words of font info for 74 fonts, out of 8000000 for 9000
+ 15986 strings out of 478268
+ 268393 string characters out of 5846347
+ 631785 words of memory out of 5000000
+ 33769 multiletter control sequences out of 15000+600000
+ 527087 words of font info for 76 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 70i,11n,76p,1437b,627s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 70i,11n,76p,1437b,625s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/tex-gyre/q-ec.enc}{/usr/l
 ocal/texlive/2022/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/texlive/20
 22/texmf-dist/fonts/enc/dvips/tex-gyre/q-ts1.enc}</usr/local/texlive/2022/texmf
@@ -976,10 +975,10 @@ t.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/t1xtt.pfb>
 </usr/local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/t1xtt.pfb></usr/
 local/texlive/2022/texmf-dist/fonts/type1/public/txfonts/tcxtt.pfb></usr/local/
 texlive/2022/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on sparcstools.pdf (11 pages, 208026 bytes).
+Output written on sparcstools.pdf (10 pages, 205795 bytes).
 PDF statistics:
- 203 PDF objects out of 1000 (max. 8388607)
- 166 compressed objects within 2 object streams
+ 204 PDF objects out of 1000 (max. 8388607)
+ 168 compressed objects within 2 object streams
  31 named destinations out of 1000 (max. 500000)
- 85 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 93 words of extra memory for PDF output out of 10000 (max. 10000000)
 

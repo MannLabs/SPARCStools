@@ -1,7 +1,4 @@
-.. sparcstools documentation master file, created by
-   sphinx-quickstart on Tue May 17 16:34:58 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. sparcstools documentation master file
 
 Welcome to SPARCSTools documentation!
 =======================================
@@ -34,10 +31,13 @@ Create a conda environment and activate it
 Install Java using conda
 
 .. code::
+
    conda install -c conda-forge openjdk
 
 Install package via pip. This should install all dependencies as well.
 
+.. code::
+   
    pip install .
 
 .. toctree::

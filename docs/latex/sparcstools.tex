@@ -59,7 +59,7 @@
 \addto\captionsenglish{\renewcommand{\contentsname}{Modules:}}
 
 \usepackage{sphinxmessages}
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 
 
 
@@ -91,63 +91,51 @@ data parsing functions to make imaging data aquired with the \sphinxhref{https:/
 or also to other downstream applications.
 
 \sphinxAtStartPar
-A stitching workflow which stitches imaging data aquired from one well on the OperaPhenix would e.g. look like this:
+The generated stitched images can then be used for downstream processing for example using the \sphinxhref{linkURL}{SPARCSpy} pipeline or also using \sphinxhref{https://single-cell-technologies.com/bias-2/}{BIAS}.
+
+
+\chapter{Installation}
+\label{\detokenize{index:installation}}
+\sphinxAtStartPar
+SPARCStools has been tested using python \textgreater{}= 3.8 on Linux and MacOS. Currently to run on Windows please utilize a Linux Virtual Machine.
+
+\sphinxAtStartPar
+Clone the github repository and navigate to the main directory:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{from} \PYG{n+nn}{sparcstools}\PYG{n+nn}{.}\PYG{n+nn}{parse} \PYG{k+kn}{import} \PYG{n}{parse\PYGZus{}phenix}
-
-\PYG{c+c1}{\PYGZsh{}after exporting data from Harmony perform image parsing}
-\PYG{n}{phenix\PYGZus{}dir} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{path/to/exported/data}\PYG{l+s+s2}{\PYGZdq{}}
-\PYG{n}{parse\PYGZus{}phenix}\PYG{p}{(}\PYG{n}{phenix\PYGZus{}dir}\PYG{p}{,} \PYG{n}{WGAbackground} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Alexa488}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{export\PYGZus{}as\PYGZus{}symlink} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{}the parsed results are written to \PYGZdq{}path/to/exported/data/parsed\PYGZus{}images\PYGZdq{}}
-\PYG{c+c1}{\PYGZsh{} after this has completed stitching can be performed}
-
-\PYG{n}{input\PYGZus{}stitching} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{phenix\PYGZus{}dir}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{parsed\PYGZus{}images}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{outdir\PYGZus{}sample} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{outdir}\PYG{p}{,} \PYG{n}{slidename}\PYG{p}{)}
-\PYG{n}{outdir\PYGZus{}merged} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{outdir\PYGZus{}sample}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{merged\PYGZus{}files}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{}create output directory if it does not already exist}
-\PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{exists}\PYG{p}{(}\PYG{n}{outdir\PYGZus{}sample}\PYG{p}{)}\PYG{p}{:}
-   \PYG{n}{os}\PYG{o}{.}\PYG{n}{makedirs}\PYG{p}{(}\PYG{n}{outdir\PYGZus{}sample}\PYG{p}{)}
-\PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{exists}\PYG{p}{(}\PYG{n}{outdir\PYGZus{}merged}\PYG{p}{)}\PYG{p}{:}
-   \PYG{n}{os}\PYG{o}{.}\PYG{n}{makedirs}\PYG{p}{(}\PYG{n}{outdir\PYGZus{}merged}\PYG{p}{)}
-
-\PYG{c+c1}{\PYGZsh{}define parameters specific to experiment}
-\PYG{n}{RowID} \PYG{o}{=} \PYG{l+m+mi}{1}
-\PYG{n}{WellID} \PYG{o}{=} \PYG{l+m+mi}{1}
-\PYG{n}{zstack\PYGZus{}value} \PYG{o}{=} \PYG{l+m+mi}{1} \PYG{c+c1}{\PYGZsh{}since we only took 1 zstack!}
-\PYG{n}{overlap} \PYG{o}{=} \PYG{l+m+mf}{0.1} \PYG{c+c1}{\PYGZsh{}fraction indicating with how much overlap the image tiles were acquired}
-
-\PYG{c+c1}{\PYGZsh{}define file pattern for reading}
-\PYG{n}{pattern} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Timepoint001\PYGZus{}Row}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{RowID}\PYG{p}{)}\PYG{o}{.}\PYG{n}{zfill}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Well}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{+} \PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{WellID}\PYG{p}{)}\PYG{o}{.}\PYG{n}{zfill}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{+} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+si}{\PYGZob{}channel\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{zstack}\PYG{l+s+s2}{\PYGZdq{}}\PYG{o}{+}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{zstack\PYGZus{}value}\PYG{p}{)}\PYG{o}{.}\PYG{n}{zfill}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)}\PYG{o}{+}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}r}\PYG{l+s+si}{\PYGZob{}row:03\PYGZcb{}}\PYG{l+s+s2}{\PYGZus{}c}\PYG{l+s+si}{\PYGZob{}col:03\PYGZcb{}}\PYG{l+s+s2}{.tif}\PYG{l+s+s2}{\PYGZdq{}}
-
-\PYG{k+kn}{from} \PYG{n+nn}{sparcstools}\PYG{n+nn}{.}\PYG{n+nn}{stitch} \PYG{k+kn}{import} \PYG{n}{generate\PYGZus{}stitched}
-
-\PYG{n}{generate\PYGZus{}stitched}\PYG{p}{(}\PYG{n}{input\PYGZus{}stitching}\PYG{p}{,}
-               \PYG{n}{slidename}\PYG{p}{,}
-               \PYG{n}{pattern}\PYG{p}{,}
-               \PYG{n}{outdir\PYGZus{}merged}\PYG{p}{,}
-               \PYG{n}{overlap}\PYG{p}{,}
-               \PYG{n}{stitching\PYGZus{}channel} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Alexa488}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}
-               \PYG{n}{crop} \PYG{o}{=} \PYG{n+nb}{eval}\PYG{p}{(}\PYG{n}{crop}\PYG{p}{)}\PYG{p}{,}
-               \PYG{n}{plot\PYGZus{}QC} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{,}
-               \PYG{n}{filetype} \PYG{o}{=} \PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{.tif}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ome.zarr}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{,}
-               \PYG{n}{WGAchannel} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Alexa488}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,}
-               \PYG{n}{do\PYGZus{}intensity\PYGZus{}rescale} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{,}
-               \PYG{n}{export\PYGZus{}XML} \PYG{o}{=} \PYG{k+kc}{True}\PYG{p}{)}
+\PYG{n}{git} \PYG{n}{clone} \PYG{n}{https}\PYG{p}{:}\PYG{o}{/}\PYG{o}{/}\PYG{n}{github}\PYG{o}{.}\PYG{n}{com}\PYG{o}{/}\PYG{n}{sophiamaedler}\PYG{o}{/}\PYG{n}{SPARCStools}\PYG{o}{.}\PYG{n}{git}
+\PYG{n}{cd} \PYG{n}{SPARCStools}
 \end{sphinxVerbatim}
 
 \sphinxAtStartPar
-The generated stitched images can then be used for downstream processing for example using the \sphinxhref{linkURL}{SPARCSpy} pipeline or also using \sphinxhref{https://single-cell-technologies.com/bias-2/}{BIAS}.
+Create a conda environment and activate it
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{conda} \PYG{n}{create} \PYG{o}{\PYGZhy{}}\PYG{n}{n} \PYG{n}{stitching} \PYG{n}{python}\PYG{o}{=}\PYG{l+m+mf}{3.10}
+\PYG{n}{conda} \PYG{n}{activate} \PYG{n}{stitching}
+\end{sphinxVerbatim}
+
+\sphinxAtStartPar
+Install Java using conda
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{conda} \PYG{n}{install} \PYG{o}{\PYGZhy{}}\PYG{n}{c} \PYG{n}{conda}\PYG{o}{\PYGZhy{}}\PYG{n}{forge} \PYG{n}{openjdk}
+\end{sphinxVerbatim}
+
+\sphinxAtStartPar
+Install package via pip. This should install all dependencies as well.
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{n}{pip} \PYG{n}{install} \PYG{o}{.}
+\end{sphinxVerbatim}
 
 \sphinxstepscope
 
 
-\chapter{Modules}
+\section{Modules}
 \label{\detokenize{pages/modules:module-sparcstools.parse}}\label{\detokenize{pages/modules:modules}}\label{\detokenize{pages/modules::doc}}\index{module@\spxentry{module}!sparcstools.parse@\spxentry{sparcstools.parse}}\index{sparcstools.parse@\spxentry{sparcstools.parse}!module@\spxentry{module}}
 
-\section{parse}
+\subsection{parse}
 \label{\detokenize{pages/modules:parse}}
 \sphinxAtStartPar
 Contains functions to parse imaging data into a usable formats for downstream pipelines.
@@ -252,7 +240,7 @@ Sort acquired phenix images into unique folders for each well.
 
 \phantomsection\label{\detokenize{pages/modules:module-sparcstools.stitch}}\index{module@\spxentry{module}!sparcstools.stitch@\spxentry{sparcstools.stitch}}\index{sparcstools.stitch@\spxentry{sparcstools.stitch}!module@\spxentry{module}}
 
-\section{stitch}
+\subsection{stitch}
 \label{\detokenize{pages/modules:stitch}}
 \sphinxAtStartPar
 Collection of functions to perform stitching of parsed image Tiffs.
@@ -392,7 +380,7 @@ All values in \{\} indicate those which are matched by regex to find all matchin
 
 \phantomsection\label{\detokenize{pages/modules:module-sparcstools.image_processing}}\index{module@\spxentry{module}!sparcstools.image\_processing@\spxentry{sparcstools.image\_processing}}\index{sparcstools.image\_processing@\spxentry{sparcstools.image\_processing}!module@\spxentry{module}}
 
-\section{image processing}
+\subsection{image processing}
 \label{\detokenize{pages/modules:image-processing}}
 \sphinxAtStartPar
 Contains functions to perform standard image processing steps, e.g. downsampling.
@@ -460,10 +448,10 @@ Overwrites the original image(!), do not run multiple times on the same image.
 \sphinxstepscope
 
 
-\chapter{Tutorials}
+\section{Tutorials}
 \label{\detokenize{pages/tutorials:tutorials}}\label{\detokenize{pages/tutorials::doc}}
 
-\section{Parsing and Stitching Data from Opera Phenix}
+\subsection{Parsing and Stitching Data from Opera Phenix}
 \label{\detokenize{pages/tutorials:parsing-and-stitching-data-from-opera-phenix}}
 \sphinxAtStartPar
 First you need to export your data from Harmony and rename the path to eliminate any spaces in the name.

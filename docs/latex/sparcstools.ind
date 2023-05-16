@@ -6,9 +6,9 @@
 
   \bigletter D
   \item \spxentry{downsample\_folder()}\spxextra{in module sparcstools.image\_processing}, 
-		\hyperpage{4}
+		\hyperpage{5}
   \item \spxentry{downsample\_img()}\spxextra{in module sparcstools.image\_processing}, 
-		\hyperpage{4}
+		\hyperpage{5}
 
   \indexspace
   \bigletter G
@@ -28,8 +28,8 @@
 
   \indexspace
   \bigletter S
-  \item \spxentry{sort\_timepoints()}\spxextra{in module sparcstools.parse}, \hyperpage{2}
-  \item \spxentry{sort\_wells()}\spxextra{in module sparcstools.parse}, \hyperpage{2}
+  \item \spxentry{sort\_timepoints()}\spxextra{in module sparcstools.parse}, \hyperpage{3}
+  \item \spxentry{sort\_wells()}\spxextra{in module sparcstools.parse}, \hyperpage{3}
   \item \spxentry{sparcstools.image\_processing}
     \subitem \spxentry{module}, \hyperpage{4}
   \item \spxentry{sparcstools.parse}
