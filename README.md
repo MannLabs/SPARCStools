@@ -1,6 +1,6 @@
 # VIPERtools
 
-documentation can be found at: https://sophiamaedler.github.io/VIPERtools/
+documentation can be found at: https://sophiamaedler.github.io/SPARCStools/
 
 ## Installation
 
