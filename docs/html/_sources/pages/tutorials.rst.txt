@@ -13,8 +13,8 @@ Then you can run the following script to parses and stitch your data.
 
     #import relevant libraries
     import os
-    from vipertools.parse import parse_phenix
-    from vipertools.stitch import generate_stitched
+    from sparcstools.parse import parse_phenix
+    from sparcstools.stitch import generate_stitched
 
     #parse image data
     path = "path to exported harmony project without any spaces"

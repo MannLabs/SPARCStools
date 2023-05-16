@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1. Tutorials &mdash; vipertools 0.0.1 documentation</title>
+  <title>1. Tutorials &mdash; sparcstools 0.0.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -31,7 +31,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            vipertools
+            sparcstools
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -45,15 +45,15 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#parse">parse</a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.parse.parse_phenix"><code class="docutils literal notranslate"><span class="pre">parse_phenix()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.parse.sort_timepoints"><code class="docutils literal notranslate"><span class="pre">sort_timepoints()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.parse.sort_wells"><code class="docutils literal notranslate"><span class="pre">sort_wells()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#sparcstools.parse.parse_phenix"><code class="docutils literal notranslate"><span class="pre">parse_phenix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#sparcstools.parse.sort_timepoints"><code class="docutils literal notranslate"><span class="pre">sort_timepoints()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#sparcstools.parse.sort_wells"><code class="docutils literal notranslate"><span class="pre">sort_wells()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#stitch">stitch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.stitch.generate_stitched"><code class="docutils literal notranslate"><span class="pre">generate_stitched()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.stitch.generate_thumbnail"><code class="docutils literal notranslate"><span class="pre">generate_thumbnail()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#sparcstools.stitch.generate_stitched"><code class="docutils literal notranslate"><span class="pre">generate_stitched()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#sparcstools.stitch.generate_thumbnail"><code class="docutils literal notranslate"><span class="pre">generate_thumbnail()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#image-processing">image processing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.image_processing.downsample_folder"><code class="docutils literal notranslate"><span class="pre">downsample_folder()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#vipertools.image_processing.downsample_img"><code class="docutils literal notranslate"><span class="pre">downsample_img()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#sparcstools.image_processing.downsample_folder"><code class="docutils literal notranslate"><span class="pre">downsample_folder()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#sparcstools.image_processing.downsample_img"><code class="docutils literal notranslate"><span class="pre">downsample_img()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -71,7 +71,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">vipertools</a>
+          <a href="../index.html">sparcstools</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -99,8 +99,8 @@ Then you can run the following script to parses and stitch your data.</p>
 <div class="code-block-caption"><span class="caption-text">example script for parsing and stitching phenix data</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#import relevant libraries</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">vipertools.parse</span> <span class="kn">import</span> <span class="n">parse_phenix</span>
-<span class="kn">from</span> <span class="nn">vipertools.stitch</span> <span class="kn">import</span> <span class="n">generate_stitched</span>
+<span class="kn">from</span> <span class="nn">sparcstools.parse</span> <span class="kn">import</span> <span class="n">parse_phenix</span>
+<span class="kn">from</span> <span class="nn">sparcstools.stitch</span> <span class="kn">import</span> <span class="n">generate_stitched</span>
 
 <span class="c1">#parse image data</span>
 <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;path to exported harmony project without any spaces&quot;</span>
@@ -163,7 +163,7 @@ Then you can run the following script to parses and stitch your data.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Sophia Maedler.</p>
+    <p>&#169; Copyright 2023, Sophia Maedler.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

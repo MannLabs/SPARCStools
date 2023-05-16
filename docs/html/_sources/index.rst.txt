@@ -1,20 +1,20 @@
-.. vipertools documentation master file, created by
+.. sparcstools documentation master file, created by
    sphinx-quickstart on Tue May 17 16:34:58 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to vipertools's documentation!
-======================================
+Welcome to SPARCSTools documentation!
+=======================================
 
-This python module contains useful wrapper functions to perform stitching with the `Ashlar API <https://labsyspharm.github.io/ashlar/>` directly in python. In addition it contains
-useful data parsing functions to make imaging data aquired with the `Perkinelmer Opera Phenix Microscope <https://www.perkinelmer.com/uk/product/opera-phenix-plus-system-hh14001000>` accessible to the Ashlar API to perform stitching 
+This python module contains wrapper functions to perform stitching with the `Ashlar API <https://labsyspharm.github.io/ashlar/>`_ directly in python. In addition it contains
+data parsing functions to make imaging data aquired with the `Perkinelmer Opera Phenix Microscope <https://www.perkinelmer.com/uk/product/opera-phenix-plus-system-hh14001000>`_ accessible to the Ashlar API to perform stitching 
 or also to other downstream applications. 
 
 A stitching workflow which stitches imaging data aquired from one well on the OperaPhenix would e.g. look like this: 
 
 .. code:: python
 
-   from vipertools.parse import parse_phenix 
+   from sparcstools.parse import parse_phenix 
 
    #after exporting data from Harmony perform image parsing
    phenix_dir = "path/to/exported/data"
@@ -42,6 +42,8 @@ A stitching workflow which stitches imaging data aquired from one well on the Op
    #define file pattern for reading
    pattern = "Timepoint001_Row"+ str(RowID).zfill(2) + "_" + "Well" + str(WellID).zfill(2) + "_{channel}_"+"zstack"+str(zstack_value).zfill(3)+"_r{row:03}_c{col:03}.tif"
 
+   from sparcstools.stitch import generate_stitched
+   
    generate_stitched(input_stitching, 
                   slidename,
                   pattern,
@@ -55,7 +57,7 @@ A stitching workflow which stitches imaging data aquired from one well on the Op
                   do_intensity_rescale = True,
                   export_XML = True)
 
-The generated stitched images can then be used for downstream processing for example using the `SPARCSpy <link URL>`_ pipeline or also using `BIAS <https://single-cell-technologies.com/bias-2/>`.
+The generated stitched images can then be used for downstream processing for example using the `SPARCSpy <link URL>`_ pipeline or also using `BIAS <https://single-cell-technologies.com/bias-2/>`_.
 
 .. toctree::
    :maxdepth: 2

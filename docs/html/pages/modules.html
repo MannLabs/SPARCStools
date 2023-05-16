@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Modules &mdash; vipertools 0.0.1 documentation</title>
+  <title>Modules &mdash; sparcstools 0.0.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="1. Tutorials" href="tutorials.html" />
-    <link rel="prev" title="Welcome to vipertools’s documentation!" href="../index.html" /> 
+    <link rel="prev" title="Welcome to SPARCSTools documentation!" href="../index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -32,7 +32,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            vipertools
+            sparcstools
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -46,15 +46,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#parse">parse</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#vipertools.parse.parse_phenix"><code class="docutils literal notranslate"><span class="pre">parse_phenix()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#vipertools.parse.sort_timepoints"><code class="docutils literal notranslate"><span class="pre">sort_timepoints()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#vipertools.parse.sort_wells"><code class="docutils literal notranslate"><span class="pre">sort_wells()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sparcstools.parse.parse_phenix"><code class="docutils literal notranslate"><span class="pre">parse_phenix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sparcstools.parse.sort_timepoints"><code class="docutils literal notranslate"><span class="pre">sort_timepoints()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sparcstools.parse.sort_wells"><code class="docutils literal notranslate"><span class="pre">sort_wells()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stitch">stitch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#vipertools.stitch.generate_stitched"><code class="docutils literal notranslate"><span class="pre">generate_stitched()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#vipertools.stitch.generate_thumbnail"><code class="docutils literal notranslate"><span class="pre">generate_thumbnail()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sparcstools.stitch.generate_stitched"><code class="docutils literal notranslate"><span class="pre">generate_stitched()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sparcstools.stitch.generate_thumbnail"><code class="docutils literal notranslate"><span class="pre">generate_thumbnail()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#image-processing">image processing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#vipertools.image_processing.downsample_folder"><code class="docutils literal notranslate"><span class="pre">downsample_folder()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#vipertools.image_processing.downsample_img"><code class="docutils literal notranslate"><span class="pre">downsample_img()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sparcstools.image_processing.downsample_folder"><code class="docutils literal notranslate"><span class="pre">downsample_folder()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sparcstools.image_processing.downsample_img"><code class="docutils literal notranslate"><span class="pre">downsample_img()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -72,7 +72,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">vipertools</a>
+          <a href="../index.html">sparcstools</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -90,15 +90,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-vipertools.parse">
-<span id="modules"></span><h1>Modules<a class="headerlink" href="#module-vipertools.parse" title="Permalink to this heading"></a></h1>
+  <section id="module-sparcstools.parse">
+<span id="modules"></span><h1>Modules<a class="headerlink" href="#module-sparcstools.parse" title="Permalink to this heading"></a></h1>
 <section id="parse">
 <h2>parse<a class="headerlink" href="#parse" title="Permalink to this heading"></a></h2>
 <p>Contains functions to parse imaging data into a usable formats for downstream pipelines.</p>
 </section>
 <dl class="py function">
-<dt class="sig sig-object py" id="vipertools.parse.parse_phenix">
-<span class="sig-prename descclassname"><span class="pre">vipertools.parse.</span></span><span class="sig-name descname"><span class="pre">parse_phenix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phenix_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatfield_exported</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGAbackground</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_as_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vipertools.parse.parse_phenix" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="sparcstools.parse.parse_phenix">
+<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">parse_phenix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phenix_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatfield_exported</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGAbackground</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_as_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.parse_phenix" title="Permalink to this definition"></a></dt>
 <dd><p>Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
 Example of an exported file name: “Timepoint{#}_Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif”</p>
 <dl class="field-list simple">
@@ -117,8 +117,8 @@ from differentoperating systems</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="vipertools.parse.sort_timepoints">
-<span class="sig-prename descclassname"><span class="pre">vipertools.parse.</span></span><span class="sig-name descname"><span class="pre">sort_timepoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vipertools.parse.sort_timepoints" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="sparcstools.parse.sort_timepoints">
+<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">sort_timepoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.sort_timepoints" title="Permalink to this definition"></a></dt>
 <dd><p>Additionally sort generated timecourse images according to well and tile position. Function
 generates a new folder called timecourse_sorted which contains a unqiue folder for each unique tile
 position containing all imaging data (i.e. zstacks, timepoints, channels) of that tile.
@@ -136,8 +136,8 @@ different OS but is signficiantly faster and does not produce as much data overh
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="vipertools.parse.sort_wells">
-<span class="sig-prename descclassname"><span class="pre">vipertools.parse.</span></span><span class="sig-name descname"><span class="pre">sort_wells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assign_random_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vipertools.parse.sort_wells" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="sparcstools.parse.sort_wells">
+<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">sort_wells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assign_random_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.sort_wells" title="Permalink to this definition"></a></dt>
 <dd><p>Sort acquired phenix images into unique folders for each well.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -150,13 +150,13 @@ different OS but is signficiantly faster and does not produce as much data overh
 </dl>
 </dd></dl>
 
-<span class="target" id="module-vipertools.stitch"></span><section id="stitch">
+<span class="target" id="module-sparcstools.stitch"></span><section id="stitch">
 <h2>stitch<a class="headerlink" href="#stitch" title="Permalink to this heading"></a></h2>
 <p>Collection of functions to perform stitching of parsed image Tiffs.</p>
 </section>
 <dl class="py function">
-<dt class="sig sig-object py" id="vipertools.stitch.generate_stitched">
-<span class="sig-prename descclassname"><span class="pre">vipertools.stitch.</span></span><span class="sig-name descname"><span class="pre">generate_stitched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slidename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stitching_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Alexa488'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'bottom':</span> <span class="pre">0,</span> <span class="pre">'left':</span> <span class="pre">0,</span> <span class="pre">'right':</span> <span class="pre">0,</span> <span class="pre">'top':</span> <span class="pre">0}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_QC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filetype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['.tif']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGAchannel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_intensity_rescale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_rescale_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_XML</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vipertools.stitch.generate_stitched" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="sparcstools.stitch.generate_stitched">
+<span class="sig-prename descclassname"><span class="pre">sparcstools.stitch.</span></span><span class="sig-name descname"><span class="pre">generate_stitched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slidename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stitching_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Alexa488'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'bottom':</span> <span class="pre">0,</span> <span class="pre">'left':</span> <span class="pre">0,</span> <span class="pre">'right':</span> <span class="pre">0,</span> <span class="pre">'top':</span> <span class="pre">0}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_QC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filetype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['.tif']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGAchannel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_intensity_rescale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_rescale_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_XML</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.stitch.generate_stitched" title="Permalink to this definition"></a></dt>
 <dd><p>Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
 stitched images.</p>
@@ -164,7 +164,7 @@ stitched images.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>input_dir</strong> (<em>str</em>) – Path to the folder containing exported TIF files named with the following nameing convention: “Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif”.
-These images can be generated for example by running the vipertools.parse.parse_phenix() function.</p></li>
+These images can be generated for example by running the sparcstools.parse.parse_phenix() function.</p></li>
 <li><p><strong>slidename</strong> (<em>str</em>) – string indicating the slidename that is added to the stitched images generated</p></li>
 <li><p><strong>pattern</strong> (<em>str</em>) – Regex string to identify the naming pattern of the TIFs that should be stitched together.
 For example: “Row1_Well2_{channel}_zstack3_r{row:03}_c{col:03}.tif”.
@@ -176,7 +176,7 @@ to give more control.</p></li>
 <li><p><strong>stitching_channel</strong> (<em>str</em>) – string indicating the channel name on which the stitching should be calculated. the positions for each tile calculated in this channel will be
 passed to the other channels.</p></li>
 <li><p><strong>crop</strong> – dictionary of the form {‘top’:0, ‘bottom’:0, ‘left’:0, ‘right’:0} indicating how many pixels (based on a generated thumbnail,
-see vipertools.stitch.generate_thumbnail) should be cropped from the final image in each indicated dimension. Leave this set to default
+see sparcstools.stitch.generate_thumbnail) should be cropped from the final image in each indicated dimension. Leave this set to default
 if no cropping should be performed.</p></li>
 <li><p><strong>plot_QC</strong> (<em>bool</em>) – boolean value indicating if QC plots should be generated</p></li>
 <li><p><strong>filetype</strong> (<em>[</em><em>str</em><em>]</em>) – list containing any of [“.tif”, “.ome.zarr”, “.ome.tif”] defining to which type of file the stiched results should be written. If more than one
@@ -192,8 +192,8 @@ not be rescaled.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="vipertools.stitch.generate_thumbnail">
-<span class="sig-prename descclassname"><span class="pre">vipertools.stitch.</span></span><span class="sig-name descname"><span class="pre">generate_thumbnail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stitching_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DAPI'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_examples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_intensity_rescale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vipertools.stitch.generate_thumbnail" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="sparcstools.stitch.generate_thumbnail">
+<span class="sig-prename descclassname"><span class="pre">sparcstools.stitch.</span></span><span class="sig-name descname"><span class="pre">generate_thumbnail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stitching_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DAPI'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_examples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_intensity_rescale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.stitch.generate_thumbnail" title="Permalink to this definition"></a></dt>
 <dd><p>Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
 stitched images.</p>
@@ -201,7 +201,7 @@ stitched images.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>input_dir</strong> (<em>str</em>) – Path to the folder containing exported TIF files named with the following nameing convention: “Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif”.
-These images can be generated for example by running the vipertools.parse.parse_phenix() function.</p></li>
+These images can be generated for example by running the sparcstools.parse.parse_phenix() function.</p></li>
 <li><p><strong>pattern</strong> (<em>str</em>) – Regex string to identify the naming pattern of the TIFs that should be stitched together.
 For example: “Row1_Well2_{channel}_zstack3_r{row:03}_c{col:03}.tif”.
 All values in {} indicate those which are matched by regex to find all matching tifs.</p></li>
@@ -215,13 +215,13 @@ All values in {} indicate those which are matched by regex to find all matching 
 </dl>
 </dd></dl>
 
-<span class="target" id="module-vipertools.image_processing"></span><section id="image-processing">
+<span class="target" id="module-sparcstools.image_processing"></span><section id="image-processing">
 <h2>image processing<a class="headerlink" href="#image-processing" title="Permalink to this heading"></a></h2>
 <p>Contains functions to perform standard image processing steps, e.g. downsampling.</p>
 </section>
 <dl class="py function">
-<dt class="sig sig-object py" id="vipertools.image_processing.downsample_folder">
-<span class="sig-prename descclassname"><span class="pre">vipertools.image_processing.</span></span><span class="sig-name descname"><span class="pre">downsample_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_ending</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('.tif',</span> <span class="pre">'.tiff')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vipertools.image_processing.downsample_folder" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="sparcstools.image_processing.downsample_folder">
+<span class="sig-prename descclassname"><span class="pre">sparcstools.image_processing.</span></span><span class="sig-name descname"><span class="pre">downsample_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_ending</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('.tif',</span> <span class="pre">'.tiff')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.image_processing.downsample_folder" title="Permalink to this definition"></a></dt>
 <dd><p>Multi-Threaded Function to downsample image equivalent to 2x2 binning. Overwrites original images! Do not run multiple times.
 Output is saved as uint16.</p>
 <dl class="field-list simple">
@@ -237,8 +237,8 @@ Output is saved as uint16.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="vipertools.image_processing.downsample_img">
-<span class="sig-prename descclassname"><span class="pre">vipertools.image_processing.</span></span><span class="sig-name descname"><span class="pre">downsample_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#vipertools.image_processing.downsample_img" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="sparcstools.image_processing.downsample_img">
+<span class="sig-prename descclassname"><span class="pre">sparcstools.image_processing.</span></span><span class="sig-name descname"><span class="pre">downsample_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.image_processing.downsample_img" title="Permalink to this definition"></a></dt>
 <dd><p>Function to downsample a single image equivalent to NxN binning using the mean between pixels.
 Overwrites the original image(!), do not run multiple times on the same image.</p>
 <dl class="field-list simple">
@@ -259,14 +259,14 @@ Overwrites the original image(!), do not run multiple times on the same image.</
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to vipertools’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to SPARCSTools documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="tutorials.html" class="btn btn-neutral float-right" title="1. Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Sophia Maedler.</p>
+    <p>&#169; Copyright 2023, Sophia Maedler.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

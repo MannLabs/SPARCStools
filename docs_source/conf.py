@@ -19,8 +19,8 @@ sys.path.insert(0, os.path.abspath('../src'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'vipertools'
-copyright = '2022, Sophia Maedler'
+project = 'sparcstools'
+copyright = '2023, Sophia Maedler'
 author = 'Sophia Maedler'
 
 # The full version, including alpha/beta/rc tags
