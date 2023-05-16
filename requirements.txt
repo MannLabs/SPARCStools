@@ -12,3 +12,4 @@ imagecodecs
 yattag
 seaborn
 xarray
+h5py
