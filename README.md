@@ -1,4 +1,4 @@
-# VIPERtools
+# SPARCStools
 
 documentation can be found at: https://sophiamaedler.github.io/SPARCStools/
 
