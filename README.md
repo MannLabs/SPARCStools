@@ -11,8 +11,12 @@ Clone the github repository and navigate to the main directory:
 
 Create a conda environment and activate it
 
-    conda create -n stitching python=3.9
+    conda create -n stitching python=3.10
     conda activate stitching
+
+Install Java using conda
+
+    conda install -c conda-forge openjdk
 
 Install package via pip. This should install all dependencies as well.
 
