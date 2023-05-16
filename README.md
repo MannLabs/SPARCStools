@@ -6,7 +6,7 @@ documentation can be found at: https://sophiamaedler.github.io/SPARCStools/
 
 Clone the github repository and navigate to the main directory:
 
-    git clone https://github.com/sophiamaedler/VIPERtools.git
+    git clone https://github.com/sophiamaedler/SPARCStools.git
     cd VIPERtools
 
 Create a conda environment and activate it
@@ -20,4 +20,4 @@ Install Java using conda
 
 Install package via pip. This should install all dependencies as well.
 
-    pip install -e .
+    pip install .
