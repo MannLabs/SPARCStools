@@ -1,6 +1,10 @@
+"""_custom_ashalar_funcs
+
+functions adapted from https://github.com/labsyspharm/ashlar to provide specific functionality required for this package.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 import networkx as nx
 import os
 
@@ -38,6 +42,7 @@ def plot_edge_quality(
     draw_mosaic_image(ax, aligner, img, **im_kwargs)
     error = np.array([aligner._cache[tuple(sorted(e))][1]
                       for e in aligner.neighbors_graph.edges])
+    
     # Manually center and scale data to 0-1, except infinity which is set to -1.
     # This lets us use the purple-green diverging color map to color the graph
     # edges and cause the "infinity" edges to disappear into the background

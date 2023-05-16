@@ -16,9 +16,11 @@ import shutil
 import glob
 from datetime import datetime
 
+
+### Phenix Parse functions
+
 def parse_phenix(phenix_dir,
                  flatfield_exported = True,
-                 parallel = False,
                  WGAbackground = False,
                  export_meta = True,
                  export_as_symlink = False):
@@ -31,10 +33,8 @@ def parse_phenix(phenix_dir,
     ----------
     phenix_dir
         Path indicating the exported harmony files to parse.
-    flatfield_exported
+    flatfield_exported : bool
         boolean indicating if the data was exported from harmony with or without flatfield correction.
-    parallel
-        boolean value indicating if the data parsing should be performed with parallelization or without (CURRENTLY NOT FUNCTIONAL ONLY USE AS FALSE)
     WGAbackground
         export second copy of WGA stains for background correction to improve segmentation. If set to False not performed. Else enter value of the channel
         that should be copied and contains the WGA stain.
@@ -186,31 +186,25 @@ def parse_phenix(phenix_dir,
     filelist = os.listdir(outdir) # dir is your directory path
     number_files = len(filelist)
 
-    if parallel:
-        print('parallel processing currently not implemented please rerun with parallel = False')
-       # Parallel(n_jobs = 10)(delayed(shutil.copyfile(os.path.join(input_dir, old), os.path.join(outdir, new)))) for old, new in zip(df.Image_files.tolist(), df.new_file_name.tolist())
+    if export_as_symlink:
+        def copyfunction(input, output):
+            try:
+                os.symlink(input, output)
+            except:
+                return()
     else:
-        #define copy function (i.e. if it should generate symlinks or not)
-        
-        if export_as_symlink:
-            def copyfunction(input, output):
-                try:
-                    os.symlink(input, output)
-                except:
-                    return()
-        else:
-            def copyfunction(input, output):
-                shutil.copyfile(input, output)
+        def copyfunction(input, output):
+            shutil.copyfile(input, output)
 
-        for old, new in tqdm(zip(df.Image_files.tolist(), df.new_file_name.tolist()), 
-                         total = len(df.new_file_name.tolist())):
-            old_path = os.path.join(input_dir, old)
-            new_path = os.path.join(outdir, new)
-            #check if old path exists
-            if os.path.exists(old_path):
-                copyfunction(old_path, new_path)
-            else:
-                print("Error: ", old_path, "not found.")
+    for old, new in tqdm(zip(df.Image_files.tolist(), df.new_file_name.tolist()), 
+                        total = len(df.new_file_name.tolist())):
+        old_path = os.path.join(input_dir, old)
+        new_path = os.path.join(outdir, new)
+        #check if old path exists
+        if os.path.exists(old_path):
+            copyfunction(old_path, new_path)
+        else:
+            print("Error: ", old_path, "not found.")
                 
     #export meta data if requested
     if export_meta:
@@ -245,10 +239,14 @@ def sort_timepoints(parsed_dir, use_symlink = False):
     position containing all imaging data (i.e. zstacks, timepoints, channels) of that tile.
     This function is meant for quick sorting of generated images for simple import of e.g. timecourse 
     experiments into FIJI. 
+    
     Parameters
     ----------
     parsed_dir
         filepath to parsed images folder generated with the function parse_phenix.
+    use_symlonks : bool
+        boolean value indicating if the images should be copied as symlinks or as regular files. Symlinks can potentially cause issues if using the data on
+        different OS but is signficiantly faster and does not produce as much data overhead.
     """
 
     outdir = parsed_dir.replace(os.path.basename(parsed_dir), "timecourse_sorted")
@@ -300,7 +298,7 @@ def sort_timepoints(parsed_dir, use_symlink = False):
 
 def sort_wells(parsed_dir, use_symlink = False, assign_random_id = False):
     """
-    Sort aquired phenix images into unique folders for each well. 
+    Sort acquired phenix images into unique folders for each well. 
 
     Parameters
     ----------

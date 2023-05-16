@@ -128,13 +128,13 @@ def _write_xml(path,
 
     Parameters
     ----------
-    path 
+    path : str
         path to where the exported images are written
-    channels
+    channels : [str]
         list of the channel names written out
-    slidename
+    slidename : str
         string indicating the name underwhich the files were written out
-    cropped
+    cropped : bool
         boolean value indicating if the stitched images were written out cropped or not.
     """
 
@@ -186,13 +186,13 @@ def generate_thumbnail(input_dir,
 
     Parameters
     ----------
-    input_dir
+    input_dir : str
         Path to the folder containing exported TIF files named with the following nameing convention: "Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif". 
         These images can be generated for example by running the vipertools.parse.parse_phenix() function.
-    pattern
+    pattern : str
         Regex string to identify the naming pattern of the TIFs that should be stitched together. 
         For example: "Row1_Well2_{channel}_zstack3_r{row:03}_c{col:03}.tif". 
-        All values in {} indicate thos which are matched by regex to find all matching tifs.
+        All values in {} indicate those which are matched by regex to find all matching tifs.
     outdir
         path indicating where the stitched images should be written out
     overlap
@@ -256,12 +256,12 @@ def generate_stitched(input_dir,
                       overlap = 0.1,
                       max_shift = 30, 
                       stitching_channel = "Alexa488",
-                      no_rescale_channel = None,
                       crop = {'top':0, 'bottom':0, 'left':0, 'right':0},
                       plot_QC = True,
                       filetype = [".tif"],
                       WGAchannel = None,
                       do_intensity_rescale = True,
+                      no_rescale_channel = None,
                       export_XML = True):
     
     """
@@ -271,40 +271,43 @@ def generate_stitched(input_dir,
 
     Parameters
     ----------
-    input_dir
+    input_dir : str
         Path to the folder containing exported TIF files named with the following nameing convention: "Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif". 
         These images can be generated for example by running the vipertools.parse.parse_phenix() function.
-    pattern
+    slidename : str
+        string indicating the slidename that is added to the stitched images generated
+    pattern : str
         Regex string to identify the naming pattern of the TIFs that should be stitched together. 
         For example: "Row1_Well2_{channel}_zstack3_r{row:03}_c{col:03}.tif". 
-        All values in {} indicate thos which are matched by regex to find all matching tifs.
-    outdir
+        All values in {} indicate those which are matched by regex to find all matching tifs.
+    outdir : str
         path indicating where the stitched images should be written out
-    overlap
+    overlap : float between 0 and 1
         value between 0 and 1 indicating the degree of overlap that was used while recording data at the microscope.
-    max_shift
-        value indicating the maximum threshold for tile shifts. Default value in ashlar is 15.
-    name
-        string indicating the slidename that is added to the stitched images generated
-    stitching_channel
+    max_shift: int
+        value indicating the maximum threshold for tile shifts. Default value in ashlar is 15. In general this parameter does not need to be adjusted but it is provided
+        to give more control.
+    stitching_channel : str
         string indicating the channel name on which the stitching should be calculated. the positions for each tile calculated in this channel will be 
         passed to the other channels. 
     crop
         dictionary of the form {'top':0, 'bottom':0, 'left':0, 'right':0} indicating how many pixels (based on a generated thumbnail, 
         see vipertools.stitch.generate_thumbnail) should be cropped from the final image in each indicated dimension. Leave this set to default 
         if no cropping should be performed.
-    plot_QC
+    plot_QC : bool
         boolean value indicating if QC plots should be generated
-    filetype
+    filetype : [str]
         list containing any of [".tif", ".ome.zarr", ".ome.tif"] defining to which type of file the stiched results should be written. If more than one 
-        element all export types will be generated in the same output directory.
-    WGAchannel
-        string indicating the name of the WGA channel in case an illumination correction should be performed on this cahhenl
-    do_intensity_rescale
-        boolean value indicating if the rescale_p1_P99 function should be applied before stitching or not. Alternatively partial then it will only
-        rescale those channels provided as a list in rescale_channels
+        element is present in the list all export types will be generated in the same output directory.
+    WGAchannel : str
+        string indicating the name of the WGA channel in case an illumination correction should be performed on this channel
+    do_intensity_rescale : bool
+        boolean value indicating if the rescale_p1_P99 function should be applied before stitching or not. Alternatively partial then those channels listed in no_rescale_channel will 
+        not be rescaled.
+    no_rescale_channel : None | [str]
+        either None or a list of channel strings on which no rescaling before stitching should be performed.
     export_XML
-        boolean value. If true than an xml is exported when writing to .tif which allows for the import into BIAS.
+        boolean value. If true then an xml is exported when writing to .tif which allows for the import into BIAS.
     """
     start_time = time.time()
     
