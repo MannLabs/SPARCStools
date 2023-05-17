@@ -7,7 +7,7 @@ documentation can be found at: https://sophiamaedler.github.io/SPARCStools/
 Clone the github repository and navigate to the main directory:
 
     git clone https://github.com/sophiamaedler/SPARCStools.git
-    cd VIPERtools
+    cd SPARCStools
 
 Create a conda environment and activate it
 
