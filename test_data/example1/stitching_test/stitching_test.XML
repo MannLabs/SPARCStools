@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BIAS version="1.0">
+    <channels>
+        <channel id="1">
+            <name>Alexa488</name>
+        </channel>
+        <channel id="2">
+            <name>DAPI</name>
+        </channel>
+        <channel id="3">
+            <name>mCherry</name>
+        </channel>
+    </channels>
+    <images>
+        <image url="stitching_test_Alexa488.tif">
+            <channel>1</channel>
+        </image>
+        <image url="stitching_test_DAPI.tif">
+            <channel>2</channel>
+        </image>
+        <image url="stitching_test_mCherry.tif">
+            <channel>3</channel>
+        </image>
+    </images>
+</BIAS>
