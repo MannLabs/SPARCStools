@@ -45,9 +45,12 @@ Citing our Work
 
 This code was developed by Sophia Maedler and Niklas Schmacke in the labs of Matthias Mann and Veit Hornung. 
 
-If you use our work please cite the following manuscript:
+If you use our work please cite the [following manuscript](https://www.biorxiv.org/content/10.1101/2023.06.01.542416v1):
 
-INSERT CITATION HERE
+SPARCS, a platform for genome-scale CRISPR screening for spatial cellular phenotypes
+Niklas Arndt Schmacke, Sophia Clara Maedler, Georg Wallmann, Andreas Metousis, Marleen Berouti, Hartmann Harz, Heinrich Leonhardt, Matthias Mann, Veit Hornung
+bioRxiv 2023.06.01.542416; doi: https://doi.org/10.1101/2023.06.01.542416
+
 
 .. toctree::
    :maxdepth: 3
