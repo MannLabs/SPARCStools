@@ -326,8 +326,8 @@ def sort_wells(parsed_dir, use_symlink = False, assign_random_id = False):
     print("\t Wells: ", wells)
     print("\t Tiles: ", tiles)
     
-    for row in rows:
-        for well in wells:
+    for row in tqdm(rows):
+        for well in tqdm(wells):
             _outdir = os.path.join(outdir, row + "_" + well)
             
             #create outdir if not already existing
@@ -361,6 +361,3 @@ def sort_wells(parsed_dir, use_symlink = False, assign_random_id = False):
             else:
                 for file in files:
                     copyfunction(file, os.path.join(_outdir, os.path.basename(file)))
-                    
-            print("completed export for " + row + "_" + well)
-
