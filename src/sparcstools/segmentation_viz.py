@@ -140,7 +140,7 @@ def sparcspy_add_seg(stitched_path, project_location, nuclei = True, cytosol = T
         print("no output file found will extract imaging data and generate a new ome.zarr")
         channels = hdf5["channels"][:, :, :]
 
-        write_zarr_with_seg(channels 
+        write_zarr_with_seg(channels,
                             segs,  #list of all sets you want to visualize
                             seg_labels, #list of what each cell set should be called
                             stitched_path)
