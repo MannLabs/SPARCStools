@@ -3,3 +3,4 @@
 sparcstools.egg-info
 src/sparcstools/__pycache__
 src/sparcstools.egg-info
+.vscode

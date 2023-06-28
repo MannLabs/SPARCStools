@@ -613,6 +613,7 @@ def prepare_stitch_slurm_job(path,
     import re
 
     files = os.listdir(input_path)
+    files =[x for x in files if x not in [".DS_Store"]]
     wells = np.unique([re.search("Row.._Well..", x).group() for x in files])
     _files = os.listdir(os.path.join(input_path, wells[0]))
     _files = [x for x in _files if x.endswith(".tif")]

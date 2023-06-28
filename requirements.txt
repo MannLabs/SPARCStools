@@ -13,3 +13,5 @@ yattag
 seaborn
 xarray
 h5py
+shapely
+rasterio
