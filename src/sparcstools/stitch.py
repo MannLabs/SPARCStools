@@ -491,7 +491,7 @@ def generate_stitched(input_dir,
         path = os.path.join(outdir, slidename + ".ome.zarr")
 
         #delete file if it already exists
-        if os.path.isfile(path):
+        if os.path.isdir(path):
             shutil.rmtree(path)
             print("Outfile already existed, deleted.")
 
