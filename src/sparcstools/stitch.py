@@ -26,6 +26,7 @@ import random
 from tqdm import tqdm
 from joblib import Parallel, delayed
 import h5py
+import gc
 
 #for export to ome.zarr
 import zarr
@@ -315,7 +316,10 @@ def generate_stitched(input_dir,
         boolean value. If true and return_type != "return_array" the tile positions are written out to csv.
     """
     start_time = time.time()
-    
+
+    #convert relativ paths into absolute paths
+    outdir = os.path.abspath(outdir)
+
     #read data 
     print("performing stitching with ", str(overlap), " overlap.")
     slide = FilePatternReaderRescale(path = input_dir, pattern = pattern, overlap = overlap, rescale_range=rescale_range)
@@ -363,6 +367,7 @@ def generate_stitched(input_dir,
 
     mosaic.dtype = np.uint16
 
+
     if "return_array" in filetype:
         print("not saving positions")
     else:
@@ -395,16 +400,29 @@ def generate_stitched(input_dir,
         return(merged_array, channels)
 
     elif ".tif" in filetype:
+        
         print("writing results to one large tif.")
+        #define shape of output image
 
-        mosaics = []
-        for channel in tqdm(mosaic.channels):
-            mosaics.append(mosaic.assemble_channel(channel = channel))
+        n_channels = len(mosaic.channels)
+        x, y = mosaic.shape
+
+        from alphabase.io import tempmmap
+        TEMP_DIR_NAME = tempmmap.redefine_temp_location(outdir)
+
+        # initialize tempmmap array to save segmentation results to
+        mosaics = tempmmap.array((n_channels, x, y), dtype=np.uint16)
+        for i, channel in tqdm(enumerate(mosaic.channels), total = n_channels):
+            mosaics[i, :, :] = mosaic.assemble_channel(channel = channel)
             
         #actually perform cropping
         if np.sum(list(crop.values())) > 0:
             print('Merged image will be cropped to the specified cropping parameters: ', crop)
             merged_array = np.array(mosaics)
+            
+            #manual garbage collection tp reduce memory footprint
+            del mosaics
+            gc.collect()
 
             cropping_factor = 20.00   #this is based on the scale that was used in the thumbnail generation
             _, x, y = merged_array.shape
@@ -414,7 +432,10 @@ def generate_stitched(input_dir,
             right = int(crop['right'] * cropping_factor)
             cropped = merged_array[:, slice(top, x-bottom), slice(left, y-right)]
 
-            #return(merged_array, cropped)
+            #manual garbage collection tp reduce memory footprint
+            del merged_array
+            gc.collect()
+
             #write to tif for each channel
             for i, channel in enumerate(slide.metadata.channel_map.values()):
                 (print('writing to file: ', channel))
@@ -423,16 +444,27 @@ def generate_stitched(input_dir,
             
             if export_XML:
                 _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = True)
-        
+
+            #manual garbage collection tp reduce memory footprint
+            del cropped
+            gc.collect()
+
         else:
             merged_array = np.array(mosaics)
+            
+            #manual garbage collection tp reduce memory footprint
+            del mosaics
+            gc.collect()
+
             for i, channel in enumerate(slide.metadata.channel_map.values()):
                 im = Image.fromarray(merged_array[i].astype('uint16'))#ensure that type is uint16
                 im.save(os.path.join(outdir, slidename + "_"+channel+'.tif'))
 
             if export_XML:
                 _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = False)
-    
+
+            del merged_array
+            
     elif "ome.tif" in filetype:
         print("writing results to ome.tif")
         path = os.path.join(outdir, slidename + ".ome.tiff")
@@ -443,11 +475,26 @@ def generate_stitched(input_dir,
         print("writing results to ome.zarr")
 
         if 'mosaics' not in locals():
-            mosaics = []
-            for channel in tqdm(mosaic.channels):
-                mosaics.append(mosaic.assemble_channel(channel = channel))
+            #define shape of output image
+
+            n_channels = len(mosaic.channels)
+            x, y = mosaic.shape
+
+            from alphabase.io import tempmmap
+            TEMP_DIR_NAME = tempmmap.redefine_temp_location(outdir)
+
+            # initialize tempmmap array to save segmentation results to
+            mosaics = tempmmap.array((n_channels, x, y), dtype=np.uint16)
+            for i, channel in tqdm(enumerate(mosaic.channels), total = n_channels):
+                mosaics[i, :, :] = mosaic.assemble_channel(channel = channel)
 
         path = os.path.join(outdir, slidename + ".ome.zarr")
+
+        #delete file if it already exists
+        if os.path.isfile(path):
+            shutil.rmtree(path)
+            print("Outfile already existed, deleted.")
+
         loc = parse_url(path, mode="w").store
         group = zarr.group(store = loc)
         axes = "cyx"
@@ -460,10 +507,24 @@ def generate_stitched(input_dir,
         group.attrs["omero"] = {
             "name":slidename + ".ome.zarr",
             "channels": [{"label":channel, "color":channel_colors[i], "active":True} for i, channel in enumerate(slide.metadata.channel_map.values())]
-        }
-        print(np.array(mosaics).shape)    
-        write_image(np.array(mosaics), group = group, axes = axes, storage_options=dict(chunks=(1, 1024, 1024)))
-    
+        }  
+        write_image(mosaics, group = group, axes = axes, storage_options=dict(chunks=(1, 1024, 1024)))
+   
+    #perform garbage collection manually to free up memory as quickly as possible
+    print("deleting old variables")
+    if "mosaic" in locals():
+        del mosaic
+        gc.collect()
+
+    if "mosaics" in locals():
+        del mosaics
+        gc.collect()
+
+    if "TEMP_DIR_NAME" in locals():
+        shutil.rmtree(TEMP_DIR_NAME, ignore_errors=True)
+        del TEMP_DIR_NAME
+        gc.collect()
+
     end_time = time.time() - start_time
     print('Merging Pipeline completed in ', str(end_time/60) , "minutes.")
 
@@ -490,58 +551,6 @@ def _stitch(x,
                         plot_QC = False,
                         export_XML = False, 
                         return_tile_positions = False)
-
-# def stitch_all(parsed_dir, 
-#                overlap, 
-#                stitching_channel = "Alexa488", 
-#                zstack_value = 1, 
-#                rescale_range = (0.1, 99.9),
-#                threads = 5):
-    
-#     """Wrapper Function to stitch all tiles contained in a repository with multithreading.
-#     """
-
-#     #generate directories where the images are sorted according to well (makes lookup for images later faster)
-#     sorted_dir = parsed_dir.replace("parsed_images", "well_sorted")
-#     if os.path.isdir(sorted_dir):
-#         print("wells already sorted skipping step")
-#     else:
-#         from sparcstools.parse import sort_wells
-#         sort_wells(parsed_dir, use_symlink=True)
-    
-#     #generate outdir if it does not already exist
-#     outdir = parsed_dir.replace("parsed_images", "stitched_wells")
-
-#     if not os.path.isdir(outdir):
-#         os.makedirs(outdir)
-
-#     #generate lookup to get wells and timepoints that need to be stitched
-#     import re
-
-#     files = os.listdir(sorted_dir)
-#     wells = np.unique([re.search("Row.._Well..", x).group() for x in files])
-
-#     print(wells[0])
-#     _files = os.listdir(os.path.join(sorted_dir, wells[0]))
-#     _files = [x for x in _files if x.endswith(".tif")]
-#     timepoints = np.unique([re.search("^Timepoint...", x).group() for x in _files])
-
-#     to_process = []
-#     for timepoint in timepoints:
-#         for well in wells:
-#             pattern = f"{timepoint}_{well}_" +"{channel}_"+"zstack"+str(zstack_value).zfill(3)+"_r{row:03}_c{col:03}.tif"
-#             slidename = f"{timepoint}_{well}"
-#             path = f"{sorted_dir}/{well}"
-            
-#             to_process.append((pattern, slidename, path))
-    
-#     #define helper function to use for stitching
-#     from sparcstools.stitch import generate_stitched
-    
-#     from multiprocessing import Pool  
-#     from functools import partial
-#     with Pool(processes=threads) as pool:
-#         results = list(tqdm(pool.imap(partial(_stitch, outdir = outdir, overlap = overlap, stitching_channel = stitching_channel, rescale_range = rescale_range), to_process), total = len(to_process)))
 
 def prepare_stitch_slurm_job(path, 
                             stitching_channel = "mCherry",
