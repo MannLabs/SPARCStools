@@ -109,7 +109,7 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
         if not self.do_rescale:
             return img
         elif self.do_rescale == "partial":
-            if c != self.no_rescale_channel:
+            if c not in self.no_rescale_channel:
                 return self.rescale_p1_p99(img, rescale_range = self.rescale_range) 
             else:
                 return img
@@ -172,7 +172,17 @@ def _write_xml(path,
     write_path = os.path.join(path, slidename + ".XML")
     with open(write_path, mode ="w") as f:
         f.write(result)
- 
+
+def _reorder_list(original_list, index_list):
+    if len(original_list) != len(index_list):
+        raise ValueError("The length of the original list and index list must be the same.")
+    
+    reordered_list = [None] * len(original_list)
+    
+    for i, index in enumerate(index_list):
+        reordered_list[index] = original_list[i]
+    
+    return reordered_list
 
 def generate_thumbnail(input_dir, 
                        pattern, 
@@ -182,7 +192,8 @@ def generate_thumbnail(input_dir,
                        stitching_channel = "DAPI", 
                        export_examples = False,
                        do_intensity_rescale = True, 
-                       rescale_range = (1, 99)):
+                       rescale_range = (1, 99),
+                       scale = 0.05):
     """
     Function to generate a scaled down thumbnail of stitched image. Can be used for example to 
     get a low resolution overview of the scanned region to select areas for exporting high resolution 
@@ -220,7 +231,7 @@ def generate_thumbnail(input_dir,
 
     #generate stitched thumbnail on which to determine cropping params
     channel_id = list(slide.metadata.channel_map.values()).index(stitching_channel)
-    _thumbnail = thumbnail.make_thumbnail(slide, channel=channel_id, scale=0.05)
+    _thumbnail = thumbnail.make_thumbnail(slide, channel=channel_id, scale=scale)
 
     _thumbnail = Image.fromarray(_thumbnail)
     _thumbnail.save(os.path.join(outdir, name + '_thumbnail_'+stitching_channel+'.tif'))
@@ -268,7 +279,8 @@ def generate_stitched(input_dir,
                       rescale_range = (1, 99),
                       no_rescale_channel = None,
                       export_XML = True,
-                      return_tile_positions = True):
+                      return_tile_positions = True,
+                      channel_order = None):
     
     """
     Function to generate a stitched image.
@@ -314,6 +326,8 @@ def generate_stitched(input_dir,
         boolean value. If true then an xml is exported when writing to .tif which allows for the import into BIAS.
     return_tile_positions : bool | default = True
         boolean value. If true and return_type != "return_array" the tile positions are written out to csv.
+    channel_order : None | [int]
+        if None do nothing, if list of ints is supplied remap channel order
     """
     start_time = time.time()
 
@@ -330,7 +344,9 @@ def generate_stitched(input_dir,
 
     if do_intensity_rescale == "partial":
         if no_rescale_channel != None:
-            no_rescale_channel_id = list(slide.metadata.channel_map.values()).index(no_rescale_channel)
+            no_rescale_channel_id = []
+            for _channel in no_rescale_channel:
+                no_rescale_channel_id.append(slide.metadata.channel_map.values().index(_channel))
             slide.no_rescale_channel = no_rescale_channel_id
         else:
             sys.exit("do_intensity_rescale set to partial but not channel passed for which no rescaling should be done.")
@@ -367,6 +383,10 @@ def generate_stitched(input_dir,
 
     mosaic.dtype = np.uint16
 
+    if channel_order is None:
+        _channels = mosaic.channels
+    else:
+        _channels = _reorder_list(mosaic.channels, channel_order)
 
     if "return_array" in filetype:
         print("not saving positions")
@@ -383,7 +403,7 @@ def generate_stitched(input_dir,
         print("Returning array instead of saving to file.")
         mosaics = []
         
-        for channel in tqdm(mosaic.channels):
+        for channel in tqdm(_channels):
             mosaics.append(mosaic.assemble_channel(channel = channel))
 
         merged_array = np.array(mosaics)
@@ -412,7 +432,7 @@ def generate_stitched(input_dir,
 
         # initialize tempmmap array to save segmentation results to
         mosaics = tempmmap.array((n_channels, x, y), dtype=np.uint16)
-        for i, channel in tqdm(enumerate(mosaic.channels), total = n_channels):
+        for i, channel in tqdm(enumerate(_channels), total = n_channels):
             mosaics[i, :, :] = mosaic.assemble_channel(channel = channel)
             
         #actually perform cropping
@@ -477,7 +497,7 @@ def generate_stitched(input_dir,
         if 'mosaics' not in locals():
             #define shape of output image
 
-            n_channels = len(mosaic.channels)
+            n_channels = len(_channels)
             x, y = mosaic.shape
 
             from alphabase.io import tempmmap
@@ -485,7 +505,7 @@ def generate_stitched(input_dir,
 
             # initialize tempmmap array to save segmentation results to
             mosaics = tempmmap.array((n_channels, x, y), dtype=np.uint16)
-            for i, channel in tqdm(enumerate(mosaic.channels), total = n_channels):
+            for i, channel in tqdm(enumerate(_channels), total = n_channels):
                 mosaics[i, :, :] = mosaic.assemble_channel(channel = channel)
 
         path = os.path.join(outdir, slidename + ".ome.zarr")
