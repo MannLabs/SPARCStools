@@ -232,6 +232,244 @@ def parse_phenix(phenix_dir,
 
         print("Parsing Alexa488 data completed, total time was ", str(endtime/60), "minutes.")
 
+def parse_phenix_40X_slide(phenix_dir,
+                            flatfield_exported = True,
+                            downsampled = False,
+                            WGAbackground = False,
+                            export_meta = True,
+                            export_as_symlink = False):
+
+    """
+    Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
+    Example of an exported file name: "Timepoint{#}_Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif"
+
+    Parameters
+    ----------
+    phenix_dir
+        Path indicating the exported harmony files to parse.
+    flatfield_exported : bool
+        boolean indicating if the data was exported from harmony with or without flatfield correction.
+    WGAbackground
+        export second copy of WGA stains for background correction to improve segmentation. If set to False not performed. Else enter value of the channel
+        that should be copied and contains the WGA stain.
+    export_meta
+        boolean value indicating if a metadata file containing, tile positions, exact time of measurement etc. should be written out.
+    export_as_symlink
+        boolean value indicating if the parsed files should be copied or symlinked. If set to true can lead to issues when accessing remote filesystems 
+        from differentoperating systems
+    """
+
+    #start timer
+    start_time = time.time()
+
+    #generate directories to save output values
+    if flatfield_exported:
+        input_dir = os.path.join(phenix_dir, 'Images', "flex")
+        index_file = os.path.join(input_dir, 'index.flex.xml')
+    else:
+        input_dir = os.path.join(phenix_dir, 'Images')
+        index_file = os.path.join(input_dir, 'Index.idx.xml')
+    
+    outdir = os.path.join(phenix_dir, 'parsed_images_40X')
+    if downsampled:
+        input_dir = f"{input_dir}_downsampled"
+        outdir = f"{outdir}_downsampled"
+
+    lookuppath = os.path.join(input_dir, 'lookup.csv')
+    outfile = os.path.join(input_dir, 'parsed_index.txt')
+    
+    metadata_file = os.path.join(outdir, "metadata.csv")
+
+    #if output directory does not exist create
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+    #extract channel names from xml file
+    cmd = """grep -E -m 20 '<ChannelName>|<ChannelID>' '""" + index_file + """'"""
+    results = subprocess.check_output(
+        cmd, shell=True).decode("utf-8").strip().split('\r\n')
+
+    results = [x.strip() for x in results]
+    channel_ids = [x.split('>')[1].split('<')[0] for x in results if x.startswith('<ChannelID')]
+    channel_names = [x.split('>')[1].split('<')[0].replace(' ', '') for x in results if x.startswith('<ChannelName')]
+
+    channel_ids = list(set(channel_ids))
+    channel_ids.sort()
+    channel_names = channel_names[0:len(channel_ids)]
+
+    #Parse Phenix XML file to get file name information
+    cmd = """grep -E '<URL>|<PositionX Unit="m">|<PositionY Unit="m">|<AbsTime>' '""" + \
+        index_file + """' > '""" + outfile + """'"""
+    subprocess.check_output(cmd, shell=True)
+
+    images = []
+    x_positions = []
+    y_positions = []
+    times = []
+
+    with open(outfile) as fp:
+        Lines = fp.readlines()
+        for line in Lines:
+            if flatfield_exported:
+                _line = line.replace('flex_', "").split('>')[1].split('<')[0]
+            else:
+                _line = line.split('>')[1].split('<')[0]
+            if line.strip().startswith("<URL>"):
+                images.append(_line)
+            elif line.strip().startswith("<PositionX"):
+                x_positions.append(float(_line))
+            elif line.strip().startswith("<PositionY"):
+                y_positions.append(float(_line))
+            elif line.strip().startswith("<AbsTime"): #relevant for time course experiments
+                times.append(_line)
+            else:
+                print('error')
+
+    #convert date/time into useful format   
+    dates = [x.split("T")[0] for x in times]
+    _times = [x.split("T")[1] for x in times]
+    _times = [(x.split("+")[0].split(".")[0] + "+" + x.split("+")[1].replace(":", "")) for x in _times]
+    time_final = [ x + " " + y for x, y in zip(dates, _times)]
+
+    datetime_format = "%Y-%m-%d %H:%M:%S%z"
+    time_unix = [datetime.strptime(x, datetime_format) for x in time_final]
+    time_unix = [datetime.timestamp(x) for x in time_unix]
+
+    #get plate and well Ids as well as channel information
+    rows = [int(x[0:3].replace('r', '')) for x in images]
+    wells = [int(x[3:6].replace('c', '')) for x in images]
+    channels = [x.split('-')[1][2:3] for x in images]
+    zstack = [int(x.split("p")[1][0:2]) for x in images]
+    timepoint = [int(x.split("sk")[1].split("fk")[0]) for x in images]
+
+    #fill up time point and zstack with leading 0s so that alphabetical sorting works correctly
+    rows = [str(x).zfill(2) for x in rows]  #need to add this since otherwise we wont be able to correctly match to wells with more than 1 digit id
+    wells = [str(x).zfill(2) for x in wells]
+    zstack = [str(x).zfill(3) for x in zstack]
+    timepoint = [str(x).zfill(3) for x in timepoint]
+
+    df = pd.DataFrame({"Image_files": images,
+                       "Row": rows,
+                       "Well": wells,
+                       "Zstack":zstack,
+                       "Timepoint":timepoint,
+                       "X": x_positions,
+                       "Y": y_positions,
+                       "X_pos":None,
+                       "Y_pos":None,
+                       "date": dates,
+                       "time": _times,
+                       "unix_time": time_unix,
+                       "Channel": channels,
+                       "new_file_name": None})
+
+    #get X positions
+    X_values = df.X.value_counts().sort_index()
+    X_values = X_values.index
+
+    for i, x in enumerate(X_values):
+        df.loc[df.X == x, 'X_pos'] = i
+
+    #get y positions
+    Y_values = df.Y.value_counts().sort_index()
+    Y_values = Y_values.index
+
+    for i, y in enumerate(Y_values):
+        df.loc[df.Y == y, 'Y_pos'] = i
+
+    #rename channels with proper channel label
+    lookup = pd.DataFrame({'id': list(channel_ids),
+                           'label': list(channel_names)})
+    print('Channel lookup table:')
+    print(lookup)
+
+    df = df.replace(dict(zip(lookup.id, lookup.label)))
+
+    wells = df.Well.value_counts().index.to_list()
+    rows = df.Row.value_counts().index.to_list()
+
+    wells.sort()
+    rows.sort(reverse = True) #invert because the image quadrant beginns in the bottom left
+
+    for well in wells:
+        for i, row in enumerate(rows):
+            if i == 0:
+                continue
+            else:
+                max_y = df.loc[((df.Well == well) & (df.Row == rows[0]))].Y_pos.max()
+                df.loc[(df.Well == well) & (df.Row == row), "Y_pos"] = df.loc[(df.Well == well) & (df.Row == row), "Y_pos"] + int(max_y) + int(1)
+                df.loc[(df.Well == well) & (df.Row == row), "Row"] = rows[0]
+            
+    df.X_pos = [str(int(x)).zfill(3) for x in df.X_pos]
+    df.Y_pos = [str(int(x)).zfill(3) for x in df.Y_pos]
+
+    #generate new file names
+    for i in range(df.shape[0]):
+        _row = df.loc[i, :]
+        name = "Timepoint{}_Row{}_Well{}_{}_zstack{}_r{}_c{}.tif".format(_row.Timepoint,
+            _row.Row, _row.Well, _row.Channel,_row.Zstack, _row.Y_pos, _row.X_pos)
+        name = name
+        df.loc[i, 'new_file_name'] = name
+
+    #write tables to file for future use
+    lookup.to_csv(lookuppath)
+
+    if flatfield_exported:
+        df.Image_files = ['flex_' + x for x in df.Image_files]
+
+    print(df.head(5))
+    #copy files from a to b
+
+    filelist = os.listdir(outdir) # dir is your directory path
+    number_files = len(filelist)
+
+    if export_as_symlink:
+        def copyfunction(input, output):
+            try:
+                os.symlink(input, output)
+            except:
+                return()
+    else:
+        def copyfunction(input, output):
+            shutil.copyfile(input, output)
+
+    for old, new in tqdm(zip(df.Image_files.tolist(), df.new_file_name.tolist()), 
+                        total = len(df.new_file_name.tolist())):
+        old_path = os.path.join(input_dir, old)
+        new_path = os.path.join(outdir, new)
+        #check if old path exists
+        if os.path.exists(old_path):
+            copyfunction(old_path, new_path)
+        else:
+            print("Error: ", old_path, "not found.")
+                
+    #export meta data if requested
+    if export_meta:
+        print("Metadata file was exported.")
+        df.to_csv(metadata_file)
+
+    if WGAbackground != False:
+
+        print("starting WGAbackground export.")
+
+        #start timer
+        start_time = time.time()
+
+        for file_name in os.listdir(outdir):
+            # construct full file path
+            if WGAbackground in file_name:
+                source = os.path.join(outdir, file_name)
+                destination = os.path.join(outdir, file_name.replace(WGAbackground, "WGAbackground"))
+                # copy only files
+                if os.path.isfile(source):
+                    shutil.copy(source, destination)
+
+        print("Parsing Alexa488 data completed, total time was ", str(endtime/60), "minutes.")
+
+    endtime = time.time() - start_time
+    print("Parsing Phenix data completed, total time was ", str(endtime/60), "minutes.")
+
+
 def sort_timepoints(parsed_dir, use_symlink = False):
     """
     Additionally sort generated timecourse images according to well and tile position. Function 
