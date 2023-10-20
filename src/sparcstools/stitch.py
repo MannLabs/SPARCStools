@@ -6,26 +6,21 @@ Collection of functions to perform stitching of parsed image Tiffs.
 
 """
 
-from ashlar import filepattern, thumbnail, reg
+from ashlar import thumbnail, reg
 from ashlar.scripts.ashlar import process_axis_flip
-from skimage.filters import gaussian
-from skimage.util import invert
+
 import numpy as np
-import subprocess
 import sys
-import skimage.exposure
-import skimage.util
+
 from PIL import Image
 from tifffile import imsave
-import matplotlib.pyplot as plt
 import shutil
 import os
 import pandas as pd
 import time
 import random
 from tqdm import tqdm
-from joblib import Parallel, delayed
-import h5py
+
 import gc
 
 #for export to ome.zarr
@@ -38,88 +33,9 @@ from ashlar.reg import PyramidWriter
 
 
 from sparcstools._custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality
-
+from sparcstools.filereaders import FilePatternReaderRescale
 
 #define custom FilePatternReaderRescale to use with Ashlar to allow for custom modifications to images before performing stitching
-class FilePatternReaderRescale(filepattern.FilePatternReader):
-
-    def __init__(self, path, pattern, overlap, pixel_size=1, do_rescale=False, WGAchannel = None, no_rescale_channel = "Alexa488", rescale_range = (1, 99)):
-        super().__init__(path, pattern, overlap, pixel_size=pixel_size)
-        self.do_rescale = do_rescale
-        self.WGAchannel = WGAchannel
-        self.no_rescale_channel = no_rescale_channel
-        self.rescale_range = rescale_range
-
-    @staticmethod
-    def rescale_p1_p99(img, rescale_range = (1, 99)):
-        img = skimage.util.img_as_float32(img)
-        cutoff1, cutoff2 = rescale_range
-        if img.max() > (40000/65535):
-            _img = img.copy()
-            _img[_img > (10000/65535)] = 0
-            p1 = np.percentile(_img, cutoff1)
-            p99 = np.percentile(_img, cutoff2)
-        else:
-            p1 = np.percentile(img, cutoff1)
-            p99 = np.percentile(img, cutoff2)
-        img = skimage.exposure.rescale_intensity(img, 
-                                                  in_range=(p1, p99), 
-                                                  out_range=(0, 1))
-        return((img * 65535).astype('uint16'))
-
-    @staticmethod
-    def correct_illumination(img, sigma = 30, double_correct = False, rescale_range = (1, 99)):
-        cutoff1, cutoff2 = rescale_range
-        img = skimage.util.img_as_float32(img)
-        if img.max() > (40000/65535):
-            print('True')
-            _img = img.copy()
-            _img[_img > (10000/65535)] = 0
-            p1 = np.percentile(_img, cutoff1)
-            p99 = np.percentile(_img, cutoff2)
-        else:
-            p1 = np.percentile(img, cutoff1)
-            p99 = np.percentile(img, cutoff2)
-
-        img = skimage.exposure.rescale_intensity(img, 
-                                                 in_range=(p1, p99), 
-                                                 out_range=(0, 1))
-
-        #calculate correction mask
-        correction = gaussian(img, sigma)
-        correction = invert(correction)
-        correction = skimage.exposure.rescale_intensity(correction, 
-                                                        out_range = (0,1))
-
-        correction_lows =  np.where(img > 0.5, 0, img) * correction
-        img_corrected = skimage.exposure.rescale_intensity(img + correction_lows,
-                                                           out_range = (0,1))
-
-        if double_correct:
-            correction_mask_highs = invert(correction)
-            correction_mask_highs_02 = skimage.exposure.rescale_intensity(np.where(img_corrected < 0.5, 0, img_corrected)*correction_mask_highs)
-            img_corrected_double = skimage.exposure.rescale_intensity(img_corrected - 0.25*correction_mask_highs_02)
-            
-            return((img_corrected_double * 65535).astype('uint16'))
-        else:
-            return((img_corrected * 65535).astype('uint16'))
-    
-    def read(self, series, c):
-        img = super().read(series, c)
-        if not self.do_rescale:
-            return img
-        elif self.do_rescale == "partial":
-            if c not in self.no_rescale_channel:
-                return self.rescale_p1_p99(img, rescale_range = self.rescale_range) 
-            else:
-                return img
-        else:
-            if c == self.WGAchannel:
-                return self.correct_illumination(img, rescale_range = self.rescale_range)
-            if c == "WGAbackground":
-                return self.correct_illumination(img, double_correct = True, rescale_range = self.rescale_range)
-            else:
-                return self.rescale_p1_p99(img, self.rescale_range)  
 
 from yattag import Doc, indent
 
@@ -263,7 +179,7 @@ def generate_thumbnail(input_dir,
                 imsave(os.path.join(outdir_examples, file), corrected)
 
         print("Example Images Exported.")
-    
+  
 def generate_stitched(input_dir, 
                       slidename,
                       pattern,
