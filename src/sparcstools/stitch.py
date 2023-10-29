@@ -302,7 +302,14 @@ def generate_stitched(input_dir,
     if channel_order is None:
         _channels = mosaic.channels
     else:
-        _channels = _reorder_list(mosaic.channels, channel_order)
+        print(mosaic.channels)
+        print("new channel order", channel_order)
+
+        _channels = []
+        for channel in channel_order:
+            _channels.append(list(slide.metadata.channel_map.values()).index(channel))
+            
+        print("new channel order", _channels)
 
     if "return_array" in filetype:
         print("not saving positions")
