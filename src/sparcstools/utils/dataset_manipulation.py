@@ -101,7 +101,7 @@ def save_cells_to_new_hdf5(project_location, name, cell_ids, annotation = "selec
 
             #actually save our data
             hf_out.get("single_cell_data")[:] = cell_images
-            hf_out.get("single_cell_index")[:] = np.array((list(range(len(indexes))), indexes)).T
+            hf_out.get("single_cell_index")[:] = np.array((list(range(len(indexes))), cell_ids)).T
             hf_out.get("annotation")[:] = annotation_df
         print("results saved.")
 
