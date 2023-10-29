@@ -74,7 +74,7 @@ def save_cells_to_new_hdf5(project_location, name, cell_ids, annotation = "selec
             single_cell_data[hf_length_old : hf_length_new] = cell_images
 
             single_cell_index.resize((hf_length_new, 2))
-            single_cell_index[hf_length_old : hf_length_new] = np.array((list(range(hf_length_old, hf_length_new)), indexes)).T
+            single_cell_index[hf_length_old : hf_length_new] = np.array((list(range(hf_length_old, hf_length_new)), cell_ids)).T
 
             annotation_hf.resize((hf_length_new, 3))
             annotation_hf[hf_length_old : hf_length_new] = annotation_df
@@ -101,7 +101,7 @@ def save_cells_to_new_hdf5(project_location, name, cell_ids, annotation = "selec
 
             #actually save our data
             hf_out.get("single_cell_data")[:] = cell_images
-            hf_out.get("single_cell_index")[:] = np.array((list(range(len(indexes))), indexes)).T
+            hf_out.get("single_cell_index")[:] = np.array((list(range(len(indexes))), cell_ids)).T
             hf_out.get("annotation")[:] = annotation_df
         print("results saved.")
 
