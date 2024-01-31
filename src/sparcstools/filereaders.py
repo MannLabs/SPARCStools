@@ -14,14 +14,18 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
         self.rescale_range = rescale_range
 
     @staticmethod
-    def rescale(img, rescale_range = (1, 99)):
+    def rescale(img, rescale_range = (1, 99), cutoff_threshold = None):
         img = skimage.util.img_as_float32(img)
         cutoff1, cutoff2 = rescale_range
-        if img.max() > (40000/65535):
-            _img = img.copy()
-            _img[_img > (10000/65535)] = 0
-            p1 = np.percentile(_img, cutoff1)
-            p99 = np.percentile(_img, cutoff2)
+        if cutoff_threshold is not None:
+            if img.max() > (cutoff_threshold/65535):
+                _img = img.copy()
+                _img[_img > (cutoff_threshold/65535)] = 0
+                p1 = np.percentile(_img, cutoff1)
+                p99 = np.percentile(_img, cutoff2)
+            else:
+                p1 = np.percentile(img, cutoff1)
+                p99 = np.percentile(img, cutoff2)
         else:
             p1 = np.percentile(img, cutoff1)
             p99 = np.percentile(img, cutoff2)
@@ -31,15 +35,18 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
         return((img * 65535).astype('uint16'))
 
     @staticmethod
-    def correct_illumination(img, sigma = 30, double_correct = False, rescale_range = (1, 99)):
+    def correct_illumination(img, sigma = 30, double_correct = False, rescale_range = (1, 99), cutoff_threshold = None):
         cutoff1, cutoff2 = rescale_range
         img = skimage.util.img_as_float32(img)
-        if img.max() > (40000/65535):
-            print('True')
-            _img = img.copy()
-            _img[_img > (10000/65535)] = 0
-            p1 = np.percentile(_img, cutoff1)
-            p99 = np.percentile(_img, cutoff2)
+        if cutoff_threshold is not None:
+            if img.max() > (cutoff_threshold/65535):
+                _img = img.copy()
+                _img[_img > (cutoff_threshold/65535)] = 0
+                p1 = np.percentile(_img, cutoff1)
+                p99 = np.percentile(_img, cutoff2)
+            else:
+                p1 = np.percentile(img, cutoff1)
+                p99 = np.percentile(img, cutoff2)
         else:
             p1 = np.percentile(img, cutoff1)
             p99 = np.percentile(img, cutoff2)
@@ -69,20 +76,26 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
     
     def read(self, series, c):
         img = super().read(series, c)
-        if not self.do_rescale:
+
+        #check rescale_range type and set rescale_range accordingly
+        if type(self.rescale_range) is dict:
+            rescale_range = self.rescale_range[c]
+        else:
+            rescale_range = self.rescale_range
+        if self.do_rescale == False or self.do_rescale == "full_image":
             return img
         elif self.do_rescale == "partial":
             if c not in self.no_rescale_channel:
-                return self.rescale(img, rescale_range = self.rescale_range) 
+                return self.rescale(img, rescale_range = rescale_range) 
             else:
                 return img
         else:
             if c == self.WGAchannel:
-                return self.correct_illumination(img, rescale_range = self.rescale_range)
+                return self.correct_illumination(img, rescale_range = rescale_range)
             if c == "WGAbackground":
-                return self.correct_illumination(img, double_correct = True, rescale_range = self.rescale_range)
+                return self.correct_illumination(img, double_correct = True, rescale_range = rescale_range)
             else:
-                return self.rescale(img, self.rescale_range)  
+                return self.rescale(img, rescale_range)  
             
 from ashlar.reg import BioformatsReader
 
