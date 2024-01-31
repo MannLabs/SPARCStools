@@ -409,8 +409,9 @@ def generate_stitched(input_dir,
             #write to tif for each channel
             for i, channel in enumerate(slide.metadata.channel_map.values()):
                 (print('writing to file: ', channel))
-                im = Image.fromarray(merged_array[i].astype('uint16'))#ensure that type is uint16
-                im.save(os.path.join(outdir, slidename + "_"+channel+'_cropped.tif'))
+
+                #save using tifffile library to ensure compatibility with very large tif files
+                imsave(os.path.join(outdir, slidename + "_"+channel+'_cropped.tif'), cropped[i].astype('uint16'))
             
             if export_XML:
                 _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = True)
@@ -419,8 +420,9 @@ def generate_stitched(input_dir,
         else:
 
             for i, channel in enumerate(slide.metadata.channel_map.values()):
-                im = Image.fromarray(merged_array[i].astype('uint16'))#ensure that type is uint16
-                im.save(os.path.join(outdir, slidename + "_"+channel+'.tif'))
+
+                #save using tifffile library to ensure compatibility with very large tif files
+                imsave(os.path.join(outdir, slidename + "_"+channel+'_cropped.tif'), merged_array[i].astype('uint16'))
 
             if export_XML:
                 _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = False)

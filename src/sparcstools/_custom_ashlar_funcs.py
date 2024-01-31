@@ -86,12 +86,22 @@ def plot_edge_scatter(aligner, outdir, annotate=True):
     ydata = np.clip(
         [np.linalg.norm(v[0]) for v in aligner._cache.values()], 0.01, np.inf
     )
-    pdata = np.clip(aligner.errors_negative_sampled, 0, 10)
+
+    #remove inf values if present
+    if np.inf in ydata:
+        ydata[ydata == np.inf] = np.max(ydata[ydata != np.inf]) * 2
+    if np.inf in xdata:
+        xdata[xdata == np.inf] = np.max(xdata[xdata != np.inf]) * 2
+
+    pdata = np.clip(aligner.errors_negative_sampled, 0, 10) #by clipping no inf values can remain
+
     g = sns.JointGrid(x = xdata, y = ydata)
     g.plot_joint(sns.scatterplot, alpha=0.5)
+    
     _, xbins = np.histogram(np.hstack([xdata, pdata]), bins=40)
+    
     sns.distplot(
-        xdata, ax=g.ax_marg_x, kde=False, bins=xbins, norm_hist=True
+        xdata, ax=g.ax_marg_x, kde=False, bins = xbins, norm_hist=True
     )
 
     sns.distplot(

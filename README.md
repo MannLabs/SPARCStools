@@ -31,7 +31,7 @@ Install package via pip. This should install all dependencies as well.
 
 ## Citing our Work
 
-py-lmd was developed by Georg Wallmann, Sophia Mädler and Niklas Schmacke in the labs of Veit Hornung and Matthias Mann. If you use our code please cite the [following manuscript](https://www.biorxiv.org/content/10.1101/2023.06.01.542416v1):
+SPARCStools was developed by Georg Wallmann, Sophia Mädler and Niklas Schmacke in the labs of Veit Hornung and Matthias Mann. If you use our code please cite the [following manuscript](https://www.biorxiv.org/content/10.1101/2023.06.01.542416v1):
 
 SPARCS, a platform for genome-scale CRISPR screening for spatial cellular phenotypes
 Niklas Arndt Schmacke, Sophia Clara Maedler, Georg Wallmann, Andreas Metousis, Marleen Berouti, Hartmann Harz, Heinrich Leonhardt, Matthias Mann, Veit Hornung
