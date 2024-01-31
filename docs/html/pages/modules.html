@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Modules &mdash; sparcstools 0.0.1 documentation</title>
@@ -13,11 +13,10 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=d45e8c67"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -31,15 +30,11 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-
-          
-          
-          <a href="../index.html" class="icon icon-home">
-            sparcstools
+            <a href="../index.html" class="icon icon-home"> sparcstools
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -49,18 +44,8 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#parse">parse</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sparcstools.parse.parse_phenix"><code class="docutils literal notranslate"><span class="pre">parse_phenix()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sparcstools.parse.parse_phenix_40X_slide"><code class="docutils literal notranslate"><span class="pre">parse_phenix_40X_slide()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sparcstools.parse.sort_timepoints"><code class="docutils literal notranslate"><span class="pre">sort_timepoints()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sparcstools.parse.sort_wells"><code class="docutils literal notranslate"><span class="pre">sort_wells()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#stitch">stitch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sparcstools.stitch.generate_stitched"><code class="docutils literal notranslate"><span class="pre">generate_stitched()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sparcstools.stitch.generate_thumbnail"><code class="docutils literal notranslate"><span class="pre">generate_thumbnail()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sparcstools.stitch.prepare_stitch_slurm_job"><code class="docutils literal notranslate"><span class="pre">prepare_stitch_slurm_job()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#image-processing">image processing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sparcstools.image_processing.downsample_folder"><code class="docutils literal notranslate"><span class="pre">downsample_folder()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sparcstools.image_processing.downsample_folder_copy_images"><code class="docutils literal notranslate"><span class="pre">downsample_folder_copy_images()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#sparcstools.image_processing.downsample_img"><code class="docutils literal notranslate"><span class="pre">downsample_img()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -96,7 +81,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li><a href="../index.html" class="icon icon-home"></a></li>
       <li class="breadcrumb-item active">Modules</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/pages/modules.rst.txt" rel="nofollow"> View page source</a>
@@ -108,18 +93,17 @@
            <div itemprop="articleBody">
              
   <section id="module-sparcstools.parse">
-<span id="modules"></span><h1>Modules<a class="headerlink" href="#module-sparcstools.parse" title="Link to this heading"></a></h1>
+<span id="modules"></span><h1>Modules<a class="headerlink" href="#module-sparcstools.parse" title="Permalink to this headline"></a></h1>
 <section id="parse">
-<h2>parse<a class="headerlink" href="#parse" title="Link to this heading"></a></h2>
+<h2>parse<a class="headerlink" href="#parse" title="Permalink to this headline"></a></h2>
 <p>Contains functions to parse imaging data into a usable formats for downstream pipelines.</p>
-</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="sparcstools.parse.parse_phenix">
-<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">parse_phenix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phenix_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatfield_exported</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGAbackground</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_as_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.parse_phenix" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">parse_phenix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phenix_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatfield_exported</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGAbackground</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_as_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.parse_phenix" title="Permalink to this definition"></a></dt>
 <dd><p>Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
 Example of an exported file name: “Timepoint{#}_Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif”</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>phenix_dir</strong> – Path indicating the exported harmony files to parse.</p></li>
 <li><p><strong>flatfield_exported</strong> (<em>bool</em>) – boolean indicating if the data was exported from harmony with or without flatfield correction.</p></li>
@@ -135,11 +119,11 @@ from differentoperating systems</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sparcstools.parse.parse_phenix_40X_slide">
-<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">parse_phenix_40X_slide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phenix_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatfield_exported</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downsampled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGAbackground</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_as_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.parse_phenix_40X_slide" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">parse_phenix_40X_slide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phenix_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatfield_exported</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downsampled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGAbackground</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_as_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.parse_phenix_40X_slide" title="Permalink to this definition"></a></dt>
 <dd><p>Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
 Example of an exported file name: “Timepoint{#}_Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif”</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>phenix_dir</strong> – Path indicating the exported harmony files to parse.</p></li>
 <li><p><strong>flatfield_exported</strong> (<em>bool</em>) – boolean indicating if the data was exported from harmony with or without flatfield correction.</p></li>
@@ -155,14 +139,14 @@ from differentoperating systems</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sparcstools.parse.sort_timepoints">
-<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">sort_timepoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.sort_timepoints" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">sort_timepoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.sort_timepoints" title="Permalink to this definition"></a></dt>
 <dd><p>Additionally sort generated timecourse images according to well and tile position. Function
 generates a new folder called timecourse_sorted which contains a unqiue folder for each unique tile
 position containing all imaging data (i.e. zstacks, timepoints, channels) of that tile.
 This function is meant for quick sorting of generated images for simple import of e.g. timecourse
 experiments into FIJI.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>parsed_dir</strong> – filepath to parsed images folder generated with the function parse_phenix.</p></li>
 <li><p><strong>use_symlonks</strong> (<em>bool</em>) – boolean value indicating if the images should be copied as symlinks or as regular files. Symlinks can potentially cause issues if using the data on
@@ -174,10 +158,10 @@ different OS but is signficiantly faster and does not produce as much data overh
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sparcstools.parse.sort_wells">
-<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">sort_wells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assign_random_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.sort_wells" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sparcstools.parse.</span></span><span class="sig-name descname"><span class="pre">sort_wells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_symlink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assign_random_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.parse.sort_wells" title="Permalink to this definition"></a></dt>
 <dd><p>Sort acquired phenix images into unique folders for each well.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>parsed_dir</strong> – filepath to parsed images folder generated with the function parse_phenix.</p></li>
 <li><p><strong>use_symlink</strong> – boolean value indicating if the images should be copied as symlinks to their new destination</p></li>
@@ -187,16 +171,16 @@ different OS but is signficiantly faster and does not produce as much data overh
 </dl>
 </dd></dl>
 
-<section id="stitch">
-<span id="module-sparcstools.stitch"></span><h2>stitch<a class="headerlink" href="#stitch" title="Link to this heading"></a></h2>
-<p>Collection of functions to perform stitching of parsed image Tiffs.</p>
 </section>
+<span class="target" id="module-sparcstools.stitch"></span><section id="stitch">
+<h2>stitch<a class="headerlink" href="#stitch" title="Permalink to this headline"></a></h2>
+<p>Collection of functions to perform stitching of parsed image Tiffs.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sparcstools.stitch.generate_stitched">
-<span class="sig-prename descclassname"><span class="pre">sparcstools.stitch.</span></span><span class="sig-name descname"><span class="pre">generate_stitched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slidename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stitching_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Alexa488'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'bottom':</span> <span class="pre">0,</span> <span class="pre">'left':</span> <span class="pre">0,</span> <span class="pre">'right':</span> <span class="pre">0,</span> <span class="pre">'top':</span> <span class="pre">0}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_QC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filetype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['.tif']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGAchannel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_intensity_rescale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">99)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_rescale_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_XML</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tile_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.stitch.generate_stitched" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sparcstools.stitch.</span></span><span class="sig-name descname"><span class="pre">generate_stitched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slidename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stitching_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Alexa488'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{'bottom':</span> <span class="pre">0,</span> <span class="pre">'left':</span> <span class="pre">0,</span> <span class="pre">'right':</span> <span class="pre">0,</span> <span class="pre">'top':</span> <span class="pre">0}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_QC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filetype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['.tif']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">WGAchannel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_intensity_rescale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">99)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_rescale_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_XML</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_tile_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.stitch.generate_stitched" title="Permalink to this definition"></a></dt>
 <dd><p>Function to generate a stitched image.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>input_dir</strong> (<em>str</em>) – Path to the folder containing exported TIF files named with the following nameing convention: “Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif”.
 These images can be generated for example by running the sparcstools.parse.parse_phenix() function.</p></li>
@@ -232,12 +216,12 @@ on a per channel basis. This ensures that all channels are scaled to the same ra
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sparcstools.stitch.generate_thumbnail">
-<span class="sig-prename descclassname"><span class="pre">sparcstools.stitch.</span></span><span class="sig-name descname"><span class="pre">generate_thumbnail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stitching_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DAPI'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_examples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_intensity_rescale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">99)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.stitch.generate_thumbnail" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sparcstools.stitch.</span></span><span class="sig-name descname"><span class="pre">generate_thumbnail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stitching_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DAPI'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_examples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_intensity_rescale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">99)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.stitch.generate_thumbnail" title="Permalink to this definition"></a></dt>
 <dd><p>Function to generate a scaled down thumbnail of stitched image. Can be used for example to
 get a low resolution overview of the scanned region to select areas for exporting high resolution
 stitched images.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>input_dir</strong> (<em>str</em>) – Path to the folder containing exported TIF files named with the following nameing convention: “Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif”.
 These images can be generated for example by running the sparcstools.parse.parse_phenix() function.</p></li>
@@ -256,14 +240,14 @@ All values in {} indicate those which are matched by regex to find all matching 
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sparcstools.stitch.prepare_stitch_slurm_job">
-<span class="sig-prename descclassname"><span class="pre">sparcstools.stitch.</span></span><span class="sig-name descname"><span class="pre">prepare_stitch_slurm_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stitching_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mCherry'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zstack_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.1,</span> <span class="pre">99.9)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jobs_per_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.stitch.prepare_stitch_slurm_job" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sparcstools.stitch.</span></span><span class="sig-name descname"><span class="pre">prepare_stitch_slurm_job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stitching_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mCherry'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zstack_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.1,</span> <span class="pre">99.9)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jobs_per_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.stitch.prepare_stitch_slurm_job" title="Permalink to this definition"></a></dt>
 <dd><p>Function to generate all required output to execute an arrayed batch job to stitch all
 wells contained within a Harmony directory.</p>
 <p>Once run navigate to the generated folder (slurm_jobs/stitch_all/logs) in the main harmony project directory
 and run “sbatch ../run.sh”.</p>
 <p>The sbatch array automatically limits the maximum number of running jobs at a time to 20.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<em>str</em>) – Folder containing the exported Harmony output generated with SPARCStools.</p></li>
 <li><p><strong>stitching_channel</strong> (<em>str</em><em>, </em><em>optional</em>) – String indicating which channel should be stitched on. Defaults to “mCherry”.</p></li>
@@ -276,17 +260,17 @@ and run “sbatch ../run.sh”.</p>
 </dl>
 </dd></dl>
 
-<section id="image-processing">
-<span id="module-sparcstools.image_processing"></span><h2>image processing<a class="headerlink" href="#image-processing" title="Link to this heading"></a></h2>
-<p>Contains functions to perform standard image processing steps, e.g. downsampling.</p>
 </section>
+<span class="target" id="module-sparcstools.image_processing"></span><section id="image-processing">
+<h2>image processing<a class="headerlink" href="#image-processing" title="Permalink to this headline"></a></h2>
+<p>Contains functions to perform standard image processing steps, e.g. downsampling.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="sparcstools.image_processing.downsample_folder">
-<span class="sig-prename descclassname"><span class="pre">sparcstools.image_processing.</span></span><span class="sig-name descname"><span class="pre">downsample_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_ending</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('.tif',</span> <span class="pre">'.tiff')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.image_processing.downsample_folder" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sparcstools.image_processing.</span></span><span class="sig-name descname"><span class="pre">downsample_folder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_ending</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('.tif',</span> <span class="pre">'.tiff')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.image_processing.downsample_folder" title="Permalink to this definition"></a></dt>
 <dd><p>Multi-Threaded Function to downsample image equivalent to 2x2 binning. Overwrites original images! Do not run multiple times.
 Output is saved as uint16.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>folder_path</strong> (<em>str</em>) – string indicating the folder containing all the image files that should be downsampled</p></li>
 <li><p><strong>num_threads</strong> (<em>int</em>) – number of threads for multithreading</p></li>
@@ -299,11 +283,11 @@ Output is saved as uint16.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sparcstools.image_processing.downsample_folder_copy_images">
-<span class="sig-prename descclassname"><span class="pre">sparcstools.image_processing.</span></span><span class="sig-name descname"><span class="pre">downsample_folder_copy_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_ending</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('.tif',</span> <span class="pre">'.tiff')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.image_processing.downsample_folder_copy_images" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sparcstools.image_processing.</span></span><span class="sig-name descname"><span class="pre">downsample_folder_copy_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_ending</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('.tif',</span> <span class="pre">'.tiff')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.image_processing.downsample_folder_copy_images" title="Permalink to this definition"></a></dt>
 <dd><p>Multi-Threaded Function to downsample image equivalent to 2x2 binning. Duplicates images before downsampling! Do not run multiple times.
 Output is saved as uint16.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>folder_path</strong> (<em>str</em>) – string indicating the folder containing all the image files that should be downsampled</p></li>
 <li><p><strong>outdir</strong> (<em>str</em>) – string indicating the folder where the downsampled images should be generated</p></li>
@@ -317,11 +301,11 @@ Output is saved as uint16.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="sparcstools.image_processing.downsample_img">
-<span class="sig-prename descclassname"><span class="pre">sparcstools.image_processing.</span></span><span class="sig-name descname"><span class="pre">downsample_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.image_processing.downsample_img" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">sparcstools.image_processing.</span></span><span class="sig-name descname"><span class="pre">downsample_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparcstools.image_processing.downsample_img" title="Permalink to this definition"></a></dt>
 <dd><p>Function to downsample a single image equivalent to NxN binning using the mean between pixels.
 Overwrites the original image(!), do not run multiple times on the same image.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>img_path</strong> (<em>str</em>) – string indicating the file path to the .tif file which should be downsampled.</p></li>
 <li><p><strong>N</strong> (<em>int</em><em>, </em><em>default = 2</em>) – number of pixels that should be binned together using mean between pixels</p></li>
@@ -330,6 +314,7 @@ Overwrites the original image(!), do not run multiple times on the same image.</
 </dl>
 </dd></dl>
 
+</section>
 <div class="toctree-wrapper compound">
 </div>
 </section>
