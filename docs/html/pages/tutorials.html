@@ -44,8 +44,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#parse">parse</a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#stitch">stitch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules.html#image-processing">image processing</a></li>
 </ul>
 </li>
 </ul>
@@ -97,7 +95,7 @@
 <section id="parsing-and-stitching-data-from-opera-phenix">
 <h2><span class="section-number">1.1. </span>Parsing and Stitching Data from Opera Phenix<a class="headerlink" href="#parsing-and-stitching-data-from-opera-phenix" title="Permalink to this headline"></a></h2>
 <p>First you need to export your data from Harmony and rename the path to eliminate any spaces in the name.
-Then you can run the following script to parses and stitch your data.</p>
+Then you can run the following script to parse and stitch your data.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">example script for parsing and stitching phenix data</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#import relevant libraries</span>
@@ -121,10 +119,11 @@ Then you can run the following script to parses and stitch your data.</p>
 <span class="n">overlap</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1">#adjust in case your data was aquired with another overlap</span>
 
 <span class="c1">#define parameters to find correct slide in experiment folder</span>
-<span class="n">row</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">well</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">zstack_value</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">timepoint</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">overlap</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1">#adjust in case your data was aquired with another overlap</span>
+<span class="n">row</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1">#specify the row of the well you want to stitch</span>
+<span class="n">well</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1">#specifc the well number you wish to stitch</span>
+<span class="n">zstack_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#specify the zstack you want to stitch. for multiple zstacks please make a loop and iterate through each of them.</span>
+<span class="n">timepoint</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#specifz the timepoint you wish to stitch</span>
 
 <span class="c1">#define on which channel should be stitched</span>
 <span class="n">stitching_channel</span> <span class="o">=</span> <span class="s2">&quot;Alexa647&quot;</span>
@@ -132,7 +131,7 @@ Then you can run the following script to parses and stitch your data.</p>
 
 <span class="c1">#adjust cropping parameter</span>
 <span class="n">crop</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;top&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;bottom&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span>  <span class="c1">#this does no cropping</span>
-<span class="c1">#crop = {&#39;top&#39;:72, &#39;bottom&#39;:52, &#39;left&#39;:48, &#39;right&#39;:58} #this is good default values for an entire PPS slide with cell culture samples imaged with the SPARCSpy protocol</span>
+<span class="c1">#crop = {&#39;top&#39;:72, &#39;bottom&#39;:52, &#39;left&#39;:48, &#39;right&#39;:58} #this is good default values for an entire PPS slides with cell culture samples imaged with the SPARCS protocol</span>
 
 <span class="c1">#create output directory if it does not exist</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outdir</span><span class="p">):</span>
@@ -141,7 +140,15 @@ Then you can run the following script to parses and stitch your data.</p>
 <span class="c1">#define pattern to recognize which slide should be stitched</span>
 <span class="c1">#remember to adjust the zstack value if you aquired zstacks and want to stitch a speciifc one in the parameters above</span>
 
-<span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;Timepoint&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">timepoint</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span><span class="s2">&quot;_Row&quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="s2">&quot;Well&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">well</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">{channel}</span><span class="s2">_&quot;</span><span class="o">+</span><span class="s2">&quot;zstack&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">zstack_value</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;_r</span><span class="si">{row:03}</span><span class="s2">_c</span><span class="si">{col:03}</span><span class="s2">.tif&quot;</span><span class="p">)</span>
+<span class="c1">#you can define different rescale ranges for each channel if you want to or alternatively use the same range for all channels</span>
+
+<span class="c1">#same range for all channels</span>
+<span class="n">rescale_range</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">99</span><span class="p">)</span>
+
+<span class="c1">#custom for each channel</span>
+<span class="n">rescale_range</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Alexa647&quot;</span><span class="p">:(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">98</span><span class="p">),</span> <span class="s2">&quot;DAPI&quot;</span><span class="p">:(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">99</span><span class="p">),</span> <span class="s2">&quot;mCherry&quot;</span><span class="p">:(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">99</span><span class="p">)}</span>  <span class="c1">#channels need to be named as is the case in the parsed folder</span>
+
+<span class="n">pattern</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Timepoint</span><span class="si">{</span><span class="n">timepoint</span><span class="si">}</span><span class="s2">_Row</span><span class="si">{</span><span class="n">row</span><span class="si">}</span><span class="s2">_Well</span><span class="si">{</span><span class="n">well</span><span class="si">}</span><span class="s2">_</span><span class="se">{{</span><span class="s2">channel</span><span class="se">}}</span><span class="s2">_zstack</span><span class="si">{</span><span class="n">zstack_value</span><span class="si">}</span><span class="s2">_r</span><span class="se">{{</span><span class="s2">row:03</span><span class="se">}}</span><span class="s2">_c</span><span class="se">{{</span><span class="s2">col:03</span><span class="se">}}</span><span class="s2">.tif&quot;</span>
 <span class="n">generate_stitched</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span>
                     <span class="n">slidename</span><span class="p">,</span>
                     <span class="n">pattern</span><span class="p">,</span>
@@ -149,7 +156,10 @@ Then you can run the following script to parses and stitch your data.</p>
                     <span class="n">overlap</span><span class="p">,</span>
                     <span class="n">crop</span> <span class="o">=</span> <span class="n">crop</span> <span class="p">,</span>
                     <span class="n">stitching_channel</span> <span class="o">=</span> <span class="n">stitching_channel</span><span class="p">,</span>
-                    <span class="n">filetype</span> <span class="o">=</span> <span class="n">output_filetype</span><span class="p">)</span>
+                    <span class="n">filetype</span> <span class="o">=</span> <span class="n">output_filetype</span><span class="p">,</span>
+                    <span class="n">plot_QC</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="n">do_intensity_rescale</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="n">rescale_range</span> <span class="o">=</span> <span class="n">rescale_range</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -160,6 +170,7 @@ Then you can run the following script to parses and stitch your data.</p>
 ├── QC_edge_quality.pdf
 ├── QC_edge_scatter.pdf
 ├── stitching_test.XML
+├── stitching_test.ome.zarr
 ├── stitching_test_Alexa488.tif
 ├── stitching_test_DAPI.tif
 ├── stitching_test_mCherry.tif
@@ -187,10 +198,13 @@ Then you can run the following script to parses and stitch your data.</p>
 <tr class="row-even"><td><p><cite>stitching_test.XML</cite></p></td>
 <td><p>contains the required input for reading the stitched files into BIAS</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>&lt;slidename&gt;_&lt;channel_name&gt;.tif</cite></p></td>
+<tr class="row-odd"><td><p><cite>&lt;slidename&gt;.ome.zarr</cite></p></td>
+<td><p>stitched image containing all channels in the ome.zarr format, optimal for viewing in napari</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>&lt;slidename&gt;_&lt;channel_name&gt;.tif</cite></p></td>
 <td><p>stitched image for the given channel</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>stitching_test_tile_positions.tsv</cite></p></td>
+<tr class="row-odd"><td><p><cite>stitching_test_tile_positions.tsv</cite></p></td>
 <td><p>coordinate position of where each tile is located</p></td>
 </tr>
 </tbody>

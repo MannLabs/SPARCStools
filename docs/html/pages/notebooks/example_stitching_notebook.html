@@ -46,8 +46,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../modules.html">Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../modules.html#parse">parse</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../modules.html#stitch">stitch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../modules.html#image-processing">image processing</a></li>
 </ul>
 </li>
 </ul>
@@ -106,24 +104,29 @@
 </pre></div>
 </div>
 </div>
-<div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;../../../test_data/example1/raw_image_tiles/&quot;</span><span class="p">)</span>
 <span class="n">slidename</span> <span class="o">=</span> <span class="s2">&quot;stitching_test&quot;</span>
 <span class="n">outdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;../../../test_data/example1/&quot;</span><span class="p">,</span> <span class="n">slidename</span><span class="p">)</span>
-<span class="n">overlap</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1">#adjust in case your data was aquired with another overlap</span>
-
-<span class="c1">#define parameters to find correct slide in experiment folder</span>
-<span class="n">row</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">well</span> <span class="o">=</span> <span class="mi">4</span>
-<span class="n">zstack_value</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">timepoint</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">overlap</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1">#adjust in case your data was aquired with another overlap</span>
+<span class="n">row</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1">#specify the row of the well you want to stitch</span>
+<span class="n">well</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1">#specifc the well number you wish to stitch</span>
+<span class="n">zstack_value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#specify the zstack you want to stitch. for multiple zstacks please make a loop and iterate through each of them.</span>
+<span class="n">timepoint</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#specifz the timepoint you wish to stitch</span>
 
 <span class="c1">#define on which channel should be stitched</span>
 <span class="n">stitching_channel</span> <span class="o">=</span> <span class="s2">&quot;Alexa488&quot;</span>
-<span class="n">output_filetype</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.tif&quot;</span><span class="p">]</span> <span class="c1">#one of .tif, .ome.tif, .ome.zarr (can pass several if you want to generate all filetypes)</span>
+<span class="n">output_filetype</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.tif&quot;</span><span class="p">,</span> <span class="s2">&quot;ome.zarr&quot;</span><span class="p">]</span> <span class="c1">#one of .tif, .ome.tif, .ome.zarr (can pass several if you want to generate all filetypes)</span>
 
 <span class="c1">#adjust cropping parameter</span>
 <span class="n">crop</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;top&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;bottom&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span>  <span class="c1">#this does no cropping</span>
@@ -132,174 +135,19 @@
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outdir</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
 
-<span class="c1">#define pattern to recognize which slide should be stitched</span>
-<span class="c1">#remember to adjust the zstack value if you aquired zstacks and want to stitch a speciifc one in the parameters above</span>
+<span class="n">pattern</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Timepoint</span><span class="si">{</span><span class="n">timepoint</span><span class="si">}</span><span class="s2">_Row</span><span class="si">{</span><span class="n">row</span><span class="si">}</span><span class="s2">_Well</span><span class="si">{</span><span class="n">well</span><span class="si">}</span><span class="s2">_</span><span class="se">{{</span><span class="s2">channel</span><span class="se">}}</span><span class="s2">_zstack</span><span class="si">{</span><span class="n">zstack_value</span><span class="si">}</span><span class="s2">_r</span><span class="se">{{</span><span class="s2">row:03</span><span class="se">}}</span><span class="s2">_c</span><span class="se">{{</span><span class="s2">col:03</span><span class="se">}}</span><span class="s2">.tif&quot;</span>
 
-<span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;Timepoint&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">timepoint</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span><span class="s2">&quot;_Row&quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="s2">&quot;Well&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">well</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_</span><span class="si">{channel}</span><span class="s2">_&quot;</span><span class="o">+</span><span class="s2">&quot;zstack&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">zstack_value</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;_r</span><span class="si">{row:03}</span><span class="s2">_c</span><span class="si">{col:03}</span><span class="s2">.tif&quot;</span><span class="p">)</span>
 <span class="n">generate_stitched</span><span class="p">(</span><span class="n">input_dir</span><span class="p">,</span>
-                    <span class="n">slidename</span><span class="p">,</span>
-                    <span class="n">pattern</span><span class="p">,</span>
-                    <span class="n">outdir</span><span class="p">,</span>
-                    <span class="n">overlap</span><span class="p">,</span>
-                    <span class="n">crop</span> <span class="o">=</span> <span class="n">crop</span> <span class="p">,</span>
-                    <span class="n">stitching_channel</span> <span class="o">=</span> <span class="n">stitching_channel</span><span class="p">,</span>
-                    <span class="n">filetype</span> <span class="o">=</span> <span class="n">output_filetype</span><span class="p">)</span>
+                <span class="n">slidename</span><span class="p">,</span>
+                <span class="n">pattern</span><span class="p">,</span>
+                <span class="n">outdir</span><span class="p">,</span>
+                <span class="n">overlap</span><span class="p">,</span>
+                <span class="n">crop</span> <span class="o">=</span> <span class="n">crop</span> <span class="p">,</span>
+                <span class="n">stitching_channel</span> <span class="o">=</span> <span class="n">stitching_channel</span><span class="p">,</span>
+                <span class="n">filetype</span> <span class="o">=</span> <span class="n">output_filetype</span><span class="p">,</span>
+                <span class="n">rescale_range</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Alexa488&quot;</span><span class="p">:(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="s2">&quot;DAPI&quot;</span><span class="p">:(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">99</span><span class="p">),</span> <span class="s2">&quot;mCherry&quot;</span><span class="p">:(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">99</span><span class="p">)},</span>
+                <span class="n">plot_QC</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 <br/><br/></pre></div>
-</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-performing stichting with  0.1  overlap.
-performing stitching on channel  Alexa488 with id number  0
-True
-    quantifying alignment error 1000/1000
-    aligning edge 12/12
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-/Users/sophia/Documents/GitHub/SPARCStools/src/sparcstools/_custom_ashlar_funcs.py:93: UserWarning:
-
-`distplot` is a deprecated function and will be removed in seaborn v0.14.0.
-
-Please adapt your code to use either `displot` (a figure-level function with
-similar flexibility) or `histplot` (an axes-level function for histograms).
-
-For a guide to updating your code to use the new functions, please see
-https://gist.github.com/mwaskom/de44147ed2974457ad6372750bbe5751
-
-  sns.distplot(
-/Users/sophia/Documents/GitHub/SPARCStools/src/sparcstools/_custom_ashlar_funcs.py:97: UserWarning:
-
-`distplot` is a deprecated function and will be removed in seaborn v0.14.0.
-
-Please adapt your code to use either `displot` (a figure-level function with
-similar flexibility) or `histplot` (an axes-level function for histograms).
-
-For a guide to updating your code to use the new functions, please see
-https://gist.github.com/mwaskom/de44147ed2974457ad6372750bbe5751
-
-  sns.distplot(
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-need to implement this here. TODO
-writing results to one large tif.
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-  0%|          | 0/3 [00:00&lt;?, ?it/s]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-        merging tile 5/9True
-        merging tile 9/9
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
- 33%|███▎      | 1/3 [00:02&lt;00:04,  2.37s/it]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-
-        merging tile 1/9True
-        merging tile 4/9True
-        merging tile 5/9True
-        merging tile 7/9True
-        merging tile 9/9True
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
- 67%|██████▋   | 2/3 [00:03&lt;00:01,  1.83s/it]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-
-        merging tile 1/9True
-        merging tile 4/9True
-        merging tile 6/9True
-        merging tile 7/9True
-        merging tile 9/9
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-100%|██████████| 3/3 [00:05&lt;00:00,  1.77s/it]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
-Merging Pipeline completed in  0.2415327986081441 minutes.
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/pages_notebooks_example_stitching_notebook_2_13.png" src="../../_images/pages_notebooks_example_stitching_notebook_2_13.png" />
-</div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<img alt="../../_images/pages_notebooks_example_stitching_notebook_2_14.png" src="../../_images/pages_notebooks_example_stitching_notebook_2_14.png" />
 </div>
 </div>
 <section id="Visualize-Stitching-Output">
@@ -336,7 +184,7 @@ Merging Pipeline completed in  0.2415327986081441 minutes.
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../_images/pages_notebooks_example_stitching_notebook_4_1.png" src="../../_images/pages_notebooks_example_stitching_notebook_4_1.png" />
+<img alt="../../_images/pages_notebooks_example_stitching_notebook_5_1.png" src="../../_images/pages_notebooks_example_stitching_notebook_5_1.png" />
 </div>
 </div>
 </section>

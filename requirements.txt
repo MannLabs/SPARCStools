@@ -16,3 +16,4 @@ h5py
 shapely
 rasterio
 alphabase
+xarray
