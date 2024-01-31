@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to SPARCStools documentation! &mdash; sparcstools 0.0.1 documentation</title>
@@ -13,10 +13,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=d45e8c67"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -29,11 +30,15 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="#" class="icon icon-home"> sparcstools
+
+          
+          
+          <a href="#" class="icon icon-home">
+            sparcstools
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -43,8 +48,18 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pages/modules.html">Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="pages/modules.html#parse">parse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.parse.parse_phenix"><code class="docutils literal notranslate"><span class="pre">parse_phenix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.parse.parse_phenix_40X_slide"><code class="docutils literal notranslate"><span class="pre">parse_phenix_40X_slide()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.parse.sort_timepoints"><code class="docutils literal notranslate"><span class="pre">sort_timepoints()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.parse.sort_wells"><code class="docutils literal notranslate"><span class="pre">sort_wells()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="pages/modules.html#stitch">stitch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.stitch.generate_stitched"><code class="docutils literal notranslate"><span class="pre">generate_stitched()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.stitch.generate_thumbnail"><code class="docutils literal notranslate"><span class="pre">generate_thumbnail()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.stitch.prepare_stitch_slurm_job"><code class="docutils literal notranslate"><span class="pre">prepare_stitch_slurm_job()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="pages/modules.html#image-processing">image processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.image_processing.downsample_folder"><code class="docutils literal notranslate"><span class="pre">downsample_folder()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.image_processing.downsample_folder_copy_images"><code class="docutils literal notranslate"><span class="pre">downsample_folder_copy_images()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.image_processing.downsample_img"><code class="docutils literal notranslate"><span class="pre">downsample_img()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -80,7 +95,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a></li>
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Welcome to SPARCStools documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
@@ -92,13 +107,13 @@
            <div itemprop="articleBody">
              
   <section id="welcome-to-sparcstools-documentation">
-<h1>Welcome to SPARCStools documentation!<a class="headerlink" href="#welcome-to-sparcstools-documentation" title="Permalink to this headline"></a></h1>
+<h1>Welcome to SPARCStools documentation!<a class="headerlink" href="#welcome-to-sparcstools-documentation" title="Link to this heading"></a></h1>
 <p>This python module contains wrapper functions to perform stitching with the <a class="reference external" href="https://labsyspharm.github.io/ashlar/">Ashlar API</a>. In addition it contains
 data parsing functions to make imaging data aquired with the <a class="reference external" href="https://www.perkinelmer.com/uk/product/opera-phenix-plus-system-hh14001000">Perkinelmer Opera Phenix Microscope</a> accessible Ashlar
 or also to other downstream applications.</p>
 <p>The generated stitched images can then be used for downstream applications, for example the <a class="reference external" href="linkURL">SPARCSpy</a> workflow or other analysis frameworks.</p>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline"></a></h2>
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p>SPARCStools has been tested using python &gt;= 3.8 on Linux and MacOS. Currently to run on Windows please utilize a Linux Virtual Machine.</p>
 <p>Clone the github repository and navigate to the main directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">MannLabs</span><span class="o">/</span><span class="n">SPARCStools</span><span class="o">.</span><span class="n">git</span>
@@ -120,7 +135,7 @@ or also to other downstream applications.</p>
 </div>
 </section>
 <section id="citing-our-work">
-<h2>Citing our Work<a class="headerlink" href="#citing-our-work" title="Permalink to this headline"></a></h2>
+<h2>Citing our Work<a class="headerlink" href="#citing-our-work" title="Link to this heading"></a></h2>
 <p>This code was developed by Sophia Maedler and Niklas Schmacke in the labs of Matthias Mann and Veit Hornung.</p>
 <p>If you use our work please cite the <a class="reference external" href="https://doi.org/10.1101/2023.06.01.542416">following manuscript</a>:</p>
 <p>SPARCS, a platform for genome-scale CRISPR screening for spatial cellular phenotypes
@@ -131,8 +146,18 @@ bioRxiv 2023.06.01.542416; doi: <a class="reference external" href="https://doi.
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pages/modules.html">Modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="pages/modules.html#parse">parse</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.parse.parse_phenix"><code class="docutils literal notranslate"><span class="pre">parse_phenix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.parse.parse_phenix_40X_slide"><code class="docutils literal notranslate"><span class="pre">parse_phenix_40X_slide()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.parse.sort_timepoints"><code class="docutils literal notranslate"><span class="pre">sort_timepoints()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.parse.sort_wells"><code class="docutils literal notranslate"><span class="pre">sort_wells()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="pages/modules.html#stitch">stitch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.stitch.generate_stitched"><code class="docutils literal notranslate"><span class="pre">generate_stitched()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.stitch.generate_thumbnail"><code class="docutils literal notranslate"><span class="pre">generate_thumbnail()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.stitch.prepare_stitch_slurm_job"><code class="docutils literal notranslate"><span class="pre">prepare_stitch_slurm_job()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="pages/modules.html#image-processing">image processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.image_processing.downsample_folder"><code class="docutils literal notranslate"><span class="pre">downsample_folder()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.image_processing.downsample_folder_copy_images"><code class="docutils literal notranslate"><span class="pre">downsample_folder_copy_images()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="pages/modules.html#sparcstools.image_processing.downsample_img"><code class="docutils literal notranslate"><span class="pre">downsample_img()</span></code></a></li>
 </ul>
 </li>
 </ul>
