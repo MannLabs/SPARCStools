@@ -6,7 +6,7 @@ Parsing and Stitching Data from Opera Phenix
 ============================================
 
 First you need to export your data from Harmony and rename the path to eliminate any spaces in the name.
-Then you can run the following script to parses and stitch your data.
+Then you can run the following script to parse and stitch your data.
 
 .. code-block:: python
     :caption: example script for parsing and stitching phenix data
@@ -32,10 +32,11 @@ Then you can run the following script to parses and stitch your data.
     overlap = 0.1 #adjust in case your data was aquired with another overlap
 
     #define parameters to find correct slide in experiment folder
-    row = 1
-    well = 1
-    zstack_value = 1
-    timepoint = str(1)
+    overlap = 0.1 #adjust in case your data was aquired with another overlap
+    row = str(2).zfill(2) #specify the row of the well you want to stitch
+    well = str(4).zfill(2) #specifc the well number you wish to stitch
+    zstack_value = str(1).zfill(3) #specify the zstack you want to stitch. for multiple zstacks please make a loop and iterate through each of them.
+    timepoint = str(1).zfill(3) #specifz the timepoint you wish to stitch
 
     #define on which channel should be stitched
     stitching_channel = "Alexa647"
@@ -43,7 +44,7 @@ Then you can run the following script to parses and stitch your data.
 
     #adjust cropping parameter
     crop = {'top':0, 'bottom':0, 'left':0, 'right':0}  #this does no cropping
-    #crop = {'top':72, 'bottom':52, 'left':48, 'right':58} #this is good default values for an entire PPS slide with cell culture samples imaged with the SPARCSpy protocol
+    #crop = {'top':72, 'bottom':52, 'left':48, 'right':58} #this is good default values for an entire PPS slides with cell culture samples imaged with the SPARCS protocol
 
     #create output directory if it does not exist
     if not os.path.exists(outdir):
@@ -52,7 +53,15 @@ Then you can run the following script to parses and stitch your data.
     #define pattern to recognize which slide should be stitched
     #remember to adjust the zstack value if you aquired zstacks and want to stitch a speciifc one in the parameters above 
 
-    pattern = "Timepoint"+str(timepoint.zfill(3) +"_Row"+ str(row).zfill(2) + "_" + "Well" + str(well).zfill(2) + "_{channel}_"+"zstack"+str(zstack_value).zfill(3)+"_r{row:03}_c{col:03}.tif")
+    #you can define different rescale ranges for each channel if you want to or alternatively use the same range for all channels
+
+    #same range for all channels
+    rescale_range = (1, 99)
+
+    #custom for each channel
+    rescale_range = {"Alexa647":(1, 98), "DAPI":(1, 99), "mCherry":(1, 99)}  #channels need to be named as is the case in the parsed folder
+
+    pattern = f"Timepoint{timepoint}_Row{row}_Well{well}_{{channel}}_zstack{zstack_value}_r{{row:03}}_c{{col:03}}.tif"
     generate_stitched(input_dir, 
                         slidename,
                         pattern,
@@ -60,7 +69,10 @@ Then you can run the following script to parses and stitch your data.
                         overlap,
                         crop = crop ,
                         stitching_channel = stitching_channel, 
-                        filetype = output_filetype)
+                        filetype = output_filetype, 
+                        plot_QC = True, 
+                        do_intensity_rescale = True,
+                        rescale_range = rescale_range)
 
 Generated output
 ------------------
@@ -73,6 +85,7 @@ The stitching script will generate the following files:
     ├── QC_edge_quality.pdf
     ├── QC_edge_scatter.pdf
     ├── stitching_test.XML
+    ├── stitching_test.ome.zarr 
     ├── stitching_test_Alexa488.tif
     ├── stitching_test_DAPI.tif
     ├── stitching_test_mCherry.tif
@@ -91,6 +104,8 @@ The stitching script will generate the following files:
      - Plots the alignment quality against each other
    * - `stitching_test.XML`
      - contains the required input for reading the stitched files into BIAS
+   * - `<slidename>.ome.zarr`
+     - stitched image containing all channels in the ome.zarr format, optimal for viewing in napari
    * - `<slidename>_<channel_name>.tif`
      - stitched image for the given channel
    * - `stitching_test_tile_positions.tsv`
@@ -102,5 +117,3 @@ Example Results
 
 .. image:: ../_static/stitched_channels.png
     :width: 100 %
-
-    
