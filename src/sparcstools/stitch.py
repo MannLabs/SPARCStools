@@ -321,7 +321,7 @@ def generate_stitched(input_dir,
         if no_rescale_channel != None:
             no_rescale_channel_id = []
             for _channel in no_rescale_channel:
-                no_rescale_channel_id.append(slide.metadata.channel_map.values().index(_channel))
+                no_rescale_channel_id.append(list(slide.metadata.channel_map.values()).index(_channel))
             slide.no_rescale_channel = no_rescale_channel_id
         else:
             sys.exit("do_intensity_rescale set to partial but not channel passed for which no rescaling should be done.")
