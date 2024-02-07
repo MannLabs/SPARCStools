@@ -396,7 +396,7 @@ def generate_stitched(input_dir,
 
         return(merged_array, channels)
 
-    elif ".tif" in filetype:
+    if ".tif" in filetype:
         
         print("writing results to one large tif.")
         
@@ -427,13 +427,13 @@ def generate_stitched(input_dir,
             if export_XML:
                 _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = False)
          
-    elif "ome.tif" in filetype:
+    if "ome.tif" in filetype:
         print("writing results to ome.tif. This writer currently does not support cropping nor rescaling the entire image. do_intensity_rescale == full_image will be ignored.")
         path = os.path.join(outdir, slidename + ".ome.tiff")
         writer = PyramidWriter([mosaic], path, scale=5, tile_size=1024, peak_size=1024, verbose=True)
         writer.run()
 
-    elif "ome.zarr" in filetype:
+    if "ome.zarr" in filetype:
         print("writing results to ome.zarr")
 
         if 'merged_array' not in locals():
