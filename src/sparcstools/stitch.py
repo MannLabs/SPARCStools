@@ -422,7 +422,7 @@ def generate_stitched(input_dir,
             for i, channel in enumerate(slide.metadata.channel_map.values()):
 
                 #save using tifffile library to ensure compatibility with very large tif files
-                imsave(os.path.join(outdir, slidename + "_"+channel+'_cropped.tif'), merged_array[i].astype('uint16'))
+                imsave(os.path.join(outdir, slidename + "_"+channel+'.tif'), merged_array[i].astype('uint16'))
 
             if export_XML:
                 _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = False)
