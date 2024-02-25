@@ -7,11 +7,20 @@ from rasterio.features import rasterize
 import numpy.ma as ma
 from tqdm.auto import tqdm
 import shutil
+import sys
 
-def get_indexes(project_location, cell_ids, return_annotation = False):
+def get_indexes(project_location, cell_ids, return_annotation = False, use_extraction_path = False, extraction_path = None):
+    
+    #get extraction path
+    if use_extraction_path:
+        if extraction_path is not None:
+            hf_path = extraction_path
+        else:
+            sys.exit("Need to provide extraction path.")
+    else:
+        hf_path = os.path.join(project_location, "extraction", "data", "single_cells.h5")
     
     #load hdf5 to get indexes
-    hf_path = os.path.join(project_location, "extraction", "data", "single_cells.h5")
     hf = h5py.File(hf_path)
     indexes = hf.get("single_cell_index")[:]
     hf.close()
