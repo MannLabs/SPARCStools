@@ -237,7 +237,8 @@ def parse_phenix_40X_slide(phenix_dir,
                             downsampled = False,
                             WGAbackground = False,
                             export_meta = True,
-                            export_as_symlink = False):
+                            export_as_symlink = False, 
+                            compress_cols = False):
 
     """
     Function to automatically rename TIFS exported from Harmony into a format where row and well ID as well as Tile position are indicated in the file name.
@@ -399,7 +400,16 @@ def parse_phenix_40X_slide(phenix_dir,
                 max_y = df.loc[((df.Well == well) & (df.Row == rows[0]))].Y_pos.max()
                 df.loc[(df.Well == well) & (df.Row == row), "Y_pos"] = df.loc[(df.Well == well) & (df.Row == row), "Y_pos"] + int(max_y) + int(1)
                 df.loc[(df.Well == well) & (df.Row == row), "Row"] = rows[0]
-            
+
+    if compress_cols:
+        for i, well in enumerate(wells):
+            if i == 0:
+                continue
+            else:
+                max_x = df.loc[((df.Well == wells[0]))].X_pos.max()
+                df.loc[(df.Well == well), "X_pos"] = df.loc[(df.Well == well), "X_pos"] + int(max_x) + int(1)
+                df.loc[(df.Well == well), "Well"] = wells[0]
+
     df.X_pos = [str(int(x)).zfill(3) for x in df.X_pos]
     df.Y_pos = [str(int(x)).zfill(3) for x in df.Y_pos]
 
