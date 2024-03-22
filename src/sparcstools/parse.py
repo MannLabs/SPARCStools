@@ -247,6 +247,8 @@ class PhenixParser:
 
         metadata.X_pos = [str(int(x)).zfill(3) for x in metadata.X_pos]
         metadata.Y_pos = [str(int(x)).zfill(3) for x in metadata.Y_pos]
+        metadata.Timepoint = [str(x).zfill(3) for x in metadata.Timepoint]
+        metadata.Zstack = [str(x).zfill(2) for x in metadata.Zstack]
 
         #generate new file names
         for i in range(metadata.shape[0]):
@@ -261,7 +263,7 @@ class PhenixParser:
     def check_for_missing_files(self, metadata = None, return_values = False):
 
         if metadata is None:
-            print("No metadata passed, so reading from file.")
+            print("No metadata passed, so reading from file. This can take a moment...")
             metadata = self.get_phenix_metadata()
             metadata = self.generate_new_filenames(metadata)
 
@@ -303,10 +305,10 @@ class PhenixParser:
                             
                             missing_y = [y for y in y_range if y not in np.unique(____df.Y_pos)]
                             for _y in missing_y:
-                                print("Missing tile at position: Timepoint{timepoint}_Row{row}_Well{well}_CHANNELS_zstackXX_r{_x}_c{_y}.tif")
+                                print(f"Missing tile at position: Timepoint{timepoint}_Row{row}_Well{well}_CHANNELS_zstackXX_r{str(_x).zfill(3)}_c{str(_y).zfill(3)}.tif")
                                 for channel in channels:
                                     for zstack in zstacks:
-                                        missing_images.append(f"Timepoint{timepoint}_Row{row}_Well{well}_{channel}_zstack{zstack}_r{_x}_c{_y}.tif")
+                                        missing_images.append(f"Timepoint{timepoint}_Row{row}_Well{well}_{channel}_zstack{zstack}_r{str(_x).zfill(3)}_c{str(_y).zfill(3)}.tif")
         if len(missing_images) == 0:
             print("No missing tiles found.")
         else:
@@ -316,7 +318,7 @@ class PhenixParser:
             image[:] = int(0)
             self.black_image = image
 
-            print(f"The found missing tiles need to be replaced with black images of the size {image.size}. You can do this be executing replace_missing_images().")
+            print(f"The found missing tiles need to be replaced with black images of the size {image.shape}. You can do this be executing replace_missing_images().")
 
         self.missing_images = missing_images
         
@@ -324,6 +326,9 @@ class PhenixParser:
             return(missing_images)
     
     def replace_missing_images(self):
+        #get output directory
+        self.define_outdir()
+
         if self.missing_images is None:
             self.check_for_missing_files()
         
