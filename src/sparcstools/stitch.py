@@ -27,6 +27,7 @@ import gc
 import zarr
 from ome_zarr.io import parse_url
 from ome_zarr.writer import write_image
+from ome_zarr.scale import Scaler
 
 #for export to ome.tif
 from ashlar.reg import PyramidWriter
@@ -460,8 +461,8 @@ def generate_stitched(input_dir,
             "name":slidename + ".ome.zarr",
             "channels": [{"label":channel, "color":channel_colors[i], "active":True} for i, channel in enumerate(slide.metadata.channel_map.values())]
         }  
-
-        write_image(merged_array, group = group, axes = axes, storage_options=dict(chunks=(1, 1024, 1024)))
+        scaler = Scaler(copy_metadata=False, downscale=4, in_place=False, labeled=False, max_layer=4, method='nearest') #increase downscale so that large slides can also be opened in napari
+        write_image(merged_array, group = group, axes = axes, storage_options=dict(chunks=(1, 1024, 1024)), scaler = scaler)
    
     #perform garbage collection manually to free up memory as quickly as possible
     print("deleting old variables")
