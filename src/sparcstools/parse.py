@@ -332,11 +332,12 @@ class PhenixParser:
         if self.missing_images is None:
             self.check_for_missing_files()
         
-        for missing_image in self.missing_images:
-            print(f"Creating black image with name: {missing_image}")
-            imwrite(os.path.join(self.outdir, missing_image), self.black_image)
-        
-        print(f"All missing images successfully replaced with black images of the dimension {self.black_image.shape}")
+        if len(self.missing_images) > 0:
+            for missing_image in self.missing_images:
+                print(f"Creating black image with name: {missing_image}")
+                imwrite(os.path.join(self.outdir, missing_image), self.black_image)
+            
+            print(f"All missing images successfully replaced with black images of the dimension {self.black_image.shape}")
         
     def copy_files(self, metadata):
 
@@ -379,7 +380,7 @@ class PhenixParser:
         self.define_outdir()
 
         #get metadata for the images we want to parse
-        metadata = self.get_phenix_metadata(self.xml_path)
+        metadata = self.get_phenix_metadata()
         metadata_new = self.generate_new_filenames(metadata)
 
         #copy/link the images to their new names
