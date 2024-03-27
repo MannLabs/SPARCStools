@@ -205,17 +205,21 @@ class PhenixParser:
     
     def generate_new_filenames(self, metadata):
 
+        #convert position values to numeric to ensure proper sorting
+        metadata["X"] = [float(x) for x in metadata.X]
+        metadata["Y"] = [float(x) for x in metadata.Y]
+
         #convert X_positions into row and col values
         metadata["X_pos"] = None
-        X_values = metadata.X.value_counts().sort_index()
-        X_values = X_values.index
+        X_values = metadata.X.value_counts().index.to_list()
+        X_values = np.sort(X_values)
         for i, x in enumerate(X_values):
             metadata.loc[metadata.X == x, 'X_pos'] = i
 
         #get y positions
         metadata["Y_pos"] = None
-        Y_values = metadata.Y.value_counts().sort_index()
-        Y_values = Y_values.index
+        Y_values = metadata.Y.value_counts().index.to_list()
+        Y_values = np.sort(Y_values) #ensure that the values are numeric and not string
         for i, y in enumerate(Y_values):
             metadata.loc[metadata.Y == y, 'Y_pos'] = i
 
