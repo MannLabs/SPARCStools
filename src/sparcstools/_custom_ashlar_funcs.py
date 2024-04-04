@@ -133,13 +133,13 @@ import ashlar.utils as utils
 
 #helper functions for paralellization
 def _execute_indexed_parallel(
-    func: Callable, *, args: list, tqdm_args: dict = None
+    func: Callable, *, args: list, tqdm_args: dict = None, n_threads: int = 10
 ) -> list:
     if tqdm_args is None:
         tqdm_args = {}
 
     results = [None for _ in range(len(args))]
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(n_threads) as executor:
         with tqdm(total=len(args), **tqdm_args) as pbar:
             futures = {executor.submit(func, *arg): i for i, arg in enumerate(args)}
             for future in as_completed(futures):
@@ -150,11 +150,11 @@ def _execute_indexed_parallel(
     return results
 
 
-def _execute_parallel(func: Callable, *, args: list, tqdm_args: dict = None):
+def _execute_parallel(func: Callable, *, args: list, tqdm_args: dict = None, n_threads: int = 10):
     if tqdm_args is None:
         tqdm_args = {}
 
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(n_threads) as executor:
         with tqdm(total=len(args), **tqdm_args) as pbar:
             futures = {executor.submit(func, *arg): i for i, arg in enumerate(args)}
             for _ in as_completed(futures):
@@ -162,6 +162,12 @@ def _execute_parallel(func: Callable, *, args: list, tqdm_args: dict = None):
 
 
 class ParallelLayerAligner(LayerAligner):
+
+    def __init__(self, reader, reference_aligner, n_threads = 20, channel=None, max_shift=15,
+                 filter_sigma=0.0, verbose=False, *args, **kwargs):
+        super().__init__(reader = reader, reference_aligner = reference_aligner, channel=channel, max_shift=max_shift,
+                 filter_sigma=filter_sigma, verbose=verbose, *args, **kwargs)
+        self.n_threads = n_threads
 
     def register_all(self):
         n = self.metadata.num_images
@@ -174,6 +180,7 @@ class ParallelLayerAligner(LayerAligner):
                 disable=not self.verbose,
                 desc="                  aligning tile",
             ),
+            n_threads = self.n_threads
         )
         shift, error = list(zip(*results))
         self.shifts = np.array(shift)
@@ -186,8 +193,14 @@ class ParallelLayerAligner(LayerAligner):
 
 class ParallelEdgeAligner(EdgeAligner):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self, reader, n_threads = 20, channel=0, max_shift=15, alpha=0.01, max_error=None,
+        randomize=False, filter_sigma=0.0, do_make_thumbnail=True, verbose=False
+    ):
+        super().__init__(reader = reader, channel=channel, max_shift=max_shift, alpha=alpha, max_error=max_error,
+        randomize=randomize, filter_sigma=filter_sigma, do_make_thumbnail=do_make_thumbnail, verbose=verbose)
+
+        self.n_threads = n_threads
 
     def compute_threshold(self):
         # Compute error threshold for rejecting aligments. We generate a
@@ -270,6 +283,7 @@ class ParallelEdgeAligner(EdgeAligner):
                 disable=not self.verbose,
                 desc="    quantifying alignment error",
             ),
+            n_threads=self.n_threads
         )
 
         errors = np.array(errors)
@@ -290,6 +304,7 @@ class ParallelEdgeAligner(EdgeAligner):
                 disable=not self.verbose,
                 desc="                  aligning edge",
             ),
+            n_threads=self.n_threads
         )
         if self.verbose:
             print()
@@ -302,6 +317,17 @@ class ParallelEdgeAligner(EdgeAligner):
 
 
 class ParallelMosaic(Mosaic):
+
+    def __init__(self, aligner, shape, n_threads = 20, channels=None, ffp_path=None, dfp_path=None,
+        flip_mosaic_x=False, flip_mosaic_y=False, barrel_correction=None,
+        verbose=False):
+        
+        super().__init__(aligner=aligner, shape=shape, channels=channels, ffp_path=ffp_path, dfp_path=dfp_path,
+        flip_mosaic_x=flip_mosaic_x, flip_mosaic_y=flip_mosaic_y, barrel_correction=barrel_correction,
+        verbose=verbose)
+
+        self.n_threads = n_threads
+
     def assemble_channel_parallel(
         self,
         channel,

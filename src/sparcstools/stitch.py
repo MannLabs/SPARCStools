@@ -499,7 +499,8 @@ def generate_stitched_multithreaded(input_dir,
                                     export_XML = True,
                                     return_tile_positions = True,
                                     channel_order = None, 
-                                    filter_sigma = 0):
+                                    filter_sigma = 0, 
+                                    threads = 20):
                     
     """
     Function to generate a stitched image.
@@ -635,7 +636,7 @@ def generate_stitched_multithreaded(input_dir,
 
     #generate aligner to use specificed channel for stitching
     print("performing stitching on channel ", stitching_channel, "with id number ", str(channel_id))
-    aligner = ParallelEdgeAligner(slide, channel=channel_id, filter_sigma=filter_sigma, verbose=True, do_make_thumbnail=False, max_shift = max_shift)
+    aligner = ParallelEdgeAligner(slide, n_threads = threads, channel=channel_id, filter_sigma=filter_sigma, verbose=True, do_make_thumbnail=False, max_shift = max_shift)
     aligner.run()  
 
     #generate some QC plots
@@ -652,6 +653,7 @@ def generate_stitched_multithreaded(input_dir,
 
     mosaic = ParallelMosaic(aligner, 
                         aligner.mosaic_shape, 
+                        n_threads = threads,
                         **mosaic_args
                         )
 
