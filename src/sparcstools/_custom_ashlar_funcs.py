@@ -17,6 +17,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import copy as copy
 import sys
 
+import multiprocessing
+from tqdm import tqdm
+
 def draw_mosaic_image(ax, aligner, img, **kwargs):
     if img is None:
         img = [[0]]
@@ -316,25 +319,93 @@ class ParallelEdgeAligner(EdgeAligner):
                 self._cache[k] = (v[0], np.inf)
 
 
+# class ParallelMosaic(Mosaic):
+
+#     def __init__(self, aligner, shape, n_threads = 20, channels=None, ffp_path=None, dfp_path=None,
+#         flip_mosaic_x=False, flip_mosaic_y=False, barrel_correction=None,
+#         verbose=False):
+
+#         super().__init__(aligner=aligner, shape=shape, channels=channels, ffp_path=ffp_path, dfp_path=dfp_path,
+#         flip_mosaic_x=flip_mosaic_x, flip_mosaic_y=flip_mosaic_y, barrel_correction=barrel_correction,
+#         verbose=verbose)
+
+#         self.n_threads = n_threads
+
+#     def assemble_channel_parallel(
+#         self,
+#         channel,
+#         positions,
+#         reader,
+#         out = None,
+#         tqdm_args = None,
+#     ):
+#         if tqdm_args is None:
+#             tqdm_args = {}
+
+#         if out is None:
+#             out = np.zeros(self.shape, self.dtype)
+#         else:
+#             if out.shape != self.shape:
+#                 raise ValueError(
+#                     f"out array shape {out.shape} does not match Mosaic"
+#                     f" shape {self.shape}"
+#                 )
+        
+#         for si, position in tqdm(enumerate(positions), **tqdm_args):
+#             img = reader.read(c=channel, series=si)
+#             img = self.correct_illumination(img, channel)
+#             utils.paste(out, img, position, func=utils.pastefunc_blend)
+
+#         #test parallel assembly
+#         def worker(position, channel, shared_output, idx):
+#             img = reader.read(c=channel, series=idx)
+#             img = self.correct_illumination(img, channel)
+#             utils.paste(shared_output, img, position, func=utils.pastefunc_blend)
+
+#         # Assuming `positions` is a list of positions and other necessary variables are defined.
+
+#         # Create a shared dictionary to store the output
+#         manager = multiprocessing.Manager()
+#         shared_output = manager.dict()
+
+#         # Create a pool of workers
+#         pool = multiprocessing.Pool(processes=self.n_threads)
+
+#         # Define a partial function to pass additional arguments to worker function
+#         partial_worker = lambda args: worker(*args)
+
+#         # Iterate over positions and apply the function in parallel
+#         for si, position in tqdm(enumerate(positions), total=len(positions)):
+#             pool.apply_async(partial_worker, args=(position, channel, shared_output, si))
+
+#         # Close the pool and wait for all processes to finish
+#         pool.close()
+#         pool.join()
+
+import numpy as np
+from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
+from ashlar import utils as utils  # Import your utils module here
+
 class ParallelMosaic(Mosaic):
 
-    def __init__(self, aligner, shape, n_threads = 20, channels=None, ffp_path=None, dfp_path=None,
-        flip_mosaic_x=False, flip_mosaic_y=False, barrel_correction=None,
-        verbose=False):
-        
+    def __init__(self, aligner, shape, n_threads=20, channels=None, ffp_path=None, dfp_path=None,
+                 flip_mosaic_x=False, flip_mosaic_y=False, barrel_correction=None,
+                 verbose=False):
+
         super().__init__(aligner=aligner, shape=shape, channels=channels, ffp_path=ffp_path, dfp_path=dfp_path,
-        flip_mosaic_x=flip_mosaic_x, flip_mosaic_y=flip_mosaic_y, barrel_correction=barrel_correction,
-        verbose=verbose)
+                         flip_mosaic_x=flip_mosaic_x, flip_mosaic_y=flip_mosaic_y, barrel_correction=barrel_correction,
+                         verbose=verbose)
 
         self.n_threads = n_threads
 
     def assemble_channel_parallel(
-        self,
-        channel,
-        positions,
-        reader,
-        out = None,
-        tqdm_args = None,
+            self,
+            channel,
+            positions,
+            reader,
+            out=None,
+            tqdm_args=None,
     ):
         if tqdm_args is None:
             tqdm_args = {}
@@ -347,10 +418,15 @@ class ParallelMosaic(Mosaic):
                     f"out array shape {out.shape} does not match Mosaic"
                     f" shape {self.shape}"
                 )
-        for si, position in tqdm(enumerate(positions), **tqdm_args):
+
+        def assemble_single(si_position):
+            si, position = si_position
             img = reader.read(c=channel, series=si)
             img = self.correct_illumination(img, channel)
             utils.paste(out, img, position, func=utils.pastefunc_blend)
+
+        with ThreadPoolExecutor(max_workers=self.n_threads) as executor:
+            list(tqdm(executor.map(assemble_single, enumerate(positions)), total=len(positions), **tqdm_args))
         
         # Memory-conserving axis flips.
         if self.flip_mosaic_x:

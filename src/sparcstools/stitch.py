@@ -567,7 +567,8 @@ def generate_stitched_multithreaded(input_dir,
 
         #assemble each of the channels
         for i, channel in tqdm(enumerate(_channels), total = n_channels):
-            mosaics[i, :, :] = mosaic.assemble_channel(channel = channel, out = mosaics[i, :, :])
+
+            mosaics[i, :, :] = mosaic.assemble_channel_parallel(positions = mosaic.aligner.positions, reader = mosaic.aligner.reader, channel = channel, out = mosaics[i, :, :])
             
             if do_intensity_rescale == "full_image":
                 print("Rescaling entire input image to 0-1 range using percentiles specified in rescale_range.")
