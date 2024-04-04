@@ -35,7 +35,7 @@ from ashlar.reg import PyramidWriter
 from skimage.exposure import rescale_intensity
 
 
-from sparcstools._custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality
+from sparcstools._custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality, ParallelEdgeAligner, ParallelMosaic
 from sparcstools.filereaders import FilePatternReaderRescale
 
 #define custom FilePatternReaderRescale to use with Ashlar to allow for custom modifications to images before performing stitching
@@ -267,7 +267,8 @@ def generate_stitched(input_dir,
 
         #assemble each of the channels
         for i, channel in tqdm(enumerate(_channels), total = n_channels):
-            mosaics[i, :, :] = mosaic.assemble_channel(channel = channel)
+            mosaics[i, :, :] = mosaic.assemble_channel(channel = channel, out = mosaics[i, :, :])
+
             if do_intensity_rescale == "full_image":
                 print("Rescaling entire input image to 0-1 range using percentiles specified in rescale_range.")
                 if type(rescale_range) == dict:
@@ -480,6 +481,306 @@ def generate_stitched(input_dir,
 
     end_time = time.time() - start_time
     print('Merging Pipeline completed in ', str(end_time/60) , "minutes.")
+
+def generate_stitched_multithreaded(input_dir, 
+                                    slidename,
+                                    pattern,
+                                    outdir,
+                                    overlap = 0.1,
+                                    max_shift = 30, 
+                                    stitching_channel = "Alexa488",
+                                    crop = {'top':0, 'bottom':0, 'left':0, 'right':0},
+                                    plot_QC = True,
+                                    filetype = [".tif"],
+                                    WGAchannel = None,
+                                    do_intensity_rescale = True,
+                                    rescale_range = (1, 99),
+                                    no_rescale_channel = None,
+                                    export_XML = True,
+                                    return_tile_positions = True,
+                                    channel_order = None, 
+                                    filter_sigma = 0):
+                    
+    """
+    Function to generate a stitched image.
+
+    Parameters
+    ----------
+    input_dir : str
+        Path to the folder containing exported TIF files named with the following nameing convention: "Row{#}_Well{#}_{channel}_zstack{#}_r{#}_c{#}.tif". 
+        These images can be generated for example by running the sparcstools.parse.parse_phenix() function.
+    slidename : str
+        string indicating the slidename that is added to the stitched images generated
+    pattern : str
+        Regex string to identify the naming pattern of the TIFs that should be stitched together. 
+        For example: "Row1_Well2_{channel}_zstack3_r{row:03}_c{col:03}.tif". 
+        All values in {} indicate those which are matched by regex to find all matching tifs.
+    outdir : str
+        path indicating where the stitched images should be written out
+    overlap : float between 0 and 1
+        value between 0 and 1 indicating the degree of overlap that was used while recording data at the microscope.
+    max_shift: int
+        value indicating the maximum threshold for tile shifts. Default value in ashlar is 15. In general this parameter does not need to be adjusted but it is provided
+        to give more control.
+    stitching_channel : str
+        string indicating the channel name on which the stitching should be calculated. the positions for each tile calculated in this channel will be 
+        passed to the other channels. 
+    crop
+        dictionary of the form {'top':0, 'bottom':0, 'left':0, 'right':0} indicating how many pixels (based on a generated thumbnail, 
+        see sparcstools.stitch.generate_thumbnail) should be cropped from the final image in each indicated dimension. Leave this set to default 
+        if no cropping should be performed.
+    plot_QC : bool
+        boolean value indicating if QC plots should be generated
+    filetype : [str]
+        list containing any of [".tif", ".ome.zarr", ".ome.tif"] defining to which type of file the stiched results should be written. If more than one 
+        element is present in the list all export types will be generated in the same output directory.
+    WGAchannel : str
+        string indicating the name of the WGA channel in case an illumination correction should be performed on this channel
+    do_intensity_rescale : bool | "partial" | "full_image"
+        boolean value indicating if the rescale_p1_P99 function should be applied to individual tiles before stitching or not. Alternatively this parameter can alos be set to partial which applies the rescale function to 
+        all channels except those specied in no_rescale_channel. Finally this parameter can also be set to "full image" which does not apply a rescaling tile wise but instead to the completely assembled image after stitching
+        on a per channel basis. This ensures that all channels are scaled to the same range.
+    rescale_range: (lower, upper) | dict({channel: (lower, upper)})
+        tuple indicating the lower and upper percentile to use for percentile rescaling. Default is (1, 99) which means that the 1st and 99th percentile are used for rescaling. Alternatively a dictionary can be passed with custom values per channel.
+    no_rescale_channel : None | [str]
+        either None or a list of channel strings on which no rescaling before stitching should be performed.
+    export_XML
+        boolean value. If true then an xml is exported when writing to .tif which allows for the import into BIAS.
+    return_tile_positions : bool | default = True
+        boolean value. If true and return_type != "return_array" the tile positions are written out to csv.
+    channel_order : None | [str]
+        if None do nothing, if list of channel names is supplied the channels are remapped into the specified order
+    """
+
+    def _assemble_mosaic(mosaic, crop = crop):
+        
+        #get dimensions of assembled final mosaic
+        n_channels = len(mosaic.channels)
+        x, y = mosaic.shape
+        
+        # initialize tempmmap array to save assemled mosaic to
+        from alphabase.io import tempmmap
+        global TEMP_DIR_NAME
+        TEMP_DIR_NAME = tempmmap.redefine_temp_location(outdir)
+        mosaics = tempmmap.array((n_channels, x, y), dtype=np.uint16)
+
+        #assemble each of the channels
+        for i, channel in tqdm(enumerate(_channels), total = n_channels):
+            mosaics[i, :, :] = mosaic.assemble_channel(channel = channel, out = mosaics[i, :, :])
+            
+            if do_intensity_rescale == "full_image":
+                print("Rescaling entire input image to 0-1 range using percentiles specified in rescale_range.")
+                if type(rescale_range) == dict:
+                    print(f"Using custom rescale range for each channel.\n{channel}: {rescale_range_ids[channel]}")
+                    cutoff1, cutoff2 = rescale_range_ids[channel]
+                else:
+                    cutoff1, cutoff2 = rescale_range
+                p1 = np.percentile(mosaics[i, :, :], cutoff1)
+                p99 = np.percentile(mosaics[i, :, :], cutoff2)
+                mosaics[i, :, :] = (rescale_intensity(mosaics[i, :, :], (p1, p99), (0, 1)) * 65535).astype('uint16')
+        
+        #perform cropping if crop parameters are specified
+        if np.sum(list(crop.values())) > 0:
+            print('Merged image will be cropped to the specified cropping parameters: ', crop)
+
+            cropping_factor = 20.00   #this is based on the scale that was used in the thumbnail generation
+            _, x, y = mosaics.shape
+            top = int(crop['top'] * cropping_factor)
+            bottom = int(crop['bottom'] * cropping_factor)
+            left = int(crop['left'] * cropping_factor)
+            right = int(crop['right'] * cropping_factor)
+            cropped = mosaics[:, slice(top, x-bottom), slice(left, y-right)]
+
+            #manual garbage collection tp reduce memory footprint
+            del mosaics
+            gc.collect()
+
+            return(cropped)
+        else:
+            return(mosaics)
+
+    start_time = time.time()
+
+    #convert relativ paths into absolute paths
+    outdir = os.path.abspath(outdir)
+
+    #read data 
+    print("performing stitching with ", str(overlap), " overlap.")
+    slide = FilePatternReaderRescale(path = input_dir, pattern = pattern, overlap = overlap, rescale_range=rescale_range)
+    
+    if type(rescale_range) == dict:
+        #lookup channel names and match them with channel ids to return a new dict whose keys are the channel ids
+        rescale_range_ids = {list(slide.metadata.channel_map.values()).index(k):v for k,v in rescale_range.items()}
+        print(rescale_range_ids)
+        slide.rescale_range = rescale_range_ids #update so that the lookup can occur correctly
+
+    # Turn on the rescaling
+    slide.do_rescale = do_intensity_rescale
+    slide.WGAchannel = WGAchannel
+
+    if do_intensity_rescale == "partial":
+        if no_rescale_channel != None:
+            no_rescale_channel_id = []
+            for _channel in no_rescale_channel:
+                no_rescale_channel_id.append(list(slide.metadata.channel_map.values()).index(_channel))
+            slide.no_rescale_channel = no_rescale_channel_id
+        else:
+            sys.exit("do_intensity_rescale set to partial but not channel passed for which no rescaling should be done.")
+    
+    #flip y-axis to comply with labeling generated by opera phenix
+    process_axis_flip(slide, flip_x=False, flip_y=True)
+
+    #get dictionary position of channel
+    channel_id = list(slide.metadata.channel_map.values()).index(stitching_channel)
+
+    #generate aligner to use specificed channel for stitching
+    print("performing stitching on channel ", stitching_channel, "with id number ", str(channel_id))
+    aligner = ParallelEdgeAligner(slide, channel=channel_id, filter_sigma=filter_sigma, verbose=True, do_make_thumbnail=False, max_shift = max_shift)
+    aligner.run()  
+
+    #generate some QC plots
+    if plot_QC:
+        plot_edge_scatter(aligner, outdir)
+        plot_edge_quality(aligner, outdir)
+
+    aligner.reader._cache = {} #need to empty cache for some reason
+
+    #generate stitched file
+    mosaic_args = {}
+    mosaic_args['verbose'] = True
+    mosaic_args['channels'] = list(slide.metadata.channel_map.keys())
+
+    mosaic = ParallelMosaic(aligner, 
+                        aligner.mosaic_shape, 
+                        **mosaic_args
+                        )
+
+    mosaic.dtype = np.uint16
+
+    if channel_order is None:
+        _channels = mosaic.channels
+    else:
+        print("current channel order: ", mosaic.channels)
+
+        _channels = []
+        for channel in channel_order:
+            _channels.append(list(slide.metadata.channel_map.values()).index(channel))
+            
+        print("new channel order", _channels)
+    
+    #output tile positions if required
+    if "return_array" in filetype:
+        print("not saving positions since returning stitched array.")
+    else:
+        if return_tile_positions:
+            
+            #write out positions to csv
+            positions = aligner.positions
+            np.savetxt(os.path.join(outdir, slidename + "_tile_positions.tsv"), positions, delimiter="\t")
+        else:
+            print("not saving positions as specified in config.")
+    
+    if "return_array" in filetype:
+
+        print("Returning array instead of saving to file.")
+        
+        if 'merged_array' not in locals():
+            merged_array = _assemble_mosaic(mosaic, crop = crop)
+
+        end_time = time.time() - start_time
+        print('Merging Pipeline completed in ', str(end_time/60) , "minutes.")
+        
+        #get channel names
+        channels = []
+        for channel in  slide.metadata.channel_map.values():
+            channels.append(channel)
+
+        return(merged_array, channels)
+
+    if ".tif" in filetype:
+        
+        print("writing results to one large tif.")
+        
+        if 'merged_array' not in locals():
+            merged_array = _assemble_mosaic(mosaic, crop = crop)
+
+        #if results were cropped write out file names with cropped in name
+        if np.sum(list(crop.values())) > 0:
+
+            #write to tif for each channel
+            for i, channel in enumerate(slide.metadata.channel_map.values()):
+                (print('writing to file: ', channel))
+
+                #save using tifffile library to ensure compatibility with very large tif files
+                imsave(os.path.join(outdir, slidename + "_"+channel+'_cropped.tif'), cropped[i].astype('uint16'))
+            
+            if export_XML:
+                _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = True)
+
+        #write out without cropped in name
+        else:
+
+            for i, channel in enumerate(slide.metadata.channel_map.values()):
+
+                #save using tifffile library to ensure compatibility with very large tif files
+                imsave(os.path.join(outdir, slidename + "_"+channel+'.tif'), merged_array[i].astype('uint16'))
+
+            if export_XML:
+                _write_xml(outdir, slide.metadata.channel_map.values(), slidename, cropped = False)
+         
+    if ".ome.tif" in filetype:
+        print("writing results to ome.tif. This writer currently does not support cropping nor rescaling the entire image. do_intensity_rescale == full_image will be ignored.")
+        path = os.path.join(outdir, slidename + ".ome.tiff")
+        writer = PyramidWriter([mosaic], path, scale=5, tile_size=1024, peak_size=1024, verbose=True)
+        writer.run()
+
+    if ".ome.zarr" in filetype:
+        print("writing results to ome.zarr")
+
+        if 'merged_array' not in locals():
+            merged_array = _assemble_mosaic(mosaic, crop = crop)
+             
+        path = os.path.join(outdir, slidename + ".ome.zarr")
+
+        #delete file if it already exists
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+            print("Outfile already existed, deleted.")
+
+        loc = parse_url(path, mode="w").store
+        group = zarr.group(store = loc)
+        axes = "cyx"
+
+        channel_colors = ["#e60049", "#0bb4ff", "#50e991", "#e6d800", "#9b19f5", "#ffa300", "#dc0ab4", "#b3d4ff", "#00bfa0"]
+        
+        #check if length of colors is enough for all channels in slide otherwise loop through n times
+        while len(slide.metadata.channel_map.values()) > len(channel_colors):
+            channel_colors = channel_colors + channel_colors
+
+        group.attrs["omero"] = {
+            "name":slidename + ".ome.zarr",
+            "channels": [{"label":channel, "color":channel_colors[i], "active":True} for i, channel in enumerate(slide.metadata.channel_map.values())]
+        }  
+
+        write_image(merged_array, group = group, axes = axes, storage_options=dict(chunks=(1, 1024, 1024)))
+   
+    #perform garbage collection manually to free up memory as quickly as possible
+    print("deleting old variables")
+    if "merged_array" in locals():
+        del merged_array
+        gc.collect()
+    
+    #make sure that the created temporary directory is cleaned up at the end of run
+    global TEMP_DIR_NAME
+    if "TEMP_DIR_NAME" in globals():
+        print(f"cleaning up temp directory {TEMP_DIR_NAME}.")
+        shutil.rmtree(TEMP_DIR_NAME, ignore_errors=True)
+        del TEMP_DIR_NAME
+        gc.collect()
+
+    end_time = time.time() - start_time
+    print('Merging Pipeline completed in ', str(end_time/60) , "minutes.")
+
 
 def _stitch(x, 
             outdir, 
