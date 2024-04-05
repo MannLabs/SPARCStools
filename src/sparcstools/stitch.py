@@ -301,6 +301,7 @@ def generate_stitched(input_dir,
             return(mosaics)
 
     start_time = time.time()
+    global TEMP_DIR_NAME
 
     #convert relativ paths into absolute paths
     outdir = os.path.abspath(outdir)
@@ -395,8 +396,25 @@ def generate_stitched(input_dir,
         channels = []
         for channel in  slide.metadata.channel_map.values():
             channels.append(channel)
+        
+        print("Since array is to be returned, memory-mapped array is being converted to regular numpy array.")
 
-        return(merged_array, channels)
+        return_array = merged_array.copy()
+
+        #perform garbage collection manually to free up memory as quickly as possible
+        print("deleting old variables")
+        if "merged_array" in locals():
+            del merged_array
+            gc.collect()
+        #make sure that the created temporary directory is cleaned up at the end of run
+    
+        if "TEMP_DIR_NAME" in globals():
+            print(f"cleaning up temp directory {TEMP_DIR_NAME}.")
+            shutil.rmtree(TEMP_DIR_NAME, ignore_errors=True)
+            del TEMP_DIR_NAME
+            gc.collect()
+
+        return(return_array, channels)
 
     if ".tif" in filetype:
         
@@ -472,7 +490,6 @@ def generate_stitched(input_dir,
         gc.collect()
     
     #make sure that the created temporary directory is cleaned up at the end of run
-    global TEMP_DIR_NAME
     if "TEMP_DIR_NAME" in globals():
         print(f"cleaning up temp directory {TEMP_DIR_NAME}.")
         shutil.rmtree(TEMP_DIR_NAME, ignore_errors=True)
@@ -561,6 +578,7 @@ def generate_stitched_multithreaded(input_dir,
         
         # initialize tempmmap array to save assemled mosaic to
         from alphabase.io import tempmmap
+
         global TEMP_DIR_NAME
         TEMP_DIR_NAME = tempmmap.redefine_temp_location(outdir)
         mosaics = tempmmap.array((n_channels, x, y), dtype=np.uint16)
@@ -602,6 +620,7 @@ def generate_stitched_multithreaded(input_dir,
             return(mosaics)
 
     start_time = time.time()
+    global TEMP_DIR_NAME
 
     #convert relativ paths into absolute paths
     outdir = os.path.abspath(outdir)
@@ -698,7 +717,24 @@ def generate_stitched_multithreaded(input_dir,
         for channel in  slide.metadata.channel_map.values():
             channels.append(channel)
 
-        return(merged_array, channels)
+        print("Since array is to be returned, memory-mapped array is being converted to regular numpy array.")
+
+        return_array = merged_array.copy()
+
+        #perform garbage collection manually to free up memory as quickly as possible
+        print("deleting old variables")
+        if "merged_array" in locals():
+            del merged_array
+            gc.collect()
+        #make sure that the created temporary directory is cleaned up at the end of run
+    
+        if "TEMP_DIR_NAME" in globals():
+            print(f"cleaning up temp directory {TEMP_DIR_NAME}.")
+            shutil.rmtree(TEMP_DIR_NAME, ignore_errors=True)
+            del TEMP_DIR_NAME
+            gc.collect()
+
+        return(return_array, channels)
 
     if ".tif" in filetype:
         
@@ -774,12 +810,11 @@ def generate_stitched_multithreaded(input_dir,
         gc.collect()
     
     #make sure that the created temporary directory is cleaned up at the end of run
-    global TEMP_DIR_NAME
     if "TEMP_DIR_NAME" in globals():
         print(f"cleaning up temp directory {TEMP_DIR_NAME}.")
         shutil.rmtree(TEMP_DIR_NAME, ignore_errors=True)
         del TEMP_DIR_NAME
-        gc.collect()
+        gc.collect()     
 
     end_time = time.time() - start_time
     print('Merging Pipeline completed in ', str(end_time/60) , "minutes.")

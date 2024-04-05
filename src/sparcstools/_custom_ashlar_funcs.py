@@ -200,7 +200,7 @@ class ParallelEdgeAligner(EdgeAligner):
         self, reader, n_threads = 20, channel=0, max_shift=15, alpha=0.01, max_error=None,
         randomize=False, filter_sigma=0.0, do_make_thumbnail=True, verbose=False
     ):
-        super().__init__(reader = reader, channel=channel, max_shift=max_shift, alpha=alpha, max_error=max_error,
+        super().__init__(reader = reader, channel=channel, max_shift = max_shift, alpha = alpha, max_error = max_error,
         randomize=randomize, filter_sigma=filter_sigma, do_make_thumbnail=do_make_thumbnail, verbose=verbose)
 
         self.n_threads = n_threads
@@ -309,14 +309,18 @@ class ParallelEdgeAligner(EdgeAligner):
             ),
             n_threads=self.n_threads
         )
-        if self.verbose:
-            print()
+
+        print("completed.")
 
         self.all_errors = np.array([x[1] for x in self._cache.values()])
+
         # Set error values above the threshold to infinity.
         for k, v in self._cache.items():
             if v[1] > self.max_error or np.any(np.abs(v[0]) > self.max_shift_pixels):
                 self._cache[k] = (v[0], np.inf)
+        
+        #set error values outside of range to 0/inf
+        print("set error values above the threshold or beyond max shift to infinity")
 
 
 # class ParallelMosaic(Mosaic):
@@ -408,7 +412,11 @@ class ParallelMosaic(Mosaic):
             tqdm_args=None,
     ):
         if tqdm_args is None:
-            tqdm_args = {}
+            tqdm_args = dict(
+                file=sys.stdout,
+                disable= not self.verbose,
+                desc="assembling tiles",
+            )
 
         if out is None:
             out = np.zeros(self.shape, self.dtype)
