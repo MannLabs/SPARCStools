@@ -310,8 +310,6 @@ class ParallelEdgeAligner(EdgeAligner):
             n_threads=self.n_threads
         )
 
-        print("completed.")
-
         self.all_errors = np.array([x[1] for x in self._cache.values()])
 
         # Set error values above the threshold to infinity.
@@ -319,9 +317,7 @@ class ParallelEdgeAligner(EdgeAligner):
             if v[1] > self.max_error or np.any(np.abs(v[0]) > self.max_shift_pixels):
                 self._cache[k] = (v[0], np.inf)
         
-        #set error values outside of range to 0/inf
-        print("set error values above the threshold or beyond max shift to infinity")
-
+        return(None)
 
 # class ParallelMosaic(Mosaic):
 

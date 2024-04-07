@@ -658,6 +658,7 @@ def generate_stitched_multithreaded(input_dir,
     print("performing stitching on channel ", stitching_channel, "with id number ", str(channel_id))
     aligner = ParallelEdgeAligner(slide, n_threads = threads, channel=channel_id, filter_sigma=filter_sigma, verbose=True, do_make_thumbnail=False, max_shift = max_shift)
     aligner.run()  
+    print("finished running aligner.")
 
     #generate some QC plots
     if plot_QC:
@@ -665,6 +666,7 @@ def generate_stitched_multithreaded(input_dir,
         plot_edge_quality(aligner, outdir)
 
     aligner.reader._cache = {} #need to empty cache for some reason
+    print("cleared cache")
 
     #generate stitched file
     mosaic_args = {}
@@ -677,6 +679,7 @@ def generate_stitched_multithreaded(input_dir,
                         **mosaic_args
                         )
 
+    print("initialized mosaic.")
     mosaic.dtype = np.uint16
 
     if channel_order is None:
