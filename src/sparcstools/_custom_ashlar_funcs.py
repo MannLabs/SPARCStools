@@ -162,6 +162,8 @@ def _execute_parallel(func: Callable, *, args: list, tqdm_args: dict = None, n_t
             futures = {executor.submit(func, *arg): i for i, arg in enumerate(args)}
             for _ in as_completed(futures):
                 pbar.update(1)
+    
+    return None
 
 
 class ParallelLayerAligner(LayerAligner):
@@ -313,10 +315,11 @@ class ParallelEdgeAligner(EdgeAligner):
         self.all_errors = np.array([x[1] for x in self._cache.values()])
 
         # Set error values above the threshold to infinity.
-        for k, v in self._cache.items():
+        for k, v in tqdm(self._cache.items(), desc = "iterating through cache items"):
             if v[1] > self.max_error or np.any(np.abs(v[0]) > self.max_shift_pixels):
                 self._cache[k] = (v[0], np.inf)
         
+        print("completed edge alignment.")
         return(None)
 
 # class ParallelMosaic(Mosaic):
