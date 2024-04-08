@@ -662,11 +662,12 @@ def generate_stitched_multithreaded(input_dir,
 
     #generate some QC plots
     if plot_QC:
+        print("plotting QC plots.")
         plot_edge_scatter(aligner, outdir)
         plot_edge_quality(aligner, outdir)
 
     aligner.reader._cache = {} #need to empty cache for some reason
-    print("cleared cache")
+    print("cleared cache.")
 
     #generate stitched file
     mosaic_args = {}
