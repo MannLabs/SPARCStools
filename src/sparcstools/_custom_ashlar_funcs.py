@@ -328,7 +328,13 @@ class ParallelEdgeAligner(EdgeAligner):
 
         def parallel_component_creation(g):
             component_data = [(c, g) for c in nx.connected_components(g)]
-            tqdm_args = {"desc": "            Creating Components"}
+            
+            tqdm_args=dict(
+                file=sys.stdout,
+                disable=not self.verbose,
+                desc="            Creating Components",
+            )
+            
             results = _execute_indexed_parallel(process_connected_component, args=component_data, tqdm_args=tqdm_args)
             return results
 
