@@ -334,7 +334,7 @@ class ParallelEdgeAligner(EdgeAligner):
                 disable=not self.verbose,
                 desc="            Creating Components",
             )
-            
+
             results = _execute_indexed_parallel(process_connected_component, args=component_data, tqdm_args=tqdm_args)
             return results
 
@@ -346,7 +346,7 @@ class ParallelEdgeAligner(EdgeAligner):
             tqdm_args=dict(
                 file=sys.stdout,
                 disable=not self.verbose,
-                desc="                  Processing Components",
+                desc="          Processing Components",
             )
             results = _execute_indexed_parallel(process_component, args=components, tqdm_args=tqdm_args)
             return results
@@ -387,7 +387,7 @@ class ParallelEdgeAligner(EdgeAligner):
         tqdm_args=dict(
                 file=sys.stdout,
                 disable=not self.verbose,
-                desc="     Calculating Positions",
+                desc="          Calculating Positions",
                 total=len(list(nx.connected_components(self.spanning_tree)))
             )
         
