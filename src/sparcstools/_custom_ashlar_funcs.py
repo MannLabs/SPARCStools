@@ -335,7 +335,10 @@ class ParallelEdgeAligner(EdgeAligner):
                 desc="            Creating Components",
             )
 
-            results = _execute_indexed_parallel(process_connected_component, args=component_data, tqdm_args=tqdm_args)
+            results = _execute_indexed_parallel(process_connected_component, 
+                                                args=component_data, 
+                                                tqdm_args=tqdm_args, 
+                                                n_threads=self.n_threads)
             return results
 
         def process_component(cc, center):
@@ -348,7 +351,10 @@ class ParallelEdgeAligner(EdgeAligner):
                 disable=not self.verbose,
                 desc="          Processing Components",
             )
-            results = _execute_indexed_parallel(process_component, args=components, tqdm_args=tqdm_args)
+            results = _execute_indexed_parallel(process_component, 
+                                                args=components, 
+                                                tqdm_args=tqdm_args,
+                                                n_threads=self.n_threads)
             return results
 
         def parallel_spanning_tree(neighbors_graph, cache):
