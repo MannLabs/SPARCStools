@@ -16,6 +16,7 @@ from typing import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import copy as copy
 import sys
+import concurrent.futures
 
 import multiprocessing
 from tqdm import tqdm
@@ -165,6 +166,44 @@ def _execute_parallel(func: Callable, *, args: list, tqdm_args: dict = None, n_t
     
     return None
 
+def parallel_eccentricity(G, batch_size=200, num_threads=20):
+    order = G.order()
+    
+    def _calculate(nodes):
+        results = {}
+        for node in nodes:
+            length = nx.shortest_path_length(G, source=node)
+            L = len(length)
+            
+            if L != order:
+                if G.is_directed():
+                    msg = (
+                        "Found infinite path length because the digraph is not"
+                        " strongly connected"
+                    )
+                else:
+                    msg = "Found infinite path length because the graph is not" " connected"
+                
+                sys.exit(msg)
+            
+            results[node] = max(length.values())
+        
+        return results
+
+    # Split nodes into batches (this limits the number of threads that need to formed making it more efficient)
+    node_batches = [list(G.nodes())[i:i + batch_size] for i in range(0, len(G.nodes()), batch_size)]
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+        # Submit tasks for each node batch to the thread pool
+        futures = [executor.submit(_calculate, batch) for batch in node_batches]
+        
+        # Gather results as they complete
+        results = {}
+        for future in concurrent.futures.as_completed(futures):
+            batch_results = future.result()
+            results.update(batch_results)
+    
+    return results
 
 class ParallelLayerAligner(LayerAligner):
 
@@ -319,7 +358,40 @@ class ParallelEdgeAligner(EdgeAligner):
             if v[1] > self.max_error or np.any(np.abs(v[0]) > self.max_shift_pixels):
                 self._cache[k] = (v[0], np.inf)
     
-    def build_spanning_tree(self):
+    def build_spanning_tree(self, batch_size = 200):
+   
+        #define function to parallelize the calculation of the eccentricity
+        #this is only faster if the graph contains a large number of nodes
+        
+
+        # Note that this may be disconnected, so it's technically a forest.
+        g = nx.Graph()
+        g.add_nodes_from(self.neighbors_graph)
+        g.add_weighted_edges_from(
+            (t1, t2, error)
+            for (t1, t2), (_, error) in self._cache.items()
+            if np.isfinite(error)
+        )
+        spanning_tree = nx.Graph()
+        spanning_tree.add_nodes_from(g)
+        
+        for c in nx.connected_components(g):
+            cc = g.subgraph(c)
+
+            #precompute eccentricity using mutli-threaded function to improve computational speed for graphs with many nodes
+            if cc.number_of_nodes() > batch_size:
+                eccentricity = parallel_eccentricity(cc, batch_size= batch_size, num_threads = self.n_threads)
+                center = nx.center(cc, e=eccentricity)[0]
+            else:
+                center = nx.center(cc)[0]
+
+            paths = nx.single_source_dijkstra_path(cc, center).values()
+            
+            for path in paths:
+                nx.add_path(spanning_tree, path)
+        self.spanning_tree = spanning_tree
+
+    def build_spanning_tree_old(self):
 
         def process_connected_component(c, g):
             cc = g.subgraph(c)
@@ -387,7 +459,7 @@ class ParallelEdgeAligner(EdgeAligner):
         spanning_tree = parallel_spanning_tree(self.neighbors_graph, self._cache)
         self.spanning_tree = spanning_tree
     
-    def calculate_positions(self):
+    def calculate_positions(self, batch_size = 200):
         shifts = {}
 
         tqdm_args=dict(
@@ -399,8 +471,15 @@ class ParallelEdgeAligner(EdgeAligner):
         
         for c in tqdm(nx.connected_components(self.spanning_tree), **tqdm_args):
             cc = self.spanning_tree.subgraph(c)
-            center = nx.center(cc)[0]
+
+            if cc.number_of_nodes() > batch_size:
+                eccentricity = parallel_eccentricity(cc, batch_size= batch_size, num_threads = self.n_threads)
+                center = nx.center(cc, e=eccentricity)[0]
+            else:
+                center = nx.center(cc)[0]
+            
             shifts[center] = np.array([0, 0])
+
             for edge in nx.traversal.bfs_edges(cc, center):
                 source, dest = edge
                 if source not in shifts:
