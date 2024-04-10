@@ -318,9 +318,6 @@ class ParallelEdgeAligner(EdgeAligner):
         for k, v in self._cache.items():
             if v[1] > self.max_error or np.any(np.abs(v[0]) > self.max_shift_pixels):
                 self._cache[k] = (v[0], np.inf)
-        
-        print("completed edge alignment.")
-        return(None)
     
     def build_spanning_tree(self):
 
@@ -340,7 +337,11 @@ class ParallelEdgeAligner(EdgeAligner):
             return [path for path in paths]
 
         def process_components(components):
-            tqdm_args = {"desc": "                  Processing Components"}
+            tqdm_args=dict(
+                file=sys.stdout,
+                disable=not self.verbose,
+                desc="                  Processing Components",
+            )
             results = _execute_indexed_parallel(process_component, args=components, tqdm_args=tqdm_args)
             return results
 
@@ -356,7 +357,12 @@ class ParallelEdgeAligner(EdgeAligner):
             components = parallel_component_creation(g)
             paths_per_component = process_components(components)
             
-            tqdm_args = {"desc": "     Constructing Spanning Tree", "total": len(paths_per_component)}
+            tqdm_args=dict(
+                file=sys.stdout,
+                disable=not self.verbose,
+                desc="     Constructing Spanning Tree",
+                total=len(paths_per_component)
+            )
 
             spanning_tree = nx.Graph()
             spanning_tree.add_nodes_from(g)
@@ -371,7 +377,15 @@ class ParallelEdgeAligner(EdgeAligner):
     
     def calculate_positions(self):
         shifts = {}
-        for c in tqdm(nx.connected_components(self.spanning_tree), total = len(list(nx.connected_components(self.spanning_tree))), desc = "     Calculating Positions"):
+
+        tqdm_args=dict(
+                file=sys.stdout,
+                disable=not self.verbose,
+                desc="     Calculating Positions",
+                total=len(list(nx.connected_components(self.spanning_tree)))
+            )
+        
+        for c in tqdm(nx.connected_components(self.spanning_tree), **tqdm_args):
             cc = self.spanning_tree.subgraph(c)
             center = nx.center(cc)[0]
             shifts[center] = np.array([0, 0])
