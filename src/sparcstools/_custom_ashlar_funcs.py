@@ -315,7 +315,7 @@ class ParallelEdgeAligner(EdgeAligner):
         self.all_errors = np.array([x[1] for x in self._cache.values()])
 
         # Set error values above the threshold to infinity.
-        for k, v in tqdm(self._cache.items(), desc = "iterating through cache items"):
+        for k, v in self._cache.items():
             if v[1] > self.max_error or np.any(np.abs(v[0]) > self.max_shift_pixels):
                 self._cache[k] = (v[0], np.inf)
         
@@ -331,7 +331,7 @@ class ParallelEdgeAligner(EdgeAligner):
 
         def parallel_component_creation(g):
             component_data = [(c, g) for c in nx.connected_components(g)]
-            tqdm_args = {"desc": "Creating Components"}
+            tqdm_args = {"desc": "            Creating Components"}
             results = _execute_indexed_parallel(process_connected_component, args=component_data, tqdm_args=tqdm_args)
             return results
 
@@ -340,7 +340,7 @@ class ParallelEdgeAligner(EdgeAligner):
             return [path for path in paths]
 
         def process_components(components):
-            tqdm_args = {"desc": "Processing Components"}
+            tqdm_args = {"desc": "                  Processing Components"}
             results = _execute_indexed_parallel(process_component, args=components, tqdm_args=tqdm_args)
             return results
 
@@ -356,7 +356,7 @@ class ParallelEdgeAligner(EdgeAligner):
             components = parallel_component_creation(g)
             paths_per_component = process_components(components)
             
-            tqdm_args = {"desc": "Constructing Spanning Tree", "total": len(paths_per_component)}
+            tqdm_args = {"desc": "     Constructing Spanning Tree", "total": len(paths_per_component)}
 
             spanning_tree = nx.Graph()
             spanning_tree.add_nodes_from(g)
@@ -368,7 +368,25 @@ class ParallelEdgeAligner(EdgeAligner):
     
         spanning_tree = parallel_spanning_tree(self.neighbors_graph, self._cache)
         self.spanning_tree = spanning_tree
-
+    
+    def calculate_positions(self):
+        shifts = {}
+        for c in tqdm(nx.connected_components(self.spanning_tree), total = len(list(nx.connected_components(self.spanning_tree))), desc = "     Calculating Positions"):
+            cc = self.spanning_tree.subgraph(c)
+            center = nx.center(cc)[0]
+            shifts[center] = np.array([0, 0])
+            for edge in nx.traversal.bfs_edges(cc, center):
+                source, dest = edge
+                if source not in shifts:
+                    source, dest = dest, source
+                shift = self.register_pair(source, dest)[0]
+                shifts[dest] = shifts[source] + shift
+        if shifts:
+            self.shifts = np.array([s for _, s in sorted(shifts.items())])
+            self.positions = self.metadata.positions + self.shifts
+        else:
+            # TODO: fill in shifts and positions with 0x2 arrays
+            raise NotImplementedError("No images")
 
 # class ParallelMosaic(Mosaic):
 
