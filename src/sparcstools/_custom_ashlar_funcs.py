@@ -321,6 +321,93 @@ class ParallelEdgeAligner(EdgeAligner):
         
         print("completed edge alignment.")
         return(None)
+    
+    def build_spanning_tree(self):
+
+        def process_connected_component(c, g):
+            cc = g.subgraph(c)
+            center = nx.center(cc)[0]
+            return (cc, center)
+
+        def parallel_component_creation(g):
+            component_data = [(c, g) for c in nx.connected_components(g)]
+            tqdm_args = {"desc": "Creating Components"}
+            results = _execute_indexed_parallel(process_connected_component, args=component_data, tqdm_args=tqdm_args)
+            return results
+
+        def process_component(cc, center):
+            paths = nx.single_source_dijkstra_path(cc, center).values()
+            return [path for path in paths]
+
+        def process_components(components):
+            tqdm_args = {"desc": "Processing Components"}
+            results = _execute_indexed_parallel(process_component, args=components, tqdm_args=tqdm_args)
+            return results
+
+        def parallel_spanning_tree(neighbors_graph, cache):
+            g = nx.Graph()
+            g.add_nodes_from(neighbors_graph)
+            g.add_weighted_edges_from(
+                (t1, t2, error)
+                for (t1, t2), (_, error) in cache.items()
+                if np.isfinite(error)
+            )
+            
+            components = parallel_component_creation(g)
+            paths_per_component = process_components(components)
+            
+            tqdm_args = {"desc": "Constructing Spanning Tree", "total": len(paths_per_component)}
+
+            spanning_tree = nx.Graph()
+            spanning_tree.add_nodes_from(g)
+            for paths in tqdm(paths_per_component, **tqdm_args):
+                for path in paths:
+                    nx.add_path(spanning_tree, path)
+            
+            return spanning_tree
+    
+        spanning_tree = parallel_spanning_tree(self.neighbors_graph, self._cache)
+        self.spanning_tree = spanning_tree
+
+    
+    def calculate_positions(self):
+
+        def calculate_position(source, dest):
+            shift = self.register_pair(source, dest)[0]
+            return shift
+    
+        shifts = {}
+        args = []
+
+        for c in nx.connected_components(self.spanning_tree):
+            cc = self.spanning_tree.subgraph(c)
+            center = nx.center(cc)[0]
+            shifts[center] = np.array([0, 0])
+            for edge in nx.traversal.bfs_edges(cc, center):
+                source, dest = edge
+                if source not in shifts:
+                    source, dest = dest, source
+                    arg = (dest, source)
+                    args.append(copy.deepcopy(arg))  # Using deepcopy to ensure each arg is independent
+
+                shift = self.register_pair(source, dest)[0]
+                shifts[dest] = shifts[source] + shift
+
+        # Parallelize the calculation of shifts
+        shifts_per_component = _execute_indexed_parallel(calculate_position, args=args)
+
+        if shifts_per_component:
+            shifts = {center: np.array([0, 0])}
+            for shift, (source, dest) in zip(shifts_per_component, args):
+                shifts[dest] = shifts[source] + shift
+
+            sorted_shifts = [s for _, s in sorted(shifts.items())]
+            self.shifts = np.array(sorted_shifts)
+            self.positions = self.metadata.positions + self.shifts
+        else:
+            # TODO: fill in shifts and positions with 0x2 arrays
+            raise NotImplementedError("No images")
+
 
 # class ParallelMosaic(Mosaic):
 
