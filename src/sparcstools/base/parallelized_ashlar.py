@@ -24,7 +24,10 @@ from ashlar import utils as utils
 
 from sparcstools.base.parallelilzation import execute_indexed_parallel, execute_parallel
 from sparcstools.base.graphs import nx2gt, get_center_nodes
-    
+
+from tqdm.auto import tqdm
+from concurrent.futures import ThreadPoolExecutor
+
 class ParallelLayerAligner(LayerAligner):
 
     def __init__(self, reader, reference_aligner, n_threads = 20, channel=None, max_shift=15,
@@ -327,8 +330,9 @@ class ParallelMosaic(Mosaic):
                 total=len(positions),
             )
         
-        execute_parallel(assemble_single, args=enumerate(positions), tqdm_args=tqdm_args, n_threads=self.n_threads)
-
+        with ThreadPoolExecutor(max_workers=self.n_threads) as executor:
+            list(tqdm(executor.map(assemble_single, enumerate(positions)), **tqdm_args))
+        
         # Memory-conserving axis flips.
         if self.flip_mosaic_x:
             for i in range(len(out)):
