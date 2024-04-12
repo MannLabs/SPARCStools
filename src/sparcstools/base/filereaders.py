@@ -4,6 +4,9 @@ from skimage.util import invert
 import skimage.exposure
 import numpy as np
 
+from ashlar.reg import BioformatsReader
+
+
 class FilePatternReaderRescale(filepattern.FilePatternReader):
 
     def __init__(self, path, pattern, overlap, pixel_size=1, do_rescale=False, WGAchannel = None, no_rescale_channel = "Alexa488", rescale_range = (1, 99)):
@@ -97,8 +100,6 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
             else:
                 return self.rescale(img, rescale_range)  
             
-from ashlar.reg import BioformatsReader
-
 class BioformatsReaderRescale(BioformatsReader):
 
         def __init__(self, path, plate=None, well=None, do_rescale=False, no_rescale_channel = ["Alexa488"], rescale_range = (1, 99)):
