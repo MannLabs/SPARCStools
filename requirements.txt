@@ -17,3 +17,5 @@ shapely
 rasterio
 alphabase
 xarray
+graph_tool
+networkx

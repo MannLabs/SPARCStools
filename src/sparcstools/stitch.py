@@ -34,8 +34,10 @@ from ashlar.reg import PyramidWriter
 
 from skimage.exposure import rescale_intensity
 
-from sparcstools._custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality, ParallelEdgeAligner, ParallelMosaic
-from sparcstools.filereaders import FilePatternReaderRescale
+from sparcstools.base.parallelized_ashlar import ParallelEdgeAligner, ParallelMosaic
+from sparcstools.base.ashlar_plotting import plot_edge_scatter, plot_edge_quality
+
+from sparcstools.base.filereaders import FilePatternReaderRescale
 
 #define custom FilePatternReaderRescale to use with Ashlar to allow for custom modifications to images before performing stitching
 

@@ -99,8 +99,7 @@ def add_seg(segmentation,  #list of all sets you want to visualize
     for seg, name in zip(segmentation, segmentation_names):
         write_labels(labels = seg.astype("uint16"), group = group, name = name, axes = "cyx")
         write_label_metadata(group = group, name = f"labels/{name}", colors = [{"label-value": 0, "rgba": [0, 0, 0, 0]}])
-
-    
+ 
 def sparcspy_add_seg(stitched_path, project_location, nuclei = True, cytosol = True):
     """
     Add segmentations generated in SPARCSpy easily to an exisiting ome.zarr or generate a new one.
