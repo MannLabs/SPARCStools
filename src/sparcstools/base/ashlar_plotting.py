@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx #required for plotting results
 from sparcstools.base.graphs import gt2nx
+from graph_tool import Graph as gtGraph
 
 def draw_mosaic_image(ax, aligner, img, **kwargs):
     if img is None:
@@ -102,14 +103,9 @@ def plot_edge_scatter(aligner, outdir, annotate=True):
     
     _, xbins = np.histogram(np.hstack([xdata, pdata]), bins=40)
     
-    sns.distplot(
-        xdata, ax=g.ax_marg_x, kde=False, bins = xbins, norm_hist=True
-    )
+    sns.histplot(xdata, kde=False, bins = xbins, stat="density", alpha=.4, edgecolor=(1, 1, 1, .4), ax=g.ax_marg_x)
+    sns.histplot(pdata,  bins = xbins, stat="density",alpha=.4, element="step", fill=False, ax=g.ax_marg_x)
 
-    sns.distplot(
-        pdata, ax=g.ax_marg_x, kde=False, bins=xbins, norm_hist=True,
-        hist_kws=dict(histtype='step')
-    )
     g.ax_joint.axvline(aligner.max_error, c='k', ls=':')
     g.ax_joint.axhline(aligner.max_shift_pixels, c='k', ls=':')
     g.ax_joint.set_yscale('log')
