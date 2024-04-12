@@ -23,10 +23,11 @@ from ashlar.reg import LayerAligner, EdgeAligner, warn_data, Mosaic
 from ashlar import utils as utils  
 
 from sparcstools.base.parallelilzation import execute_indexed_parallel, execute_parallel
-from sparcstools.base.graphs import nx2gt, get_center_nodes
+from sparcstools.base.graphs import nx2gt, get_center_nodes, gt2nx
 
 from tqdm.auto import tqdm
 from concurrent.futures import ThreadPoolExecutor
+
 
 class ParallelLayerAligner(LayerAligner):
 
@@ -174,7 +175,9 @@ class ParallelEdgeAligner(EdgeAligner):
             n_threads=self.n_threads
         )
 
+        #need to reorder the errors to match the order of the edges
         self.all_errors = np.array([x[1] for x in self._cache.values()])
+        
         # Set error values above the threshold to infinity.
         for k, v in self._cache.items():
             if v[1] > self.max_error or np.any(np.abs(v[0]) > self.max_shift_pixels):
@@ -191,8 +194,9 @@ class ParallelEdgeAligner(EdgeAligner):
             if np.isfinite(error)
         )
 
+        #convert to a graph-tool graph
         gtG = nx2gt(g)
-
+        
         spanning_tree = gtGraph(gtG)
         spanning_tree.clear_edges()
 
@@ -203,20 +207,20 @@ class ParallelEdgeAligner(EdgeAligner):
         centers = []
         for i in components:
             u = GraphView(gtG, vfilt=c.a == i)
-            #graph_draw(u, vertex_text=u.vertex_index, ink_scale = 0.5)
-            
+
             center = get_center_nodes(u)
             centers.append(center)
             vertices = list(u.vertices())
             for vertix in vertices:
-                vlist, elist = shortest_path(u, center, vertix)
+                vlist, elist = shortest_path(u, center, vertix, weights = u.ep.weight)
                 spanning_tree.add_edge_list(elist)
 
         remove_parallel_edges(spanning_tree)
+
         self.spanning_tree = spanning_tree
         self.centers_spanning_tree = centers
-
-    def calculate_positions(self, batch_size = 200):
+        
+    def calculate_positions(self):
         shifts = {}
         _components = []
 
@@ -227,7 +231,7 @@ class ParallelEdgeAligner(EdgeAligner):
         for ix, i in enumerate(components):
             u = GraphView(self.spanning_tree, vfilt=c.a == i)
             nodes = list(u.get_vertices())
-            _components.append(nodes)
+            _components.append(set(nodes))
 
             center = self.centers_spanning_tree[ix]
             
@@ -243,14 +247,14 @@ class ParallelEdgeAligner(EdgeAligner):
                     shift = self.register_pair(source, dest)[0]
                     shifts[dest] = shifts[source] + shift
 
-            if shifts:
-                self.shifts = np.array([s for _, s in sorted(shifts.items())])
-                self.positions = self.metadata.positions + self.shifts
-                self.components_spanning_tree = _components
-            else:
-                # TODO: fill in shifts and positions with 0x2 arrays
-                raise NotImplementedError("No images")    
-
+        if shifts:
+            self.shifts = np.array([s for _, s in sorted(shifts.items())])
+            self.positions = self.metadata.positions + self.shifts
+            self.components_spanning_tree = _components
+        else:
+            # TODO: fill in shifts and positions with 0x2 arrays
+            raise NotImplementedError("No images")   
+        
     def fit_model(self):
         components = self.components_spanning_tree
         components = sorted(
