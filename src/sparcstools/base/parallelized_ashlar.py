@@ -175,18 +175,19 @@ class ParallelEdgeAligner(EdgeAligner):
         )
 
         self.all_errors = np.array([x[1] for x in self._cache.values()])
-
         # Set error values above the threshold to infinity.
         for k, v in self._cache.items():
             if v[1] > self.max_error or np.any(np.abs(v[0]) > self.max_shift_pixels):
                 self._cache[k] = (v[0], np.inf)
+
+        self.cached_errors = self._cache.copy() # save as a backup
 
     def build_spanning_tree(self):
         g = nxGraph()
         g.add_nodes_from(self.neighbors_graph)
         g.add_weighted_edges_from(
             (t1, t2, error)
-            for (t1, t2), (_, error) in self._cache.items()
+            for (t1, t2), (_, error) in self.cached_errors.items()
             if np.isfinite(error)
         )
 

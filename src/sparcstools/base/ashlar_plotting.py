@@ -69,7 +69,10 @@ def plot_edge_quality(
         draw_mosaic_image(ax, aligner, img, **im_kwargs)
         
         #convert spanning tree to nx graph
-        spanning_tree = gt2nx(aligner.spanning_tree)
+        if type(aligner.spanning_tree) == gtGraph:
+            spanning_tree = gt2nx(aligner.spanning_tree)
+        else:
+            spanning_tree = aligner.spanning_tree
 
         # Spanning tree with nodes at original tile positions.
         nx.draw(
@@ -86,9 +89,15 @@ def plot_edge_scatter(aligner, outdir, annotate=True):
     
     import seaborn as sns
     xdata = aligner.all_errors
-    ydata = np.clip(
-        [np.linalg.norm(v[0]) for v in aligner._cache.values()], 0.01, np.inf
-    )
+
+    if "cached_errors" in aligner.__dict__.keys():
+        ydata = np.clip(
+            [np.linalg.norm(v[0]) for v in aligner.cached_errors.values()], 0.01, np.inf
+        )
+    else:
+        ydata = np.clip(
+            [np.linalg.norm(v[0]) for v in aligner._cache.values()], 0.01, np.inf
+        )
 
     #remove inf values if present
     if np.inf in ydata:
