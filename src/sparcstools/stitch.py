@@ -34,7 +34,6 @@ from ashlar.reg import PyramidWriter
 
 from skimage.exposure import rescale_intensity
 
-
 from sparcstools._custom_ashlar_funcs import  plot_edge_scatter, plot_edge_quality, ParallelEdgeAligner, ParallelMosaic
 from sparcstools.filereaders import FilePatternReaderRescale
 

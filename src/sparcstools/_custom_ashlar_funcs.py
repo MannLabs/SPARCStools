@@ -21,6 +21,11 @@ import concurrent.futures
 import multiprocessing
 from tqdm import tqdm
 
+import numpy as np
+from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
+from ashlar import utils as utils  # Import your utils module here
+
 def draw_mosaic_image(ax, aligner, img, **kwargs):
     if img is None:
         img = [[0]]
@@ -205,6 +210,148 @@ def parallel_eccentricity(G, batch_size=200, num_threads=20):
     
     return results
 
+
+import networkx as nx
+from graph_tool import graph_tool as gt
+from graph_tool import topology as topology
+from graph_tool.draw import graph_draw
+from graph_tool.search import dijkstra_search, dijkstra_iterator
+import sklearn.linear_model
+
+def get_prop_type(value, key=None):
+    """
+    Performs typing and value conversion for the graph_tool PropertyMap class.
+    If a key is provided, it also ensures the key is in a format that can be
+    used with the PropertyMap. Returns a tuple, (type name, value, key)
+    """
+    if isinstance(key, str):
+        # Ensure the key is in ASCII format
+        key = key.encode('ascii', errors='replace').decode('ascii')
+
+    # Deal with the value
+    if isinstance(value, bool):
+        tname = 'bool'
+
+    elif isinstance(value, int):
+        tname = 'float'
+        value = float(value)
+
+    elif isinstance(value, float):
+        tname = 'float'
+
+    elif isinstance(value, str):
+        tname = 'string'
+        value = value.encode('ascii', errors='replace').decode('ascii')
+
+    elif isinstance(value, dict):
+        tname = 'object'
+
+    else:
+        tname = 'string'
+        value = str(value)
+
+    return tname, value, key
+
+
+def nx2gt(nxG):
+    """
+    Converts a networkx graph to a graph-tool graph.
+    """
+    # Phase 0: Create a directed or undirected graph-tool Graph
+    gtG = gt.Graph(directed=nxG.is_directed())
+
+    # Add the Graph properties as "internal properties"
+    for key, value in nxG.graph.items():
+        # Convert the value and key into a type for graph-tool
+        tname, value, key = get_prop_type(value, key)
+
+        prop = gtG.new_graph_property(tname) # Create the PropertyMap
+        gtG.graph_properties[key] = prop     # Set the PropertyMap
+        gtG.graph_properties[key] = value    # Set the actual value
+
+    # Phase 1: Add the vertex and edge property maps
+    # Go through all nodes and edges and add seen properties
+    # Add the node properties first
+    nprops = set() # cache keys to only add properties once
+    for node, data in nxG.nodes(data=True):
+
+        # Go through all the properties if not seen and add them.
+        for key, val in data.items():
+            if key in nprops: continue # Skip properties already added
+
+            # Convert the value and key into a type for graph-tool
+            tname, _, key  = get_prop_type(val, key)
+
+            prop = gtG.new_vertex_property(tname) # Create the PropertyMap
+            gtG.vertex_properties[key] = prop     # Set the PropertyMap
+
+            # Add the key to the already seen properties
+            nprops.add(key)
+
+    # Also add the node id: in NetworkX a node can be any hashable type, but
+    # in graph-tool node are defined as indices. So we capture any strings
+    # in a special PropertyMap called 'id' -- modify as needed!
+    gtG.vertex_properties['id'] = gtG.new_vertex_property('string')
+
+    # Add the edge properties second
+    eprops = set() # cache keys to only add properties once
+    for src, dst, data in nxG.edges(data=True):
+
+        # Go through all the edge properties if not seen and add them.
+        for key, val in data.items():
+            if key in eprops: continue # Skip properties already added
+
+            # Convert the value and key into a type for graph-tool
+            tname, _, key = get_prop_type(val, key)
+
+            prop = gtG.new_edge_property(tname) # Create the PropertyMap
+            gtG.edge_properties[key] = prop     # Set the PropertyMap
+
+            # Add the key to the already seen properties
+            eprops.add(key)
+
+    # Phase 2: Actually add all the nodes and vertices with their properties
+    # Add the nodes
+    vertices = {} # vertex mapping for tracking edges later
+    for node, data in nxG.nodes(data=True):
+
+        # Create the vertex and annotate for our edges later
+        v = gtG.add_vertex()
+        vertices[node] = v
+
+        # Set the vertex properties, not forgetting the id property
+        data['id'] = str(node)
+        for key, value in data.items():
+            gtG.vp[key][v] = value # vp is short for vertex_properties
+
+    # Add the edges
+    for src, dst, data in nxG.edges(data=True):
+
+        # Look up the vertex structs from our vertices mapping and add edge.
+        e = gtG.add_edge(vertices[src], vertices[dst])
+
+        # Add the edge properties
+        for key, value in data.items():
+            gtG.ep[key][e] = value # ep is short for edge_properties
+
+    # Done, finally!
+    return gtG
+
+def get_center_nodes(g):
+    
+    nodes = g.get_vertices()
+    if len(nodes) > 2:
+        
+        distances = topology.shortest_distance(g)
+        eccentricities = [x.a[x.a < 1e100].max() for x in distances]
+        
+        centers = nodes[eccentricities.index(min(eccentricities))]
+
+        return(centers)
+        
+    else:
+        return(nodes[0]) 
+    
 class ParallelLayerAligner(LayerAligner):
 
     def __init__(self, reader, reference_aligner, n_threads = 20, channel=None, max_shift=15,
@@ -357,14 +504,8 @@ class ParallelEdgeAligner(EdgeAligner):
         for k, v in self._cache.items():
             if v[1] > self.max_error or np.any(np.abs(v[0]) > self.max_shift_pixels):
                 self._cache[k] = (v[0], np.inf)
-    
-    def build_spanning_tree(self, batch_size = 200):
-   
-        #define function to parallelize the calculation of the eccentricity
-        #this is only faster if the graph contains a large number of nodes
-        
 
-        # Note that this may be disconnected, so it's technically a forest.
+    def build_spanning_tree(self):
         g = nx.Graph()
         g.add_nodes_from(self.neighbors_graph)
         g.add_weighted_edges_from(
@@ -372,194 +513,104 @@ class ParallelEdgeAligner(EdgeAligner):
             for (t1, t2), (_, error) in self._cache.items()
             if np.isfinite(error)
         )
-        spanning_tree = nx.Graph()
-        spanning_tree.add_nodes_from(g)
-        
-        for c in nx.connected_components(g):
-            cc = g.subgraph(c)
 
-            #precompute eccentricity using mutli-threaded function to improve computational speed for graphs with many nodes
-            if cc.number_of_nodes() > batch_size:
-                eccentricity = parallel_eccentricity(cc, batch_size= batch_size, num_threads = self.n_threads)
-                center = nx.center(cc, e=eccentricity)[0]
-            else:
-                center = nx.center(cc)[0]
+        gtG = nx2gt(g)
 
-            paths = nx.single_source_dijkstra_path(cc, center).values()
+        spanning_tree = gt.Graph(gtG)
+        spanning_tree.clear_edges()
+
+        # label the components in a property map
+        c = gt.topology.label_components(gtG)[0]
+        components = np.unique(c.a)
+
+        centers = []
+        for i in components:
+            u = gt.GraphView(gtG, vfilt=c.a == i)
+            #graph_draw(u, vertex_text=u.vertex_index, ink_scale = 0.5)
             
-            for path in paths:
-                nx.add_path(spanning_tree, path)
+            center = get_center_nodes(u)
+            centers.append(center)
+            vertices = list(u.vertices())
+            for vertix in vertices:
+                vlist, elist = gt.topology.shortest_path(u, center, vertix)
+                spanning_tree.add_edge_list(elist)
+
+        gt.generation.remove_parallel_edges(spanning_tree)
         self.spanning_tree = spanning_tree
+        self.centers_spanning_tree = centers
 
-    def build_spanning_tree_old(self):
-
-        def process_connected_component(c, g):
-            cc = g.subgraph(c)
-            center = nx.center(cc)[0]
-            return (cc, center)
-
-        def parallel_component_creation(g):
-            component_data = [(c, g) for c in nx.connected_components(g)]
-            
-            tqdm_args=dict(
-                file=sys.stdout,
-                disable=not self.verbose,
-                desc="            Creating Components",
-            )
-
-            results = _execute_indexed_parallel(process_connected_component, 
-                                                args=component_data, 
-                                                tqdm_args=tqdm_args, 
-                                                n_threads=self.n_threads)
-            return results
-
-        def process_component(cc, center):
-            paths = nx.single_source_dijkstra_path(cc, center).values()
-            return [path for path in paths]
-
-        def process_components(components):
-            tqdm_args=dict(
-                file=sys.stdout,
-                disable=not self.verbose,
-                desc="          Processing Components",
-            )
-            results = _execute_indexed_parallel(process_component, 
-                                                args=components, 
-                                                tqdm_args=tqdm_args,
-                                                n_threads=self.n_threads)
-            return results
-
-        def parallel_spanning_tree(neighbors_graph, cache):
-            g = nx.Graph()
-            g.add_nodes_from(neighbors_graph)
-            g.add_weighted_edges_from(
-                (t1, t2, error)
-                for (t1, t2), (_, error) in cache.items()
-                if np.isfinite(error)
-            )
-            
-            components = parallel_component_creation(g)
-            paths_per_component = process_components(components)
-            
-            tqdm_args=dict(
-                file=sys.stdout,
-                disable=not self.verbose,
-                desc="     Constructing Spanning Tree",
-                total=len(paths_per_component)
-            )
-
-            spanning_tree = nx.Graph()
-            spanning_tree.add_nodes_from(g)
-            for paths in tqdm(paths_per_component, **tqdm_args):
-                for path in paths:
-                    nx.add_path(spanning_tree, path)
-            
-            return spanning_tree
-    
-        spanning_tree = parallel_spanning_tree(self.neighbors_graph, self._cache)
-        self.spanning_tree = spanning_tree
-    
     def calculate_positions(self, batch_size = 200):
         shifts = {}
+        _components = []
 
-        tqdm_args=dict(
-                file=sys.stdout,
-                disable=not self.verbose,
-                desc="          Calculating Positions",
-                total=len(list(nx.connected_components(self.spanning_tree)))
-            )
-        
-        for c in tqdm(nx.connected_components(self.spanning_tree), **tqdm_args):
-            cc = self.spanning_tree.subgraph(c)
+        # label the components in a property map
+        c = gt.topology.label_components(self.spanning_tree)[0]
+        components = np.unique(c.a)
 
-            if cc.number_of_nodes() > batch_size:
-                eccentricity = parallel_eccentricity(cc, batch_size= batch_size, num_threads = self.n_threads)
-                center = nx.center(cc, e=eccentricity)[0]
-            else:
-                center = nx.center(cc)[0]
+        for ix, i in enumerate(components):
+            u = gt.GraphView(self.spanning_tree, vfilt=c.a == i)
+            nodes = list(u.get_vertices())
+            _components.append(nodes)
+
+            center = self.centers_spanning_tree[ix]
             
             shifts[center] = np.array([0, 0])
+            
+            if len(nodes) > 1:
+                for edge in gt.search.bfs_iterator(u, source=center):
+                    source, dest = edge
+                    source = int(source)
+                    dest = int(dest)
+                    if source not in shifts:
+                        source, dest = dest, source
+                    shift = self.register_pair(source, dest)[0]
+                    shifts[dest] = shifts[source] + shift
 
-            for edge in nx.traversal.bfs_edges(cc, center):
-                source, dest = edge
-                if source not in shifts:
-                    source, dest = dest, source
-                shift = self.register_pair(source, dest)[0]
-                shifts[dest] = shifts[source] + shift
-        if shifts:
-            self.shifts = np.array([s for _, s in sorted(shifts.items())])
-            self.positions = self.metadata.positions + self.shifts
-        else:
-            # TODO: fill in shifts and positions with 0x2 arrays
-            raise NotImplementedError("No images")
+            if shifts:
+                self.shifts = np.array([s for _, s in sorted(shifts.items())])
+                self.positions = self.metadata.positions + self.shifts
+                self.components_spanning_tree = _components
+            else:
+                # TODO: fill in shifts and positions with 0x2 arrays
+                raise NotImplementedError("No images")    
 
-# class ParallelMosaic(Mosaic):
+    def fit_model(self):
+        components = self.components_spanning_tree
+        components = sorted(
+            components,
+            key=len, reverse=True
+        )
 
-#     def __init__(self, aligner, shape, n_threads = 20, channels=None, ffp_path=None, dfp_path=None,
-#         flip_mosaic_x=False, flip_mosaic_y=False, barrel_correction=None,
-#         verbose=False):
-
-#         super().__init__(aligner=aligner, shape=shape, channels=channels, ffp_path=ffp_path, dfp_path=dfp_path,
-#         flip_mosaic_x=flip_mosaic_x, flip_mosaic_y=flip_mosaic_y, barrel_correction=barrel_correction,
-#         verbose=verbose)
-
-#         self.n_threads = n_threads
-
-#     def assemble_channel_parallel(
-#         self,
-#         channel,
-#         positions,
-#         reader,
-#         out = None,
-#         tqdm_args = None,
-#     ):
-#         if tqdm_args is None:
-#             tqdm_args = {}
-
-#         if out is None:
-#             out = np.zeros(self.shape, self.dtype)
-#         else:
-#             if out.shape != self.shape:
-#                 raise ValueError(
-#                     f"out array shape {out.shape} does not match Mosaic"
-#                     f" shape {self.shape}"
-#                 )
+        # Fit LR model on positions of largest connected component.
+        cc0 = list(components[0])
+        self.lr = sklearn.linear_model.LinearRegression()
+        self.lr.fit(self.metadata.positions[cc0], self.positions[cc0])
+        # Fix up degenerate transform matrix. This happens when the spanning
+        # tree is completely edgeless or cc0's metadata positions fall in a
+        # straight line. In this case we fall back to the identity transform.
+        if np.linalg.det(self.lr.coef_) < 1e-3:
+            # FIXME We should probably exit here, not just warn. We may provide
+            # an option to force it anyway.
+            warn_data(
+                "Could not align enough edges, proceeding anyway with original"
+                " stage positions."
+            )
+            self.lr.coef_ = np.diag(np.ones(2))
+            self.lr.intercept_ = np.zeros(2)
         
-#         for si, position in tqdm(enumerate(positions), **tqdm_args):
-#             img = reader.read(c=channel, series=si)
-#             img = self.correct_illumination(img, channel)
-#             utils.paste(out, img, position, func=utils.pastefunc_blend)
-
-#         #test parallel assembly
-#         def worker(position, channel, shared_output, idx):
-#             img = reader.read(c=channel, series=idx)
-#             img = self.correct_illumination(img, channel)
-#             utils.paste(shared_output, img, position, func=utils.pastefunc_blend)
-
-#         # Assuming `positions` is a list of positions and other necessary variables are defined.
-
-#         # Create a shared dictionary to store the output
-#         manager = multiprocessing.Manager()
-#         shared_output = manager.dict()
-
-#         # Create a pool of workers
-#         pool = multiprocessing.Pool(processes=self.n_threads)
-
-#         # Define a partial function to pass additional arguments to worker function
-#         partial_worker = lambda args: worker(*args)
-
-#         # Iterate over positions and apply the function in parallel
-#         for si, position in tqdm(enumerate(positions), total=len(positions)):
-#             pool.apply_async(partial_worker, args=(position, channel, shared_output, si))
-
-#         # Close the pool and wait for all processes to finish
-#         pool.close()
-#         pool.join()
-
-import numpy as np
-from concurrent.futures import ThreadPoolExecutor
-from tqdm import tqdm
-from ashlar import utils as utils  # Import your utils module here
+        # Adjust position of remaining components so their centroids match
+        # the predictions of the model.
+        for cc in components[1:]:
+            nodes = list(cc)
+            centroid_m = np.mean(self.metadata.positions[nodes], axis=0)
+            centroid_f = np.mean(self.positions[nodes], axis=0)
+            shift = self.lr.predict([centroid_m])[0] - centroid_f
+            self.positions[nodes] += shift
+        # Adjust positions and model intercept to put origin at 0,0.
+        self.origin = self.positions.min(axis=0)
+        self.positions -= self.origin
+        self.lr.intercept_ -= self.origin
+        self.centers = self.positions + self.metadata.size / 2
 
 class ParallelMosaic(Mosaic):
 
