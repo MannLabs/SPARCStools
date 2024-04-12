@@ -200,7 +200,7 @@ def gt2nx(gtG):
     # Add vertices
     vertex_id_map = {}  # Mapping from graph-tool vertex index to NetworkX node ID
     for v in gtG.vertices():
-        vertex_id = gtG.vp['id'][v]
+        vertex_id = int(gtG.vp['id'][v])
         vertex_id_map[v] = vertex_id
         nxG.add_node(vertex_id, **{key: value[v] for key, value in gtG.vp.items() if key != 'id'})
 
