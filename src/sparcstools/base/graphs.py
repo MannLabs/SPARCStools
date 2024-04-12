@@ -50,10 +50,14 @@ def nx2gt(nxG):
     gtG : graph-tool.Graph
         The graph-tool graph.
     """
-
+    node_list = list(nxG.nodes())
     edge_list = list(nxG.edges(data = True))
     edge_list =[(x, y, weight["weight"]) for x, y, weight in edge_list]
     gtG = Graph(edge_list, eprops=[('weight', 'float')], directed = nxG.is_directed())
+
+    vertices = gtG.get_vertices()
+    for missing_node in [x for x in node_list if x not in vertices]:
+        gtG.add_vertex()
         
     return gtG
 
