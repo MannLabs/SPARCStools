@@ -28,6 +28,7 @@ from sparcstools.base.graphs import nx2gt, get_center_nodes, gt2nx
 from tqdm.auto import tqdm
 from concurrent.futures import ThreadPoolExecutor
 
+from alphabase.io.tempmmap import mmap_array_from_path
 
 class ParallelLayerAligner(LayerAligner):
 
@@ -304,40 +305,46 @@ class ParallelMosaic(Mosaic):
                          verbose=verbose)
 
         self.n_threads = n_threads
-
+  
     def assemble_channel_parallel(
             self,
             channel,
-            positions,
-            reader,
+            ch_index,
             out=None,
-            tqdm_args=None,
+            hdf5_path = None,
+            tqdm_args=None
     ):
+        """This function assembles a single channel of the mosaic writing to the same HDF5 file being used as a mmap array in the backend."""
         if out is None:
-            out = np.zeros(self.shape, self.dtype)
+            if hdf5_path is not None:
+                out = mmap_array_from_path(hdf5_path)
+            else:
+                out = np.zeros(self.shape, self.dtype)
         else:
             if out.shape != self.shape:
                 raise ValueError(
                     f"out array shape {out.shape} does not match Mosaic"
                     f" shape {self.shape}"
                 )
-
-        def assemble_single(si_position):
-            si, position = si_position
-            img = reader.read(c=channel, series=si)
-            img = self.correct_illumination(img, channel)
-            utils.paste(out, img, position, func=utils.pastefunc_blend)
-        
+            if hdf5_path is None:
+                raise ValueError(
+                    f"if specifying an out array, you also need to pass the HDF5 path of the memory mapped temparray"
+                )
+        out = mmap_array_from_path(hdf5_path)
         tqdm_args = dict(
                 file=sys.stdout,
                 disable= not self.verbose,
-                desc="assembling tiles",
-                total=len(positions),
+                desc=f"assembling channel {ch_index}",
+                total=len(self.aligner.positions),
             )
         
-        with ThreadPoolExecutor(max_workers=self.n_threads) as executor:
-            list(tqdm(executor.map(assemble_single, enumerate(positions)), **tqdm_args))
-        
+        #this can not be multi-threaded as it leads to inconsistent results in the overlap array
+        #threading over the channels was the easiest and most robust way to implement
+        for si, position in tqdm(enumerate(self.aligner.positions), **tqdm_args): #potentially may want to disable tqdm output for this as this runs in an individual thread and it could get confusing
+            img = self.aligner.reader.read(c=channel, series=si)
+            img = self.correct_illumination(img, channel)
+            utils.paste(out[ch_index, :, :], img, position, func=utils.pastefunc_blend)
+            
         # Memory-conserving axis flips.
         if self.flip_mosaic_x:
             for i in range(len(out)):
@@ -345,5 +352,5 @@ class ParallelMosaic(Mosaic):
         if self.flip_mosaic_y:
             for i in range(len(out) // 2):
                 out[[i, -i - 1]] = out[[-i - 1, i]]
-        return out
-    
+        
+        return None

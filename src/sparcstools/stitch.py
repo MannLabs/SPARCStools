@@ -38,6 +38,7 @@ from sparcstools.base.parallelized_ashlar import ParallelEdgeAligner, ParallelMo
 from sparcstools.base.ashlar_plotting import plot_edge_scatter, plot_edge_quality
 
 from sparcstools.base.filereaders import FilePatternReaderRescale
+from concurrent.futures import ThreadPoolExecutor
 
 #define custom FilePatternReaderRescale to use with Ashlar to allow for custom modifications to images before performing stitching
 
@@ -578,17 +579,23 @@ def generate_stitched_multithreaded(input_dir,
         x, y = mosaic.shape
         
         # initialize tempmmap array to save assemled mosaic to
-        from alphabase.io import tempmmap
+        from alphabase.io.tempmmap import create_empty_mmap, redefine_temp_location, mmap_array_from_path
 
         global TEMP_DIR_NAME
-        TEMP_DIR_NAME = tempmmap.redefine_temp_location(outdir)
-        mosaics = tempmmap.array((n_channels, x, y), dtype=np.uint16)
+        TEMP_DIR_NAME = redefine_temp_location(outdir)
+        hdf5_path = create_empty_mmap((n_channels, x, y), dtype=np.uint16)
+        mosaics = mmap_array_from_path(hdf5_path)
 
         #assemble each of the channels
+        args = []
         for i, channel in tqdm(enumerate(_channels), total = n_channels):
+            args.append((channel, mosaics[i, :, :], i, hdf5_path))
+        
+        def assemble_channel(args):
+            channel, out, i, hdf5_path = args
+            mosaic.assemble_channel_parallel(channel = channel, out = out, ch_index = i, hdf5_path = hdf5_path)
 
-            mosaics[i, :, :] = mosaic.assemble_channel_parallel(positions = mosaic.aligner.positions, reader = mosaic.aligner.reader, channel = channel, out = mosaics[i, :, :])
-            
+            #this code is not memory optimized. could lead to issues for very large datasets (has not been tested)
             if do_intensity_rescale == "full_image":
                 print("Rescaling entire input image to 0-1 range using percentiles specified in rescale_range.")
                 if type(rescale_range) == dict:
@@ -599,8 +606,21 @@ def generate_stitched_multithreaded(input_dir,
                 p1 = np.percentile(mosaics[i, :, :], cutoff1)
                 p99 = np.percentile(mosaics[i, :, :], cutoff2)
                 mosaics[i, :, :] = (rescale_intensity(mosaics[i, :, :], (p1, p99), (0, 1)) * 65535).astype('uint16')
-        
+
+        tqdm_args = dict(
+                file=sys.stdout,
+                desc=f"assembling mosaic",
+                total=len(_channels),
+            )
+
+        #threading over channels is safe as the channels are written to different postions in the hdf5 file and do not interact with one another
+        #threading over the writing of a single channel is not safe and leads to inconsistent results
+        workers = np.min([threads, len(_channels)])
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            list(tqdm(executor.map(assemble_channel, args), **tqdm_args))
+            
         #perform cropping if crop parameters are specified
+        #this code is not memory optimized. could lead to issues for very large datasets (has not been tested)
         if np.sum(list(crop.values())) > 0:
             print('Merged image will be cropped to the specified cropping parameters: ', crop)
 
@@ -659,16 +679,14 @@ def generate_stitched_multithreaded(input_dir,
     print("performing stitching on channel ", stitching_channel, "with id number ", str(channel_id))
     aligner = ParallelEdgeAligner(slide, n_threads = threads, channel=channel_id, filter_sigma=filter_sigma, verbose=True, do_make_thumbnail=False, max_shift = max_shift)
     aligner.run()  
-    print("finished running aligner.")
 
     #generate some QC plots
     if plot_QC:
-        print("plotting QC plots.")
+        print("plotting QC plots...")
         plot_edge_scatter(aligner, outdir)
         plot_edge_quality(aligner, outdir)
 
     aligner.reader._cache = {} #need to empty cache for some reason
-    print("cleared cache.")
 
     #generate stitched file
     mosaic_args = {}
@@ -681,7 +699,6 @@ def generate_stitched_multithreaded(input_dir,
                         **mosaic_args
                         )
 
-    print("initialized mosaic.")
     mosaic.dtype = np.uint16
 
     if channel_order is None:
