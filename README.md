@@ -23,7 +23,7 @@ Create a conda environment and activate it
 
 Install Java using conda
 
-    conda install -c conda-forge openjdk
+    conda install -c conda-forge openjdk graph_tool
 
 Install package via pip. This should install all dependencies as well.
 
