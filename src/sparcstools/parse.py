@@ -41,11 +41,12 @@ class PhenixParser:
             print("The wells found in the phenix layout will be compressed into one column after parsing the images, r and c indicators will be adjusted accordingly.")
 
         self.xml_path = self.get_xml_path()
-
         self.image_dir = self.get_input_dir()
         self.channel_lookup = self.get_channel_metadata(self.xml_path)
     
     def get_xml_path(self):
+        #directory depends on if flatfield images were exported or not
+        #these generated folder structures are hard coded during phenix export, do not change
         if self.flatfield_status:
             index_file = os.path.join(self.experiment_dir, "Images", 'Index.ref.xml')
         else:
@@ -58,6 +59,8 @@ class PhenixParser:
         return(index_file)
     
     def get_input_dir(self):
+        #directory depends on if flatfield images were exported or not
+        #these generated folder structures are hard coded during phenix export, do not change
         if self.flatfield_status:
             input_dir = os.path.join(self.experiment_dir, 'Images', "flex")   
         else:
@@ -69,13 +72,13 @@ class PhenixParser:
 
         return(input_dir)
 
-    def define_outdir(self):
+    def define_outdir(self, name = "parsed_images"):
 
-        self.outdir = f"{self.experiment_dir}/parsed_images"   
+        setattr(self, f"outdir_{name}", f"{self.experiment_dir}/{name}")
 
         # if output directory did not exist create it
-        if not os.path.isdir(self.outdir):
-            os.makedirs(self.outdir)  
+        if not os.path.isdir(getattr(self, f"outdir_{name}")):
+            os.makedirs(getattr(self, f"outdir_{name}"))  
        
     def get_channel_metadata(self, xml_path) ->  pd.DataFrame:
 
@@ -263,7 +266,27 @@ class PhenixParser:
             metadata.loc[i, 'new_file_name'] = name
 
         return(metadata)
+    
+    def get_tile_id(string):
+        pattern = r"_r(\d+)_c(\d+)\.tif"
+        match = re.search(pattern, string)
+        if match:
+            row = match.group(1)
+            col = match.group(2)
+            return f"r{row}_c{col}"
+        else:
+            return None
+        
+    def generate_metadata(self):
 
+        metadata = self.get_phenix_metadata()
+        metadata_new = self.generate_new_filenames(metadata)
+        
+        #save results to self for easy access
+        self.metadata = metadata_new
+
+        return(metadata_new)
+    
     def check_for_missing_files(self, metadata = None, return_values = False):
 
         if metadata is None:
@@ -330,8 +353,6 @@ class PhenixParser:
             return(missing_images)
     
     def replace_missing_images(self):
-        #get output directory
-        self.define_outdir()
 
         if self.missing_images is None:
             self.check_for_missing_files()
@@ -339,13 +360,11 @@ class PhenixParser:
         if len(self.missing_images) > 0:
             for missing_image in self.missing_images:
                 print(f"Creating black image with name: {missing_image}")
-                imwrite(os.path.join(self.outdir, missing_image), self.black_image)
+                imwrite(os.path.join(self.outdir_parsing, missing_image), self.black_image)
             
             print(f"All missing images successfully replaced with black images of the dimension {self.black_image.shape}")
-        
-    def copy_files(self, metadata):
 
-        print("Starting copy process...")
+    def define_copy_functions(self):
         #define function for copying depending on if symlinks should be used or not
         if self.export_symlinks:
             def copyfunction(input, output):
@@ -356,18 +375,39 @@ class PhenixParser:
         else:
             def copyfunction(input, output):
                 shutil.copyfile(input, output)
+        
+        self.copyfunction = copyfunction
+
+    def copy_files(self, metadata):
+        """
+        Copy files from the source directory to the output directory. The new file names are defined in the metadata.
+
+        Parameters
+        ----------
+
+        metadata : pd.DataFrame
+            Expected columns are: filename, new_file_name, source, dest
+
+        Returns
+        -------
+        None
+
+        """
+        print("Starting copy process...")
+        self.define_copy_functions()
 
         #actually perform the copy process  
-        for old, new, source in tqdm(zip(metadata.filename.tolist(), metadata.new_file_name.tolist(), metadata.source.tolist()), 
-                            total = len(metadata.new_file_name.tolist())):
+        for old, new, source, dest in tqdm(zip(metadata.filename.tolist(), metadata.new_file_name.tolist(), metadata.source.tolist(), metadata.dest.tolist()), 
+                            total = len(metadata.new_file_name.tolist()),
+                            desc = "Copying files"):
             
             #define old and new paths for copy process
             old_path = os.path.join(source, old)
-            new_path = os.path.join(self.outdir, new)
+            new_path = os.path.join(dest, new)
             
             #check if old path exists
             if os.path.exists(old_path):
-                copyfunction(old_path, new_path)
+                self.copyfunction(old_path, new_path)
             else:
                 print("Error: ", old_path, "not found.")
         print("Copy process completed.")
@@ -381,33 +421,120 @@ class PhenixParser:
     def parse(self):
         
         #create output directory
-        self.define_outdir()
+        self.define_outdir(name = "parsed_images")
 
         #get metadata for the images we want to parse
-        metadata = self.get_phenix_metadata()
-        metadata_new = self.generate_new_filenames(metadata)
+        metadata = self.generate_metadata()
+
+        #set destination for copying
+        metadata["dest"] = getattr(self, f"outdir_parsed_images")
 
         #copy/link the images to their new names
-        self.copy_files(metadata=metadata_new)
+        self.copy_files(metadata=metadata)
 
         #check for missing images and replace them
-        self.check_for_missing_files(metadata = metadata_new)
+        self.check_for_missing_files(metadata = metadata)
         self.replace_missing_images()
-        self.save_metadata(metadata_new)
+        self.save_metadata(metadata)
+
+    def sort_wells(self, sort_tiles = False):
+
+        #create output directory
+        self.define_outdir(name = "sorted_wells")
+
+        #get all new file names
+        if "metdata" in self.__dict__:
+            metadata = self.metadata
+        else:
+            metadata = self.generate_metadata()
+
+        metadata["tiles"] = [self.get_tile_id(x) for x in metadata.new_file_name.to_list()]
+
+        #get unique rows, wells and tiles
+        rows = list(set(metadata.Row.to_list()))
+        wells = list(set(metadata.Well.to_list()))
+        tiles = list(set(metadata.tiles.to_list()))
+
+        print("Found the following image specs: ")
+        print("\t Timepoints: ", rows)
+        print("\t Rows: ", rows)
+        print("\t Wells: ", wells)
+        print("\t Tiles: ", tiles)
+
+        if sort_tiles:
+            #update metadata to include destination for each tile
+            metadata["dest"] = [os.path.join(getattr(self, f"outdir_sorted_wells"), row + "_" + well, tile) for row, well, tile in zip(metadata.Row, metadata.Well, metadata.tiles)]
+        else:
+            metadata["dest"] = [os.path.join(getattr(self, f"outdir_sorted_wells"), row + "_" + well) for row, well in zip(metadata.Row, metadata.Well)]
         
+        #unique directories for each tile
+        unique_dirs = list(set(metadata.dest.to_list()))
+
+        for _dir in unique_dirs:            
+            if not os.path.exists(_dir):
+                os.makedirs(_dir)
+
+        #copy/link the images to their new names
+        self.copy_files(metadata=metadata)
+                    
+    def sort_timepoints(self, sort_wells = False):
+
+        #create output directory
+        self.define_outdir(name = "sorted_timepoints")
+
+        #get all new file names
+        if "metdata" in self.__dict__:
+            metadata = self.metadata
+        else:
+            metadata = self.generate_metadata()
+
+        metadata["tiles"] = [self.get_tile_id(x) for x in metadata.new_file_name.to_list()]
+
+        #get unique rows, wells and tiles
+        rows = list(set(metadata.Row.to_list()))
+        wells = list(set(metadata.Well.to_list()))
+        tiles = list(set(metadata.tiles.to_list()))
+        timepoints = list(set(metadata.Timepoint.to_list()))
+
+        print("Found the following image specs: ")
+        print("\t Timepoints: ", timepoints)
+        print("\t Rows: ", rows)
+        print("\t Wells: ", wells)
+        print("\t Tiles: ", tiles)
+
+        if sort_wells:
+            #update metadata to include destination for each tile
+            metadata["dest"] = [os.path.join(getattr(self, f"outdir_sorted_timepoints"), timepoint, f"{row}_{well}") for row, well, timepoint, in zip(metadata.Row, metadata.Well, metadata.Timepoint)]
+        else:
+            metadata["dest"] = [os.path.join(getattr(self, f"outdir_sorted_timepoints"), timepoint) for timepoint in  metadata.Timepoint]
+        
+        #unique directories for each tile
+        unique_dirs = list(set(metadata.dest.to_list()))
+
+        for _dir in unique_dirs:            
+            if not os.path.exists(_dir):
+                os.makedirs(_dir)
+
+        #copy/link the images to their new names
+        self.copy_files(metadata=metadata)
+
 class CombinedPhenixParser(PhenixParser):
     directory_combined_measurements = "experiments_to_combine" 
 
     def __init__(self, experiment_dir, flatfield_exported=True, export_symlinks=True, compress_rows=False, compress_cols=False) -> None:
         
-        self.experiment_dir = experiment_dir
         self.get_datasets_to_combine()
 
         super().__init__(experiment_dir, flatfield_exported, export_symlinks, compress_rows, compress_cols)   
 
     def get_xml_path(self):
+        #directory depends on if flatfield images were exported or not
+        #these generated folder structures are hard coded during phenix export, do not change
         #get index file of the first phenix dir(this is our main experiment!)
-        index_file = f"{self.phenix_dirs[0]}/Images/Index.ref.xml"
+        if self.flatfield_status:
+            index_file = f"{self.phenix_dirs[0]}/Images/Index.ref.xml"
+        else:
+            index_file = f"{self.phenix_dirs[0]}/Index.idx.xml"
         
         #perform sanity check if file exists else exit
         if not os.path.isfile(index_file):
@@ -416,7 +543,14 @@ class CombinedPhenixParser(PhenixParser):
         return(index_file)
     
     def get_input_dir(self):
-        input_dir = f"{self.phenix_dirs[0]}/Images/flex"
+
+        #directory depends on if flatfield images were exported or not
+        #these generated folder structures are hard coded during phenix export, do not change
+        #for the combined exported the first experiment is always used (they should have the same exported XML file anyways for reading)
+        if self.flatfield_status:
+            input_dir = f"{self.phenix_dirs[0]}/Images/flex"
+        else:
+            input_dir = f"{self.phenix_dirs[0]}/Images"
 
         #perform sanity check if file exists else exit
         if not os.path.isdir(input_dir):
@@ -452,14 +586,16 @@ class CombinedPhenixParser(PhenixParser):
         #define under what path the actual exported images will be found
         #this is hard coded through phenix export script, do not change
         if self.flatfield_status:
+            xml_path = "Images/Index.ref.xml"
             append_string = "Images/flex"
         else:
             append_string = "Images"
+            xml_path = "Index.idx.xml"
 
         #read all metadata
         metadata = {}
         for phenix_dir in self.phenix_dirs:
-            df = self.read_phenix_xml(f"{phenix_dir}/Images/Index.ref.xml")
+            df = self.read_phenix_xml(f"{phenix_dir}/{xml_path}")
             df = df.set_index(["Row", "Well", "Zstack", "Timepoint", "X", "Y", "Channel"])
             df.loc[:, "source"] = f"{phenix_dir}/{append_string}" #update source with the correct strings
             metadata[phenix_dir] = df
@@ -476,151 +612,3 @@ class CombinedPhenixParser(PhenixParser):
         #return generated dataframe
         print("merged metadata generated from all passed phenix experiments.")
         return(metadata_merged)
-    
-    def parse(self):
-
-        #create output directory
-        self.define_outdir()
-
-        metadata = self.get_phenix_metadata()
-        metadata_new = self.generate_new_filenames(metadata=metadata)
-
-        self.copy_files(metadata=metadata_new)
-
-        #check for missing images and replace them
-        self.check_for_missing_files(metadata = metadata_new)
-        self.replace_missing_images()
-
-        #generate a log report of the parsing process and write out the metadatafile used to parse the images
-        self.save_metadata(metadata_new)
-
-
-def sort_timepoints(parsed_dir, use_symlink = False):
-    """
-    Additionally sort generated timecourse images according to well and tile position. Function 
-    generates a new folder called timecourse_sorted which contains a unqiue folder for each unique tile
-    position containing all imaging data (i.e. zstacks, timepoints, channels) of that tile.
-    This function is meant for quick sorting of generated images for simple import of e.g. timecourse 
-    experiments into FIJI. 
-    
-    Parameters
-    ----------
-    parsed_dir
-        filepath to parsed images folder generated with the function parse_phenix.
-    use_symlonks : bool
-        boolean value indicating if the images should be copied as symlinks or as regular files. Symlinks can potentially cause issues if using the data on
-        different OS but is signficiantly faster and does not produce as much data overhead.
-    """
-
-    outdir = parsed_dir.replace(os.path.basename(parsed_dir), "timecourse_sorted")
-    if not os.path.exists(outdir):
-        os.mkdir(outdir)
-
-    images = os.listdir(parsed_dir)
-    images = [x for x in images if x.endswith((".tiff", ".tif"))]
-
-    rows = list(set([x.split("_")[1] for x in images]))
-    wells = list(set([x.split("_")[2] for x in images]))
-    tiles = list(set([x.split(".tif")[0].split("_zstack")[1][4:] for x in images]))
-
-    print("Found the following image specs: ")
-    print("\t Rows: ", rows)
-    print("\t Wells: ", wells)
-    print("\t Tiles: ", tiles)
-    
-    for row in rows:
-        for well in wells:
-            _outdir = os.path.join(outdir, row + "_" + well)
-            for tile in tiles:
-                
-                __outdir = os.path.join(_outdir + "_" + tile)
-                
-                #create outdir if not already existing
-                if not os.path.exists(__outdir):
-                    os.mkdir(__outdir)
-
-                #copy all files that match this folder
-
-                expression = f"*_{row}_{well}_*_{tile}.tif"
-
-                if use_symlink:
-                    def copyfunction(input, output):
-                        try:
-                            os.symlink(input, output)
-                        except OSError as e:
-                            if e.errno == errno.EEXIST:
-                                os.remove(output)
-                                os.symlink(input, output)
-                else:
-                    def copyfunction(input, output):
-                        shutil.copyfile(input, output)
-
-                for file in glob.glob(os.path.join(parsed_dir, expression)):
-                    copyfunction(file, os.path.join(__outdir, os.path.basename(file)))
-                print("completed export for " + row + "_" + well + "_" + tile)
-
-def sort_wells(parsed_dir, use_symlink = False, assign_random_id = False):
-    """
-    Sort acquired phenix images into unique folders for each well. 
-
-    Parameters
-    ----------
-    parsed_dir
-        filepath to parsed images folder generated with the function parse_phenix.
-    use_symlink
-        boolean value indicating if the images should be copied as symlinks to their new destination
-    assign_random_id
-        boolean value indicating if the images in the sorted wells folder should be prepended with a random id.
-    """
-
-    outdir = parsed_dir.replace("parsed_images", "well_sorted")
-    if not os.path.exists(outdir):
-        os.mkdir(outdir)
-
-    images = os.listdir(parsed_dir)
-    images = [x for x in images if x.endswith((".tiff", ".tif"))]
-
-    rows = list(set([x.split("_")[1] for x in images]))
-    wells = list(set([x.split("_")[2] for x in images]))
-    tiles = list(set([x.split(".tif")[0].split("_zstack")[1][4:] for x in images]))
-
-    print("Found the following image specs: ")
-    print("\t Rows: ", rows)
-    print("\t Wells: ", wells)
-    print("\t Tiles: ", tiles)
-    
-    for row in tqdm(rows):
-        for well in tqdm(wells):
-            _outdir = os.path.join(outdir, row + "_" + well)
-            
-            #create outdir if not already existing
-            if not os.path.exists(_outdir):
-                os.mkdir(_outdir)
-
-            #copy all files that match this folder
-
-            expression = f"*_{row}_{well}_*.tif"
-
-            if use_symlink:
-                def copyfunction(input, output):
-                    try:
-                        os.symlink(input, output)
-                    except OSError as e:
-                        if e.errno == erro.EEXIST:
-                            os.remove(output)
-                            os.symlink(input, output)
-            else:
-                def copyfunction(input, output):
-                    shutil.copyfile(input, output)
-            files = glob.glob(os.path.join(parsed_dir, expression))
-            files = np.sort(files)
-
-            if assign_random_id:
-                random.seed(16)
-                random.shuffle(files)
-                for i, file in enumerate(files):
-                    outfile_name = str(i) + "_" + os.path.basename(file)
-                    copyfunction(file, os.path.join(_outdir, outfile_name))
-            else:
-                for file in files:
-                    copyfunction(file, os.path.join(_outdir, os.path.basename(file)))
