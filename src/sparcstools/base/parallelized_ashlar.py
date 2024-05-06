@@ -1,6 +1,5 @@
-"""_custom_ashalar_funcs
-
-functions adapted from https://github.com/labsyspharm/ashlar to provide specific functionality required for this package.
+"""
+functions adapted from https://github.com/labsyspharm/ashlar to provide support for multi-threaded execution.
 """
 
 import sys
@@ -29,36 +28,6 @@ from tqdm.auto import tqdm
 from concurrent.futures import ThreadPoolExecutor
 
 from alphabase.io.tempmmap import mmap_array_from_path
-
-class ParallelLayerAligner(LayerAligner):
-
-    def __init__(self, reader, reference_aligner, n_threads = 20, channel=None, max_shift=15,
-                 filter_sigma=0.0, verbose=False, *args, **kwargs):
-        super().__init__(reader = reader, reference_aligner = reference_aligner, channel=channel, max_shift=max_shift,
-                 filter_sigma=filter_sigma, verbose=verbose, *args, **kwargs)
-        self.n_threads = n_threads
-
-    def register_all(self):
-        n = self.metadata.num_images
-        args = [copy.deepcopy((i,)) for i in range(n)]
-        results = execute_indexed_parallel(
-            self.register,
-            args=args,
-            tqdm_args=dict(
-                file=sys.stdout,
-                disable=not self.verbose,
-                desc="                  aligning tile",
-            ),
-            n_threads = self.n_threads
-        )
-        shift, error = list(zip(*results))
-        self.shifts = np.array(shift)
-        self.errors = np.array(error)
-        assert self.shifts.shape == (n, 2)
-        assert self.errors.shape == (n,)
-
-        if self.verbose:
-            print()
 
 class ParallelEdgeAligner(EdgeAligner):
 
@@ -310,9 +279,9 @@ class ParallelMosaic(Mosaic):
             self,
             channel,
             ch_index,
-            out=None,
+            out = None,
             hdf5_path = None,
-            tqdm_args=None
+            tqdm_args = None
     ):
         """This function assembles a single channel of the mosaic writing to the same HDF5 file being used as a mmap array in the backend."""
         if out is None:
