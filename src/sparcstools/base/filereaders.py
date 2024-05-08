@@ -5,7 +5,7 @@ import skimage.exposure
 import numpy as np
 
 from ashlar.reg import BioformatsReader
-
+from sparcstools.image_processing import rescale_image
 
 class FilePatternReaderRescale(filepattern.FilePatternReader):
 
@@ -18,45 +18,12 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
 
     @staticmethod
     def rescale(img, rescale_range = (1, 99), cutoff_threshold = None):
-        img = skimage.util.img_as_float32(img)
-        cutoff1, cutoff2 = rescale_range
-        if cutoff_threshold is not None:
-            if img.max() > (cutoff_threshold/65535):
-                _img = img.copy()
-                _img[_img > (cutoff_threshold/65535)] = 0
-                p1 = np.percentile(_img, cutoff1)
-                p99 = np.percentile(_img, cutoff2)
-            else:
-                p1 = np.percentile(img, cutoff1)
-                p99 = np.percentile(img, cutoff2)
-        else:
-            p1 = np.percentile(img, cutoff1)
-            p99 = np.percentile(img, cutoff2)
-        img = skimage.exposure.rescale_intensity(img, 
-                                                  in_range=(p1, p99), 
-                                                  out_range=(0, 1))
-        return((img * 65535).astype('uint16'))
+        return (rescale_image(img, rescale_range, cutoff_threshold = cutoff_threshold))
 
     @staticmethod
     def correct_illumination(img, sigma = 30, double_correct = False, rescale_range = (1, 99), cutoff_threshold = None):
-        cutoff1, cutoff2 = rescale_range
-        img = skimage.util.img_as_float32(img)
-        if cutoff_threshold is not None:
-            if img.max() > (cutoff_threshold/65535):
-                _img = img.copy()
-                _img[_img > (cutoff_threshold/65535)] = 0
-                p1 = np.percentile(_img, cutoff1)
-                p99 = np.percentile(_img, cutoff2)
-            else:
-                p1 = np.percentile(img, cutoff1)
-                p99 = np.percentile(img, cutoff2)
-        else:
-            p1 = np.percentile(img, cutoff1)
-            p99 = np.percentile(img, cutoff2)
-
-        img = skimage.exposure.rescale_intensity(img, 
-                                                 in_range=(p1, p99), 
-                                                 out_range=(0, 1))
+        
+        img = rescale_image(img, rescale_range, cutoff_threshold = cutoff_threshold, return_float= True)
 
         #calculate correction mask
         correction = gaussian(img, sigma)
@@ -85,6 +52,7 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
             rescale_range = self.rescale_range[c]
         else:
             rescale_range = self.rescale_range
+        
         if self.do_rescale == False or self.do_rescale == "full_image":
             return img
         elif self.do_rescale == "partial":

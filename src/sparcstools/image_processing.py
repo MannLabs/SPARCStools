@@ -7,9 +7,42 @@ Contains functions to perform standard image processing steps, e.g. downsampling
 
 import os
 from skimage.io import imread, imsave
+from skimage.exposure import rescale_intensity
 import xarray as xr
 from functools import partial
 from concurrent.futures import ProcessPoolExecutor as Pool
+import numpy as np
+
+def rescale_image(image, rescale_range, outrange = (0, 1), dtype = "uint16", cutoff_threshold = None, return_float = False):
+    #convert to float for better percentile calculation
+    img = image.astype("float")
+
+    #define factor to rescale image to uints
+    if dtype == "uint16":
+        factor = 65535
+    elif dtype == "uint8":
+        factor = 255
+    
+    #get cutoff values
+    cutoff1, cutoff2 = rescale_range
+
+    #if cutoff_threshold is given, set all values above the threshold to 0 but do not consider them for percentile calculation
+    if cutoff_threshold is not None:
+        if img.max() > cutoff_threshold:
+            _img = img.copy()
+            values = _img[_img < (cutoff_threshold/factor)]
+    else:
+        values = img 
+    
+    #calculate percentiles
+    p1 = np.percentile(values, cutoff1)
+    p99 = np.percentile(values, cutoff2)
+    del values
+
+    if return_float:
+        return(rescale_intensity(img, (p1, p99), outrange))
+    else:
+        return((rescale_intensity(img, (p1, p99), outrange) * factor).astype(dtype))
 
 def _downsample_img(img, N=2):
     """
