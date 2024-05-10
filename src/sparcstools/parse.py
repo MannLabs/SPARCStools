@@ -306,7 +306,7 @@ class PhenixParser:
                 for zstack in zstacks:
                     for x_pos in x_positions:
                         for y_pos in y_positions:
-                            _missing_tiles.append(f"Timepoint{timepoint}_Row{row}_Well{well}_{channel}_zstack{zstack}_r{x_pos}_c{y_pos}.tif")
+                            _missing_tiles.append(f"Timepoint{timepoint}_Row{row}_Well{well}_{channel}_zstack{zstack}_r{y_pos}_c{x_pos}.tif")
             return(_missing_tiles)       
 
         #check if metadata has been passed or is already calculated, else repeat calculation
@@ -361,7 +361,7 @@ class PhenixParser:
             image[:] = int(0)
             self.black_image = image
 
-            print(f"The found missing tiles need to be replaced with black images of the size {image.shape}. You can do this be executing replace_missing_images().")
+            print(f"The found missing tiles need to be replaced with black images of the size {image.shape}.")
 
         self.missing_images = missing_tiles
         
