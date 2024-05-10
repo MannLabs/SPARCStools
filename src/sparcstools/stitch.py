@@ -132,11 +132,15 @@ class Stitcher:
 
             #lookup channel names and match them with channel ids to return a new dict whose keys are the channel ids
             rescale_range_ids = {list(self.channel_names).index(k):v for k,v in self.rescale_range.items()}
+            self.reader.do_rescale = True
             self.reader.rescale_range = rescale_range_ids #update so that the lookup can occur correctly
 
         else:
             self.reader.do_rescale = False
             self.reader.rescale_range = None
+
+        print(self.rescale_range)
+        print(self.reader.rescale_range)
              
     def reorder_channels(self):
         if self.channel_order is None:
