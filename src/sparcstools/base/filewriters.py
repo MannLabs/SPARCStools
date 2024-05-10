@@ -12,6 +12,17 @@ from ome_zarr.scale import Scaler
 from yattag import Doc, indent
 
 def write_tif(image_path: str, image: np.array, dtype = "uint16"):
+    """_summary_
+
+    Parameters
+    ----------
+    image_path : str
+        absolute file path where the image should be written
+    image : np.array
+        image that should be saved to disk
+    dtype : str, optional
+        datatype to save the image as, by default "uint16"
+    """
     #save using tifffile library to ensure compatibility with very large tif files
     imsave(image_path, image.astype(dtype))
             
@@ -121,7 +132,6 @@ def write_xml(image_paths: [str],
             raise ValueError(f"Channel {channels[i]} is not included in image {image_path}")
         
     #generate the XML document for writing out
-    
     doc, tag, text = Doc().tagtext()
     
     xml_header = '<?xml version="1.0" encoding="UTF-8"?>'
