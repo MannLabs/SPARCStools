@@ -4,10 +4,13 @@ from skimage.util import invert
 import skimage.exposure
 import numpy as np
 
+from ashlar.filepattern import FilePatternReader
 from ashlar.reg import BioformatsReader
 from sparcstools.image_processing import rescale_image
 
-class FilePatternReaderRescale(filepattern.FilePatternReader):
+class FilePatternReaderRescale(FilePatternReader):
+    """Class for reading images based on a file pattern. If desired the images can be rescaled to a certain range while reading.
+    """
 
     def __init__(self, path, pattern, overlap, pixel_size=1, do_rescale=False, WGAchannel = None, no_rescale_channel = "Alexa488", rescale_range = (1, 99)):
         super().__init__(path, pattern, overlap, pixel_size=pixel_size)
@@ -21,6 +24,8 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
         return (rescale_image(img, rescale_range, cutoff_threshold = cutoff_threshold))
 
     @staticmethod
+    #placeholer method kept for compatibility with old code
+    #should be reimplemented in the future to allow for more flexible illumination correction
     def correct_illumination(img, sigma = 30, double_correct = False, rescale_range = (1, 99), cutoff_threshold = None):
         
         img = rescale_image(img, rescale_range, cutoff_threshold = cutoff_threshold, return_float= True)
@@ -47,68 +52,70 @@ class FilePatternReaderRescale(filepattern.FilePatternReader):
     def read(self, series, c):
         img = super().read(series, c)
 
-        #check rescale_range type and set rescale_range accordingly
-        if type(self.rescale_range) is dict:
-            rescale_range = self.rescale_range[c]
+        if not self.do_rescale:
+            return img 
         else:
-            rescale_range = self.rescale_range
-        
-        if self.do_rescale == False or self.do_rescale == "full_image":
-            return img
-        elif self.do_rescale == "partial":
             if c not in self.no_rescale_channel:
+
+                #get rescale_range for channel c
+                if type(self.rescale_range) is dict:
+                    rescale_range = self.rescale_range[c]
+                else:
+                    rescale_range = self.rescale_range
+                
+                #actually read the image with rescaling applied
                 return self.rescale(img, rescale_range = rescale_range) 
             else:
                 return img
-        else:
-            if c == self.WGAchannel:
-                return self.correct_illumination(img, rescale_range = rescale_range)
-            if c == "WGAbackground":
-                return self.correct_illumination(img, double_correct = True, rescale_range = rescale_range)
-            else:
-                return self.rescale(img, rescale_range)  
             
 class BioformatsReaderRescale(BioformatsReader):
+    """Class for reading images from Bioformats files (e.g. nd2). If desired the images can be rescaled to a certain range while reading."""
 
-        def __init__(self, path, plate=None, well=None, do_rescale=False, no_rescale_channel = ["Alexa488"], rescale_range = (1, 99)):
-            super().__init__(path, plate, well)
-            self.do_rescale = do_rescale
-            self.no_rescale_channel = no_rescale_channel
-            self.rescale_range = rescale_range
+    def __init__(self, path, plate=None, well=None, do_rescale=False, no_rescale_channel = ["Alexa488"], rescale_range = (1, 99)):
+        super().__init__(path, plate, well)
+        self.do_rescale = do_rescale
+        self.no_rescale_channel = no_rescale_channel
+        self.rescale_range = rescale_range
 
-        @staticmethod    
-        def rescale(img, rescale_range = (1, 99)):
-            img = skimage.util.img_as_float32(img)
-            cutoff1, cutoff2 = rescale_range
-            
-            if img.max() > (40000/65535):
-                _img = img.copy()
-                _img[_img > (10000/65535)] = 0
-                p1 = np.percentile(_img, cutoff1)
-                p99 = np.percentile(_img, cutoff2)
-            else:
-                p1 = np.percentile(img, cutoff1)
-                p99 = np.percentile(img, cutoff2)
-            
-            img = skimage.exposure.rescale_intensity(img, 
-                                                    in_range=(p1, p99), 
-                                                    out_range=(0, 1))
-            return((img * 65535).astype('uint16'))
+    @staticmethod    
+    def rescale(img, rescale_range = (1, 99)):
+        img = skimage.util.img_as_float32(img)
+        cutoff1, cutoff2 = rescale_range
+        
+        if img.max() > (40000/65535):
+            _img = img.copy()
+            _img[_img > (10000/65535)] = 0
+            p1 = np.percentile(_img, cutoff1)
+            p99 = np.percentile(_img, cutoff2)
+        else:
+            p1 = np.percentile(img, cutoff1)
+            p99 = np.percentile(img, cutoff2)
+        
+        img = skimage.exposure.rescale_intensity(img, 
+                                                in_range=(p1, p99), 
+                                                out_range=(0, 1))
+        return((img * 65535).astype('uint16'))
 
-        def read(self, series, c):
-            self.metadata._reader.setSeries(self.metadata.active_series[series])
-            index = self.metadata._reader.getIndex(0, c, 0)
-            byte_array = self.metadata._reader.openBytes(index)
-            dtype = self.metadata.pixel_dtype
-            shape = self.metadata.tile_size(series)
-            img = np.frombuffer(byte_array.tostring(), dtype=dtype).reshape(shape)
+    def read(self, series, c):
+        self.metadata._reader.setSeries(self.metadata.active_series[series])
+        index = self.metadata._reader.getIndex(0, c, 0)
+        byte_array = self.metadata._reader.openBytes(index)
+        dtype = self.metadata.pixel_dtype
+        shape = self.metadata.tile_size(series)
+        img = np.frombuffer(byte_array.tostring(), dtype=dtype).reshape(shape)
 
-            if not self.do_rescale:
-                return img
-            elif self.do_rescale == "partial":
-                if c not in self.no_rescale_channel:
-                    return self.rescale(img, self.rescale_range)
+        if not self.do_rescale:
+            return img 
+        else:
+            if c not in self.no_rescale_channel:
+
+                #get rescale_range for channel c
+                if type(self.rescale_range) is dict:
+                    rescale_range = self.rescale_range[c]
                 else:
-                    return img
+                    rescale_range = self.rescale_range
+                
+                #actually read the image with rescaling applied
+                return self.rescale(img, rescale_range = rescale_range) 
             else:
-                return self.rescale(img, self.rescale_range)
+                return img
