@@ -441,7 +441,8 @@ class PhenixParser:
         print(f"Metadata used to parse images saved to file {self.experiment_dir}/metadata_image_parsing.csv")
 
     def parse(self):
-        
+        """Complete parsing of phenix experiment including checking for and replacing missing images.
+        """
         #create output directory
         self.define_outdir(name = "parsed_images")
 
@@ -460,6 +461,16 @@ class PhenixParser:
         self.save_metadata(metadata)
 
     def sort_wells(self, sort_tiles = False):
+        """Sorts parsed images according to their well.
+
+        Generates a folder tree where each well has its own folder containing all images from that well. 
+        If sort_tiles = True an additional layer will be added to the tree where all images obtained from the same FOV are sorted into a unique subfolder.
+
+        Parameters
+        ----------
+        sort_tiles : bool, optional
+            if the images should be sorted into individual directories according to FOV in addition to well, by default False
+        """
 
         #create output directory
         self.define_outdir(name = "sorted_wells")
@@ -500,6 +511,16 @@ class PhenixParser:
         self.copy_files(metadata=metadata)
                     
     def sort_timepoints(self, sort_wells = False):
+        """Sorts parsed images according to their timepoint.
+
+        Generates a folder tree where each timepoint has its own folder containing all images captured at that timepoint. 
+        If sort_wells = True an additional layer will be added to the tree where all images obtained from the same well are sorted into a unique subfolder according to timepoint.
+
+        Parameters
+        ----------
+        sort_wellss : bool, optional
+            if the images should be sorted into individual directories according to well in addition to timepoint, by default False
+        """
 
         #create output directory
         self.define_outdir(name = "sorted_timepoints")
