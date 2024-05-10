@@ -20,6 +20,7 @@ from datetime import datetime
 import pandas as pd
 import re
 import numpy as np
+from itertools import product
 
 from tifffile import imread, imwrite
 
@@ -43,6 +44,7 @@ class PhenixParser:
         self.xml_path = self.get_xml_path()
         self.image_dir = self.get_input_dir()
         self.channel_lookup = self.get_channel_metadata(self.xml_path)
+        self.metadata = None
     
     def get_xml_path(self):
         #directory depends on if flatfield images were exported or not
@@ -289,24 +291,52 @@ class PhenixParser:
     
     def check_for_missing_files(self, metadata = None, return_values = False):
 
-        if metadata is None:
-            print("No metadata passed, so reading from file. This can take a moment...")
-            metadata = self.get_phenix_metadata()
-            metadata = self.generate_new_filenames(metadata)
 
+        def _missing_file_names(x_positions,
+                                y_positions,
+                                timepoint = timepoint, 
+                                row = row, 
+                                well = well,
+                                x_pos = x_pos, 
+                                channels = channels,
+                                zstacks = zstacks):
+            """Helper function to generate missing file names given x_positions and y_positions."""
+            
+            _missing_tiles = []
+            
+            for channel in channels:
+                for zstack in zstacks:
+                    for x_pos in x_positions:
+                        for y_pos in y_positions:
+                            _missing_tiles.append(f"Timepoint{timepoint}_Row{row}_Well{well}_{channel}_zstack{zstack}_r{x_pos}_c{y_pos}.tif")
+            return(_missing_tiles)       
+
+        #check if metadata has been passed or is already calculated, else repeat calculation
+        if metadata is None:
+
+            if self.metadata is None:
+                print("No metadata passed, so reading from file. This can take a moment...")
+                metadata = self.get_phenix_metadata()
+                metadata = self.generate_new_filenames(metadata)
+
+            else:
+                metadata = self.metadata
+
+        #get unique values for each category describing the imaging experiment
         channels = np.unique(metadata.Channel)
         zstacks = np.unique(metadata.Zstack)
-
         rows = np.unique(metadata.Row)
         wells = np.unique(metadata.Well)
         timepoints = np.unique(metadata.Timepoint)
 
-        #all X and Y pos values need to be there
+        #all X and Y pos values need to be there 
         y_range = np.unique(metadata.Y_pos) 
         x_range = np.unique(metadata.X_pos)
 
-        missing_images = []
+        #this will not catch missing tiles were an entire row or column is missing
+        missing_tiles = []
         print("Checking for missing images...")
+
         for timepoint in timepoints:
             _df = metadata[metadata.Timepoint == timepoint]
             for row in rows:
@@ -314,29 +344,21 @@ class PhenixParser:
                 for well in wells:
                     ___df = __df[__df.Well == well]
                     
-                    #define X_pos as missing if we expect them but they dont exist
-                    missing_x = [x for x in x_range if x not in np.unique(___df.X_pos)]
+                    for x_pos in x_range:
+                        _check = ___df[___df.X_pos == x_pos]
+                        _y_pos = [y_pos for y_pos in y_range if y_pos not in set(_check.Y_pos)]
+
+                        if len(_y_pos) > 0:
+                            missing_tiles = missing_tiles + _missing_file_names([x_pos], _y_pos)
                     
-                    max_tiles_x = ___df.X_pos.value_counts().max()
-                    min_tiles_x = ___df.X_pos.value_counts().min()
-                    
-                    y_range = ___df.Y_pos.max()
-                    
-                    #also define them as missing if there are some positions that have less images than other
-                    if max_tiles_x != min_tiles_x:
-                        missing_x = missing_x + ___df.X_pos.value_counts()[___df.X_pos.value_counts() < max_tiles_x].index.to_list()
-                
-                    if len(missing_x) > 0:
-                        for _x in missing_x:
-                            ____df = ___df[___df.X_pos == _x]
-                            
-                            missing_y = [y for y in y_range if y not in np.unique(____df.Y_pos)]
-                            for _y in missing_y:
-                                print(f"Missing tile at position: Timepoint{timepoint}_Row{row}_Well{well}_CHANNELS_zstackXX_r{str(_x).zfill(3)}_c{str(_y).zfill(3)}.tif")
-                                for channel in channels:
-                                    for zstack in zstacks:
-                                        missing_images.append(f"Timepoint{timepoint}_Row{row}_Well{well}_{channel}_zstack{zstack}_r{str(_x).zfill(3)}_c{str(_y).zfill(3)}.tif")
-        if len(missing_images) == 0:
+                    for y_pos in y_range:
+                        _check = ___df[___df.Y_pos == y_pos]
+                        _x_pos = [x_pos for x_pos in x_range if x_pos not in set(_check.X_pos)]
+
+                        if len(_y_pos) > 0:
+                            missing_tiles = missing_tiles + _missing_file_names(_x_pos, [y_pos])
+   
+        if len(missing_tiles) == 0:
             print("No missing tiles found.")
         else:
             
@@ -347,10 +369,10 @@ class PhenixParser:
 
             print(f"The found missing tiles need to be replaced with black images of the size {image.shape}. You can do this be executing replace_missing_images().")
 
-        self.missing_images = missing_images
+        self.missing_images = missing_tiles
         
         if return_values:
-            return(missing_images)
+            return(missing_tiles)
     
     def replace_missing_images(self):
 
