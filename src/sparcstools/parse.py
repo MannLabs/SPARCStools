@@ -369,13 +369,16 @@ class PhenixParser:
             return(missing_tiles)
     
     def replace_missing_images(self):
-
-        if self.missing_images is None:
+        
+        #calculate missing images if not already done
+        if "missing_images" not in self.__dict__:
             self.check_for_missing_files()
 
+        #initialize output directory if not alreadt done
         if "outdir_parsed_images" not in self.__dict__:
             self.define_outdir(name = "parsed_images")
         
+        #if there are missing images replace them with black images
         if len(self.missing_images) > 0:
             for missing_image in self.missing_images:
                 print(f"Creating black image with name: {missing_image}")
