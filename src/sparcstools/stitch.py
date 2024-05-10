@@ -103,6 +103,8 @@ class Stitcher:
     def setup_rescaling(self):
         #set up rescaling
         if self.do_intensity_rescale:
+            
+            self.reader.no_rescale_channel = []
 
             #if all channels should be rescaled the same initialize dictionary with all channels
             if type(self.rescale_range) is tuple:
@@ -110,10 +112,6 @@ class Stitcher:
 
             #check if all channels are in dictionary for rescaling
             rescale_channels = list(self.rescale_range.keys())
-            
-            ##
-            #perform some basic sanity checks to make sure we have all of the required information
-            ###
 
             #make sure all channels provided in lookup dictionary are in the experiment
             if not set(rescale_channels).issubset(set(self.channel_names)):
@@ -121,6 +119,7 @@ class Stitcher:
             
             #check if we have any channels missing in the rescale_range dictionary
             missing_channels = set.difference(set(self.channel_names), set(rescale_channels))
+            
             if len(missing_channels) > 0:
                 Warning("The rescale_range dictionary does not contain all channels in the experiment. This may lead to unexpected results. For the missing channels rescaling will be turned off.")
 
@@ -136,6 +135,7 @@ class Stitcher:
             self.reader.rescale_range = rescale_range_ids #update so that the lookup can occur correctly
 
         else:
+            self.reader.no_rescale_channel = []
             self.reader.do_rescale = False
             self.reader.rescale_range = None
 
