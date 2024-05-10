@@ -12,13 +12,13 @@
         </channel>
     </channels>
     <images>
-        <image url="stitching_test_Alexa488.tif">
+        <image url="/Users/sophia/Documents/GitHub/SPARCStools/test_data/example1/stitching_test/stitching_test_Alexa488.tif">
             <channel>1</channel>
         </image>
-        <image url="stitching_test_DAPI.tif">
+        <image url="/Users/sophia/Documents/GitHub/SPARCStools/test_data/example1/stitching_test/stitching_test_DAPI.tif">
             <channel>2</channel>
         </image>
-        <image url="stitching_test_mCherry.tif">
+        <image url="/Users/sophia/Documents/GitHub/SPARCStools/test_data/example1/stitching_test/stitching_test_mCherry.tif">
             <channel>3</channel>
         </image>
     </images>
