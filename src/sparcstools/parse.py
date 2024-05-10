@@ -372,11 +372,14 @@ class PhenixParser:
 
         if self.missing_images is None:
             self.check_for_missing_files()
+
+        if "outdir_parsed_images" not in self.__dict__:
+            self.define_outdir(name = "parsed_images")
         
         if len(self.missing_images) > 0:
             for missing_image in self.missing_images:
                 print(f"Creating black image with name: {missing_image}")
-                imwrite(os.path.join(self.outdir_parsing, missing_image), self.black_image)
+                imwrite(os.path.join(self.outdir_parsed_images, missing_image), self.black_image)
             
             print(f"All missing images successfully replaced with black images of the dimension {self.black_image.shape}")
 
