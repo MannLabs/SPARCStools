@@ -291,15 +291,13 @@ class PhenixParser:
     
     def check_for_missing_files(self, metadata = None, return_values = False):
 
-
-        def _missing_file_names(x_positions,
+        def _generate_missing_file_names(x_positions,
                                 y_positions,
-                                timepoint = timepoint, 
-                                row = row, 
-                                well = well,
-                                x_pos = x_pos, 
-                                channels = channels,
-                                zstacks = zstacks):
+                                timepoint, 
+                                row, 
+                                well,
+                                channels,
+                                zstacks):
             """Helper function to generate missing file names given x_positions and y_positions."""
             
             _missing_tiles = []
@@ -313,12 +311,8 @@ class PhenixParser:
 
         #check if metadata has been passed or is already calculated, else repeat calculation
         if metadata is None:
-
             if self.metadata is None:
-                print("No metadata passed, so reading from file. This can take a moment...")
-                metadata = self.get_phenix_metadata()
-                metadata = self.generate_new_filenames(metadata)
-
+                metadata = self.generate_metadata
             else:
                 metadata = self.metadata
 
@@ -343,20 +337,20 @@ class PhenixParser:
                 __df = _df[_df.Row == row]
                 for well in wells:
                     ___df = __df[__df.Well == well]
-                    
+
                     for x_pos in x_range:
                         _check = ___df[___df.X_pos == x_pos]
                         _y_pos = [y_pos for y_pos in y_range if y_pos not in set(_check.Y_pos)]
 
                         if len(_y_pos) > 0:
-                            missing_tiles = missing_tiles + _missing_file_names([x_pos], _y_pos)
+                            missing_tiles = missing_tiles + _generate_missing_file_names([x_pos], _y_pos, timepoint, row, well, channels, zstacks)
                     
                     for y_pos in y_range:
                         _check = ___df[___df.Y_pos == y_pos]
                         _x_pos = [x_pos for x_pos in x_range if x_pos not in set(_check.X_pos)]
 
                         if len(_y_pos) > 0:
-                            missing_tiles = missing_tiles + _missing_file_names(_x_pos, [y_pos])
+                            missing_tiles = missing_tiles + _generate_missing_file_names(_x_pos, [y_pos],  timepoint, row, well, channels, zstacks)
    
         if len(missing_tiles) == 0:
             print("No missing tiles found.")
