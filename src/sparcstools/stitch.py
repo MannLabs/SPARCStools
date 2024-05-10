@@ -39,12 +39,11 @@ class Stitcher:
                  filter_sigma: int = 0,
                  do_intensity_rescale: bool = True,
                  rescale_range: tuple = (1, 99),
-                 plot_QC: bool = True,
-                 WGAchannel: str = None,
                  channel_order: [str] = None,
-                 overwrite: bool = False,
                  reader_type = FilePatternReaderRescale, 
-                 orientation = {'flip_x': False, 'flip_y': True},
+                 orientation: dict = {'flip_x': False, 'flip_y': True},
+                 plot_QC: bool = True,
+                 overwrite: bool = False,
                  cache: str = None,
                  ) -> None:
         
@@ -203,6 +202,8 @@ class Stitcher:
             self.save_positions()
         
         self.aligner.reader._cache = {} #need to empty cache for some reason
+
+        print("Alignment complete.")
     
     def initialize_mosaic(self):
         mosaic = Mosaic(self.aligner, 
@@ -238,6 +239,7 @@ class Stitcher:
                 self.assembled_mosaic[i, :, :] = rescale_image(self.assembled_mosaic[i, :, :], self.rescale_range[channel])
 
     def generate_mosaic(self):
+        
         #reorder channels
         self.reorder_channels()
 
@@ -304,7 +306,24 @@ class ParallelStitcher(Stitcher):
                 threads: int = 20
                 ) -> None:
         
-        super().__init__(input_dir, slidename, outdir, stitching_channel, pattern, overlap, max_shift, filter_sigma, do_intensity_rescale, rescale_range, plot_QC, WGAchannel, channel_order, overwrite, reader_type, orientation, cache)
+        super().__init__(input_dir, 
+                        slidename, 
+                        outdir,
+                        stitching_channel,
+                        pattern,
+                        overlap,
+                        max_shift,
+                        filter_sigma,
+                        do_intensity_rescale,
+                        rescale_range,
+                        channel_order,
+                        reader_type, 
+                        orientation,
+                        plot_QC,
+                        overwrite,
+                        cache,
+                        )
+        
         self.threads = threads
     
     def initialize_aligner(self):
