@@ -138,10 +138,7 @@ class Stitcher:
             self.reader.no_rescale_channel = []
             self.reader.do_rescale = False
             self.reader.rescale_range = None
-
-        print(self.rescale_range)
-        print(self.reader.rescale_range)
-             
+          
     def reorder_channels(self):
         if self.channel_order is None:
             self.channels = self.channels
@@ -161,6 +158,7 @@ class Stitcher:
             self.reader = self.reader_type(self.input_dir, self.pattern, self.overlap, rescale_range = self.rescale_range)
         elif self.reader_type == BioformatsReaderRescale:
             print("THIS NEEDS TO BE IMPLEMENTED HERE")
+        
         #setup correct orientation of slide (this depends on microscope used to generate the data)
         process_axis_flip(self.reader, flip_x = self.orientation['flip_x'], flip_y = self.orientation['flip_y'])
 
@@ -369,6 +367,12 @@ class ParallelStitcher(Stitcher):
         #get dimensions of assembled final mosaic
         n_channels = len(self.mosaic.channels)
         x, y = self.mosaic.shape
+
+        #setup temp dirname
+        if self.cache is None:
+            TEMP_DIR_NAME = redefine_temp_location(self.outdir)
+        else:
+            TEMP_DIR_NAME = redefine_temp_location(self.cache)
 
         hdf5_path = create_empty_mmap((n_channels, x, y), dtype=np.uint16)
         self.assembled_mosaic = mmap_array_from_path(hdf5_path)
