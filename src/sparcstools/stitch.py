@@ -374,7 +374,8 @@ class ParallelStitcher(Stitcher):
         else:
             TEMP_DIR_NAME = redefine_temp_location(self.cache)
 
-        hdf5_path = create_empty_mmap((n_channels, x, y), dtype=np.uint16)
+        hdf5_path = create_empty_mmap((n_channels, x, y), dtype=np.uint16, tmp_dir_abs_path = TEMP_DIR_NAME)
+        print(f"created tempmmap array for assembled mosaic at {hdf5_path}")
         self.assembled_mosaic = mmap_array_from_path(hdf5_path)
 
         #assemble each of the channels
@@ -383,7 +384,7 @@ class ParallelStitcher(Stitcher):
             args.append((channel, self.assembled_mosaic[i, :, :], i, hdf5_path))  
         tqdm_args = dict(
             file=sys.stdout,
-            desc=f"assembling mosaic",
+            desc="assembling mosaic",
             total=len(self.channels),
         )
         #threading over channels is safe as the channels are written to different postions in the hdf5 file and do not interact with one another
