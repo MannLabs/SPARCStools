@@ -18,14 +18,12 @@ from graph_tool import GraphView
 from graph_tool.generation import remove_parallel_edges
 from graph_tool.search import bfs_iterator
 
-from ashlar.reg import LayerAligner, EdgeAligner, warn_data, Mosaic
+from ashlar.reg import EdgeAligner, warn_data, Mosaic
 from ashlar import utils as utils  
 
 from sparcstools.base.parallelilzation import execute_indexed_parallel, execute_parallel
-from sparcstools.base.graphs import nx2gt, get_center_nodes, gt2nx
-
+from sparcstools.base.graphs import nx2gt, get_center_nodes
 from tqdm.auto import tqdm
-from concurrent.futures import ThreadPoolExecutor
 
 from alphabase.io.tempmmap import mmap_array_from_path
 
@@ -297,9 +295,9 @@ class ParallelMosaic(Mosaic):
                 )
             if hdf5_path is None:
                 raise ValueError(
-                    f"if specifying an out array, you also need to pass the HDF5 path of the memory mapped temparray"
+                    "if specifying an out array, you also need to pass the HDF5 path of the memory mapped temparray"
                 )
-        out = mmap_array_from_path(hdf5_path)
+            
         tqdm_args = dict(
                 file=sys.stdout,
                 disable= not self.verbose,

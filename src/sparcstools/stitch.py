@@ -25,6 +25,7 @@ from sparcstools.base.parallelized_ashlar import ParallelEdgeAligner, ParallelMo
 from sparcstools.base.ashlar_plotting import plot_edge_scatter, plot_edge_quality
 from sparcstools.base.filereaders import FilePatternReaderRescale, BioformatsReaderRescale
 from sparcstools.base.filewriters import write_xml, write_tif, write_ome_zarr
+from sparcstools.base.daskmmap import dask_array_from_path
 
 class Stitcher:
 
@@ -79,6 +80,22 @@ class Stitcher:
         self.cache = cache
 
         self.initialize_outdir()
+
+    def __exit__(self):
+        self.clear_cache()
+    
+    def __del__(self):
+        self.clear_cache()
+
+    def create_cache(self):
+        if self.cache is None:
+            TEMP_DIR_NAME = redefine_temp_location(self.outdir)
+        else:
+            TEMP_DIR_NAME = redefine_temp_location(self.cache)
+        self.TEMP_DIR_NAME = TEMP_DIR_NAME
+
+    def clear_cache(self):
+        shutil.rmtree(self.TEMP_DIR_NAME)
 
     def initialize_outdir(self):
         if not os.path.exists(self.outdir):
@@ -187,6 +204,10 @@ class Stitcher:
                                 max_shift = self.max_shift)
         return(aligner)
     
+    def plot_qc(self):
+        fig = plot_edge_scatter(self.aligner, self.outdir)
+        fig = plot_edge_quality(self.aligner, self.outdir)
+
     def perform_alignment(self):
         
         #intitialize reader for getting individual image tiles
@@ -197,8 +218,7 @@ class Stitcher:
         self.aligner.run()  
 
         if self.plot_QC:
-            fig = plot_edge_scatter(self.aligner, self.outdir)
-            fig = plot_edge_quality(self.aligner, self.outdir)
+            self.plot_qc()
         
         if self.save_positions:
             self.save_positions()
@@ -224,12 +244,11 @@ class Stitcher:
         # initialize tempmmap array to save assemled mosaic to
         # if no cache is specified the tempmmap will be created in the outdir
 
-        if self.cache is None:
-            TEMP_DIR_NAME = redefine_temp_location(self.outdir)
-        else:
-            TEMP_DIR_NAME = redefine_temp_location(self.cache)
-            
-        self.assembled_mosaic = tempmmap.array((n_channels, x, y), dtype=np.uint16)
+        self.create_cache()
+
+        #create empty mmap array to store assembled mosaic
+        hdf5_path = create_empty_mmap((n_channels, x, y), dtype=np.uint16, tmp_dir_abs_path = self.TEMP_DIR_NAME)
+        self.assembled_mosaic = mmap_array_from_path(hdf5_path)
 
         #assemble each of the channels
         for i, channel in tqdm(enumerate(self.channels), total = n_channels):
@@ -239,6 +258,9 @@ class Stitcher:
                 #warning this has not been tested for memory efficiency
                 print("Rescaling entire input image to 0-1 range using percentiles specified in rescale_range.")
                 self.assembled_mosaic[i, :, :] = rescale_image(self.assembled_mosaic[i, :, :], self.rescale_range[channel])
+
+        #convery to dask array
+        self.assembled_mosaic = dask_array_from_path(hdf5_path)
 
     def generate_mosaic(self):
         
@@ -348,51 +370,47 @@ class ParallelStitcher(Stitcher):
         return(mosaic)
     
     def assemble_channel(self, args):
-        channel, out, i, hdf5_path = args
-        self.mosaic.assemble_channel_parallel(channel = channel, out = out, ch_index = i, hdf5_path = hdf5_path)
+        channel, i, hdf5_path = args
+        out = mmap_array_from_path(hdf5_path) 
+        self.mosaic.assemble_channel_parallel(channel = channel, ch_index = i, hdf5_path = hdf5_path)
 
         if self.rescale_full_image: 
-            
-            #reconnect to memory mapped array
-            image = mmap_array_from_path(hdf5_path)
-            
             #warning this has not been tested for memory efficiency
             print("Rescaling entire input image to 0-1 range using percentiles specified in rescale_range.")
-            image[i, :, :] = rescale_image(image[i, :, :], self.rescale_range[channel])
+            out[i, :, :] = rescale_image(out[i, :, :], self.rescale_range[channel])
             
-            del image
-
     def assemble_mosaic(self):
         
         #get dimensions of assembled final mosaic
         n_channels = len(self.mosaic.channels)
         x, y = self.mosaic.shape
 
-        #setup temp dirname
-        if self.cache is None:
-            TEMP_DIR_NAME = redefine_temp_location(self.outdir)
-        else:
-            TEMP_DIR_NAME = redefine_temp_location(self.cache)
+        self.create_cache()
 
-        hdf5_path = create_empty_mmap((n_channels, x, y), dtype=np.uint16, tmp_dir_abs_path = TEMP_DIR_NAME)
+        hdf5_path = create_empty_mmap((n_channels, x, y), dtype=np.uint16, tmp_dir_abs_path = self.TEMP_DIR_NAME)
         print(f"created tempmmap array for assembled mosaic at {hdf5_path}")
         self.assembled_mosaic = mmap_array_from_path(hdf5_path)
 
         #assemble each of the channels
         args = []
         for i, channel in enumerate(self.channels):
-            args.append((channel, self.assembled_mosaic[i, :, :], i, hdf5_path))  
+            args.append((channel, i, hdf5_path))  
+        
         tqdm_args = dict(
             file=sys.stdout,
             desc="assembling mosaic",
             total=len(self.channels),
         )
+        
         #threading over channels is safe as the channels are written to different postions in the hdf5 file and do not interact with one another
         #threading over the writing of a single channel is not safe and leads to inconsistent results
         workers = np.min([self.threads, len(self.channels)])
         with ThreadPoolExecutor(max_workers=workers) as executor:
             list(tqdm(executor.map(self.assemble_channel, args), **tqdm_args))
-    
+
+        #conver to dask array
+        self.assembled_mosaic = dask_array_from_path(hdf5_path)
+
     def write_tif_parallel(self, export_xml = True):
         
         filenames = []
@@ -404,7 +422,7 @@ class ParallelStitcher(Stitcher):
         
         tqdm_args = dict(
             file=sys.stdout,
-            desc=f"writing tif files",
+            desc="writing tif files",
             total=len(self.channels),
         )
 
