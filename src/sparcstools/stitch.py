@@ -573,7 +573,6 @@ class ParallelStitcher(Stitcher):
         aligner : ParallelEdgeAligner
             Initialized ParallelEdgeAligner object.
         """
-        hdf5_path = self.hdf5_path
         aligner = ParallelEdgeAligner(self.reader, 
                                     channel=self.stitching_channel_id, 
                                     filter_sigma=self.filter_sigma, 
@@ -593,6 +592,7 @@ class ParallelStitcher(Stitcher):
         return(mosaic)
     
     def assemble_channel(self, args):
+        hdf5_path = self.hdf5_path
         channel, i, hdf5_path = args
         out = mmap_array_from_path(hdf5_path) 
         self.mosaic.assemble_channel_parallel(channel = channel, ch_index = i, hdf5_path = hdf5_path)
