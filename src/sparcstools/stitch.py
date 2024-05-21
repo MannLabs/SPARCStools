@@ -134,6 +134,7 @@ class Stitcher:
             TEMP_DIR_NAME = redefine_temp_location(self.outdir)
         else:
             TEMP_DIR_NAME = redefine_temp_location(self.cache)
+        
         self.TEMP_DIR_NAME = TEMP_DIR_NAME
 
     def clear_cache(self):
@@ -573,6 +574,46 @@ class ParallelStitcher(Stitcher):
             Initialized ParallelEdgeAligner object.
         """
         hdf5_path = self.hdf5_path
+        aligner = ParallelEdgeAligner(self.reader, 
+                                    channel=self.stitching_channel_id, 
+                                    filter_sigma=self.filter_sigma, 
+                                    verbose=True, 
+                                    do_make_thumbnail=False, 
+                                    max_shift = self.max_shift,
+                                    n_threads = self.threads)
+        return(aligner)
+    
+    def initialize_mosaic(self):
+        mosaic = ParallelMosaic(self.aligner, 
+                                self.aligner.mosaic_shape, 
+                                verbose = True,
+                                channels = self.channels,
+                                n_threads = self.threads
+                                )
+        return(mosaic)
+    
+    def assemble_channel(self, args):
+        channel, i, hdf5_path = args
+        out = mmap_array_from_path(hdf5_path) 
+        self.mosaic.assemble_channel_parallel(channel = channel, ch_index = i, hdf5_path = hdf5_path)
+
+        if self.rescale_full_image: 
+            #warning this has not been tested for memory efficiency
+            print("Rescaling entire input image to 0-1 range using percentiles specified in rescale_range.")
+            out[i, :, :] = rescale_image(out[i, :, :], self.rescale_range[channel])
+            
+    def assemble_mosaic(self):
+        
+        #get dimensions of assembled final mosaic
+        n_channels = len(self.mosaic.channels)
+        x, y = self.mosaic.shape
+
+        self.create_cache()
+
+        hdf5_path = create_empty_mmap((n_channels, x, y), dtype=np.uint16, tmp_dir_abs_path = self.TEMP_DIR_NAME)
+        print(f"created tempmmap array for assembled mosaic at {hdf5_path}")
+        self.assembled_mosaic = mmap_array_from_path(hdf5_path)
+        self.hdf5_path = hdf5_path #save variable to self for easier access
 
         # assemble each of the channels
         args = []
