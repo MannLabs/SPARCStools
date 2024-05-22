@@ -171,6 +171,7 @@ class Stitcher:
         self.stitching_channel_id = list(self.channel_lookup.values()).index(
             self.stitching_channel
         )
+        self.n_channels = len(self.channels)
 
     def setup_rescaling(self):
         """
@@ -369,9 +370,8 @@ class Stitcher:
         Assemble the image tiles into a mosaic.
         """
         # get dimensions of assembled final mosaic
-        n_channels = len(self.channels)
         x, y = self.mosaic.shape
-        shape = (n_channels, x, y)
+        shape = (self.n_channels, x, y)
         print(f"assembling mosaic with shape {shape}")
 
         # initialize tempmmap array to save assemled mosaic to
@@ -608,9 +608,8 @@ class ParallelStitcher(Stitcher):
     def assemble_mosaic(self):
         
         #get dimensions of assembled final mosaic
-        n_channels = len(self.channels)
         x, y = self.mosaic.shape
-        shape = (n_channels, x, y)
+        shape = (self.n_channels, x, y)
 
         print(f"assembling mosaic with shape {shape}")
 
