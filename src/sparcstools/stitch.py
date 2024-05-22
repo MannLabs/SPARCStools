@@ -634,7 +634,7 @@ class ParallelStitcher(Stitcher):
 
         # threading over channels is safe as the channels are written to different postions in the hdf5 file and do not interact with one another
         # threading over the writing of a single channel is not safe and leads to inconsistent results
-        workers = np.min([self.threads, len(self.channels)])
+        workers = np.min([self.threads, self.n_channels])
         with ThreadPoolExecutor(max_workers=workers) as executor:
             list(tqdm(executor.map(self.assemble_channel, args), **tqdm_args))
 
@@ -670,7 +670,7 @@ class ParallelStitcher(Stitcher):
             write_tif(filename, self.assembled_mosaic[ix, :, :])
 
         # threading over channels is safe as the channels are written to different files
-        workers = np.min([self.threads, len(self.channels)])
+        workers = np.min([self.threads, self.n_channels])
         with ThreadPoolExecutor(max_workers=workers) as executor:
             list(tqdm(executor.map(_write_tif, args), **tqdm_args))
 
