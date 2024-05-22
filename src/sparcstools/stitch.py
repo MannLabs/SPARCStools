@@ -369,7 +369,7 @@ class Stitcher:
         Assemble the image tiles into a mosaic.
         """
         # get dimensions of assembled final mosaic
-        n_channels = len(self.mosaic.channels)
+        n_channels = len(self.channels)
         x, y = self.mosaic.shape
         shape = (n_channels, x, y)
         print(f"assembling mosaic with shape {shape}")
@@ -608,7 +608,7 @@ class ParallelStitcher(Stitcher):
     def assemble_mosaic(self):
         
         #get dimensions of assembled final mosaic
-        n_channels = len(self.mosaic.channels)
+        n_channels = len(self.channels)
         x, y = self.mosaic.shape
         shape = (n_channels, x, y)
 
