@@ -388,7 +388,7 @@ class Stitcher:
         self.hdf5_path = hdf5_path  # save variable into self for easier access
 
         # assemble each of the channels
-        for i, channel in tqdm(enumerate(self.channels), total=n_channels):
+        for i, channel in tqdm(enumerate(self.channels), total=self.n_channels):
             self.assembled_mosaic[i, :, :] = self.mosaic.assemble_channel(
                 channel=channel, out=self.assembled_mosaic[i, :, :]
             )
