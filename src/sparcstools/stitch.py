@@ -371,6 +371,8 @@ class Stitcher:
         # get dimensions of assembled final mosaic
         n_channels = len(self.mosaic.channels)
         x, y = self.mosaic.shape
+        shape = (n_channels, x, y)
+        print(f"assembling mosaic with shape {shape}")
 
         # initialize tempmmap array to save assemled mosaic to
         # if no cache is specified the tempmmap will be created in the outdir
@@ -379,8 +381,9 @@ class Stitcher:
 
         # create empty mmap array to store assembled mosaic
         hdf5_path = create_empty_mmap(
-            (n_channels, x, y), dtype=np.uint16, tmp_dir_abs_path=self.TEMP_DIR_NAME
+            shape, dtype=np.uint16, tmp_dir_abs_path=self.TEMP_DIR_NAME
         )
+        print(f"created tempmmap array for assembled mosaic at {hdf5_path}")
         self.assembled_mosaic = mmap_array_from_path(hdf5_path)
         self.hdf5_path = hdf5_path  # save variable into self for easier access
 
@@ -607,11 +610,15 @@ class ParallelStitcher(Stitcher):
         #get dimensions of assembled final mosaic
         n_channels = len(self.mosaic.channels)
         x, y = self.mosaic.shape
+        shape = (n_channels, x, y)
+
+        print(f"assembling mosaic with shape {shape}")
 
         self.create_cache()
 
-        hdf5_path = create_empty_mmap((n_channels, x, y), dtype=np.uint16, tmp_dir_abs_path = self.TEMP_DIR_NAME)
+        hdf5_path = create_empty_mmap(shape, dtype=np.uint16, tmp_dir_abs_path = self.TEMP_DIR_NAME)
         print(f"created tempmmap array for assembled mosaic at {hdf5_path}")
+
         self.assembled_mosaic = mmap_array_from_path(hdf5_path)
         self.hdf5_path = hdf5_path #save variable to self for easier access
 
