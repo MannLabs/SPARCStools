@@ -3,6 +3,7 @@ import dask
 import dask.array as da
 import h5py
 
+
 def dask_array_from_path(file_path):
     """Create a memory-mapped Dask array from a HDF5 file.
 
@@ -30,9 +31,10 @@ def dask_array_from_path(file_path):
     dask_array = mmap_dask_array(file_path, shape, dtype, offset=offset, chunks=chunks)
     return dask_array
 
+
 def calculate_chunk_sizes(shape, dtype, target_size_gb=5):
     """
-    Calculate chunk sizes that result in chunks of approximately the target size in GB. 
+    Calculate chunk sizes that result in chunks of approximately the target size in GB.
 
     XY dimensions are divided by 2 until the target size is reached to keep chunks as square as possible. The chunk sizes for all higher dimensions are set to 1.
 
@@ -53,7 +55,7 @@ def calculate_chunk_sizes(shape, dtype, target_size_gb=5):
     # Size of each element in bytes
     element_size = np.dtype(dtype).itemsize
     # Target number of bytes per chunk
-    target_size_bytes = target_size_gb * 1024 ** 3
+    target_size_bytes = target_size_gb * 1024**3
     # Calculate the total number of elements that fit into the target chunk size
     total_elements_per_chunk = target_size_bytes // element_size
 
@@ -61,12 +63,13 @@ def calculate_chunk_sizes(shape, dtype, target_size_gb=5):
     chunk_sizes = [1] * len(shape)
     chunk_sizes[-1] = shape[-1]
     chunk_sizes[-2] = shape[-2]
-    
+
     while np.product(chunk_sizes) > total_elements_per_chunk:
         chunk_sizes[-1] = chunk_sizes[-1] // 2
         chunk_sizes[-2] = chunk_sizes[-2] // 2
 
     return tuple(chunk_sizes)
+
 
 def mmap_dask_array(filename, shape, dtype, offset=0, chunks=(5,)):
     """
@@ -103,16 +106,21 @@ def mmap_dask_array(filename, shape, dtype, offset=0, chunks=(5,)):
                     min(chunks[1], shape[1] - j),
                     min(chunks[2], shape[2] - k),
                 )
-                slices = (slice(i, i + chunk_shape[0]), slice(j, j + chunk_shape[1]), slice(k, k + chunk_shape[2]))
+                slices = (
+                    slice(i, i + chunk_shape[0]),
+                    slice(j, j + chunk_shape[1]),
+                    slice(k, k + chunk_shape[2]),
+                )
                 chunk = da.from_delayed(
                     load(filename, shape, dtype, offset, slices),
                     shape=chunk_shape,
-                    dtype=dtype
+                    dtype=dtype,
                 )
                 row_chunks.append(chunk)
             channel_chunks.append(da.concatenate(row_chunks, axis=2))
         chunk_arrays.append(da.concatenate(channel_chunks, axis=1))
     return da.concatenate(chunk_arrays, axis=0)
+
 
 def mmap_load_chunk(filename, shape, dtype, offset, slices):
     """
@@ -136,5 +144,5 @@ def mmap_load_chunk(filename, shape, dtype, offset, slices):
     np.ndarray
         The sliced chunk from the memory-mapped array.
     """
-    data = np.memmap(filename, mode='r', shape=shape, dtype=dtype, offset=offset)
+    data = np.memmap(filename, mode="r", shape=shape, dtype=dtype, offset=offset)
     return data[slices]
