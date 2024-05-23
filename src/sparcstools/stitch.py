@@ -239,7 +239,7 @@ class Stitcher:
 
             channels = []
             for channel in self.channel_order:
-                self.channels.append(self.channel_names.index(channel))
+                channels.append(self.channel_names.index(channel))
             print("new channel order", channels)
 
             self.channels = channels
