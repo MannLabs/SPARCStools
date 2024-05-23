@@ -256,7 +256,10 @@ class Stitcher:
                 rescale_range=self.rescale_range,
             )
         elif self.reader_type == BioformatsReaderRescale:
-            print("THIS NEEDS TO BE IMPLEMENTED HERE")
+            self.reader = self.reader_type(
+                self.input_dir,
+                rescale_range = self.rescale_range
+            )
 
         # setup correct orientation of slide (this depends on microscope used to generate the data)
         process_axis_flip(
