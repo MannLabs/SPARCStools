@@ -36,7 +36,7 @@ def write_ome_zarr(filepath: str,
                    chunk_size: (int, int, int) = (1, 1024, 1024),
                    overwrite: bool = False, 
                    ):
-    """_summary_
+    """write out an image as an OME-Zarr file compatible with napari
 
     Parameters
     ----------
