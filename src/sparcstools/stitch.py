@@ -635,6 +635,7 @@ class ParallelStitcher(Stitcher):
         # threading over channels is safe as the channels are written to different postions in the hdf5 file and do not interact with one another
         # threading over the writing of a single channel is not safe and leads to inconsistent results
         workers = np.min([self.threads, self.n_channels])
+        print(f"assembling channels with {workers} workers")
         with ThreadPoolExecutor(max_workers=workers) as executor:
             list(tqdm(executor.map(self.assemble_channel, args), **tqdm_args))
 
