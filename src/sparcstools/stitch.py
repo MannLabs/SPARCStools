@@ -567,6 +567,11 @@ class ParallelStitcher(Stitcher):
             overwrite,
             cache,
         )
+        #dirty fix to avoide multithreading error with BioformatsReader until this can be fixed
+        if self.reader_type == BioformatsReaderRescale:
+            threads = 1
+            print("BioformatsReaderRescale does not support multithreading for calculating the error threshold currently. Proceeding with 1 thread.")
+            Warning("BioformatsReaderRescale does not support multithreading for calculating the error threshold currently. Proceeding with 1 thread.")
 
         self.threads = threads
 
