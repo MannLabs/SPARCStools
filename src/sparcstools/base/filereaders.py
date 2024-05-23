@@ -5,7 +5,7 @@ import skimage.exposure
 import numpy as np
 
 from ashlar.filepattern import FilePatternReader
-from ashlar.reg import BioformatsReader, PlateMetadata
+from ashlar.reg import BioformatsReader, BioformatsMetadata
 from sparcstools.image_processing import rescale_image
 
 class FilePatternReaderRescale(FilePatternReader):
@@ -68,7 +68,7 @@ class FilePatternReaderRescale(FilePatternReader):
             else:
                 return img
 
-class BioformatsMetadataRescale(PlateMetadata):
+class BioformatsMetadataRescale(BioformatsMetadata):
     """Reimplementation of BioformatsMetadata class to provide same parameters as contained in FilePatternReaderRescale"""
     def __init__(self, path):
         super().__init__(path)
