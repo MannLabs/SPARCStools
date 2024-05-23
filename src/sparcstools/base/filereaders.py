@@ -58,7 +58,7 @@ class FilePatternReaderRescale(FilePatternReader):
             if c not in self.no_rescale_channel:
 
                 #get rescale_range for channel c
-                if type(self.rescale_range) is dict:
+                if isinstance(self.rescale_range, dict):
                     rescale_range = self.rescale_range[c]
                 else:
                     rescale_range = self.rescale_range
@@ -70,7 +70,9 @@ class FilePatternReaderRescale(FilePatternReader):
 
 class BioformatsMetadataRescale(PlateMetadata):
     """Reimplementation of BioformatsMetadata class to provide same parameters as contained in FilePatternReaderRescale"""
-    
+    def __init__(self, path):
+        super().__init__(path)
+
     @property
     def channel_map(self):
         n_channels = self._metadata.getChannelCount(0)
