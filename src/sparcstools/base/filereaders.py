@@ -5,7 +5,7 @@ import skimage.exposure
 import numpy as np
 
 from ashlar.filepattern import FilePatternReader
-from ashlar.reg import BioformatsReader
+from ashlar.reg import BioformatsReader, PlateMetadata
 from sparcstools.image_processing import rescale_image
 
 class FilePatternReaderRescale(FilePatternReader):
@@ -67,12 +67,28 @@ class FilePatternReaderRescale(FilePatternReader):
                 return self.rescale(img, rescale_range = rescale_range) 
             else:
                 return img
-            
+
+class BioformatsMetadataRescale(PlateMetadata):
+    """Reimplementation of BioformatsMetadata class to provide same parameters as contained in FilePatternReaderRescale"""
+    
+    @property
+    def channel_map(self):
+        n_channels = self._metadata.getChannelCount(0)
+        channel_names = []
+        
+        for id in range(n_channels):
+            channel_names.append(self._metadata.getChannelName(0, id))
+        channel_map = dict(zip(list(range(n_channels)), channel_names))
+    
+        return channel_map
+
 class BioformatsReaderRescale(BioformatsReader):
     """Class for reading images from Bioformats files (e.g. nd2). If desired the images can be rescaled to a certain range while reading."""
 
     def __init__(self, path, plate=None, well=None, do_rescale=False, no_rescale_channel = None, rescale_range = (1, 99)):
-        super().__init__(path, plate, well)
+        self.path = path
+        self.metadata = BioformatsMetadataRescale(self.path)
+        self.metadata.set_active_plate_well(plate, well)
         self.do_rescale = do_rescale
         self.no_rescale_channel = no_rescale_channel
         self.rescale_range = rescale_range
