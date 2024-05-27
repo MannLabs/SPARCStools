@@ -60,14 +60,16 @@ def calculate_chunk_sizes(shape, dtype, target_size_gb=5):
     # Calculate the total number of elements that fit into the target chunk size
     total_elements_per_chunk = target_size_bytes // element_size
 
-    # Initialize chunk sizes to 1
-    chunk_sizes = [1] * len(shape)
-    chunk_sizes[-1] = shape[-1]
-    chunk_sizes[-2] = shape[-2]
+    # Initialize chunk sizes to the array shape
+    chunk_sizes = list(shape)
 
-    while np.product(chunk_sizes) > total_elements_per_chunk:
-        chunk_sizes[-1] = chunk_sizes[-1] // 2
-        chunk_sizes[-2] = chunk_sizes[-2] // 2
+    # Reduce the dimensions while total elements exceed target
+    while np.prod(chunk_sizes) > total_elements_per_chunk:
+        for i in range(len(chunk_sizes)):
+            if chunk_sizes[i] > 1:
+                chunk_sizes[i] = chunk_sizes[i] // 2
+                if np.prod(chunk_sizes) <= total_elements_per_chunk:
+                    break
 
     return tuple(chunk_sizes)
 
@@ -97,9 +99,9 @@ def mmap_dask_array(filename, shape, dtype, offset=0, chunks=(5,)):
     chunk_arrays = []
 
     for i in range(0, shape[0], chunks[0]):
-        channel_chunks = []
+        row_chunks = []
         for j in range(0, shape[1], chunks[1]):
-            row_chunks = []
+            col_chunks = []
             for k in range(0, shape[2], chunks[2]):
                 chunk_shape = (
                     min(chunks[0], shape[0] - i),
@@ -116,9 +118,9 @@ def mmap_dask_array(filename, shape, dtype, offset=0, chunks=(5,)):
                     shape=chunk_shape,
                     dtype=dtype,
                 )
-                row_chunks.append(chunk)
-            channel_chunks.append(da.concatenate(row_chunks, axis=2))
-        chunk_arrays.append(da.concatenate(channel_chunks, axis=1))
+                col_chunks.append(chunk)
+            row_chunks.append(da.concatenate(col_chunks, axis=2))
+        chunk_arrays.append(da.concatenate(row_chunks, axis=1))
     return da.concatenate(chunk_arrays, axis=0)
 
 def mmap_load_chunk(filename, shape, dtype, offset, slices):
@@ -174,17 +176,25 @@ def create_dask_array_from_chunked_dataset(file_path, container_name, shape, dty
     for i in range(0, shape[0], chunks[0]):
         row_chunks = []
         for j in range(0, shape[1], chunks[1]):
-            slices = (slice(i, i + chunks[0]), slice(j, j + chunks[1]))
-            chunk_shape = (
-                min(chunks[0], shape[0] - i),
-                min(chunks[1], shape[1] - j)
-            )
-            chunk = da.from_delayed(
-                load_chunk(file_path, container_name, slices, chunk_shape),
-                shape=chunk_shape,
-                dtype=dtype
-            )
-            row_chunks.append(chunk)
+            col_chunks = []
+            for k in range(0, shape[2], chunks[2]):
+                slices = (
+                    slice(i, i + chunks[0]),
+                    slice(j, j + chunks[1]),
+                    slice(k, k + chunks[2])
+                )
+                chunk_shape = (
+                    min(chunks[0], shape[0] - i),
+                    min(chunks[1], shape[1] - j),
+                    min(chunks[2], shape[2] - k)
+                )
+                chunk = da.from_delayed(
+                    load_chunk(file_path, container_name, slices, chunk_shape),
+                    shape=chunk_shape,
+                    dtype=dtype
+                )
+                col_chunks.append(chunk)
+            row_chunks.append(da.concatenate(col_chunks, axis=2))
         chunk_arrays.append(da.concatenate(row_chunks, axis=1))
 
     return da.concatenate(chunk_arrays, axis=0)
