@@ -4,7 +4,7 @@ import dask.array as da
 import h5py
 
 
-def dask_array_from_path(file_path):
+def dask_array_from_path(file_path, container_name = "array"):
     """Create a memory-mapped Dask array from a HDF5 file.
 
     Parameters
@@ -19,7 +19,7 @@ def dask_array_from_path(file_path):
     """
     # Load the memory-mapped array from the file
     with h5py.File(file_path, "r") as hdf_file:
-        array = hdf_file["array"]
+        array = hdf_file[container_name]
         shape = array.shape
         dtype = array.dtype
         offset = array.id.get_offset()
