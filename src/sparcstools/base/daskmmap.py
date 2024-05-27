@@ -31,7 +31,7 @@ def dask_array_from_path(file_path, container_name="array"):
         else:
             # Chunked dataset
             chunks = array.chunks
-            dask_array = da.from_array(array, chunks=chunks)
+            dask_array = create_dask_array_from_chunked_dataset(file_path, container_name, shape, dtype, chunks)
     
     return dask_array
 
@@ -145,3 +145,70 @@ def mmap_load_chunk(filename, shape, dtype, offset, slices):
     """
     data = np.memmap(filename, mode="r", shape=shape, dtype=dtype, offset=offset)
     return data[slices]
+
+def create_dask_array_from_chunked_dataset(file_path, container_name, shape, dtype, chunks):
+    """
+    Create a Dask array from a chunked HDF5 dataset.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the HDF5 file.
+    container_name : str
+        Name of the dataset in the HDF5 file.
+    shape : tuple
+        Shape of the array.
+    dtype : np.dtype
+        Data type of the array.
+    chunks : tuple
+        Chunk sizes for the dataset.
+
+    Returns
+    -------
+    dask.array.Array
+        Dask array representing the chunked HDF5 dataset.
+    """
+    load_chunk = dask.delayed(load_hdf5_chunk)
+
+    chunk_arrays = []
+    for i in range(0, shape[0], chunks[0]):
+        row_chunks = []
+        for j in range(0, shape[1], chunks[1]):
+            slices = (slice(i, i + chunks[0]), slice(j, j + chunks[1]))
+            chunk_shape = (
+                min(chunks[0], shape[0] - i),
+                min(chunks[1], shape[1] - j)
+            )
+            chunk = da.from_delayed(
+                load_chunk(file_path, container_name, slices, chunk_shape),
+                shape=chunk_shape,
+                dtype=dtype
+            )
+            row_chunks.append(chunk)
+        chunk_arrays.append(da.concatenate(row_chunks, axis=1))
+
+    return da.concatenate(chunk_arrays, axis=0)
+
+def load_hdf5_chunk(file_path, container_name, slices, shape):
+    """
+    Load a chunk of data from a chunked HDF5 dataset.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the HDF5 file.
+    container_name : str
+        Name of the dataset in the HDF5 file.
+    slices : tuple
+        Tuple of slices specifying the chunk to load.
+    shape : tuple
+        Shape of the chunk.
+
+    Returns
+    -------
+    np.ndarray
+        The sliced chunk from the HDF5 dataset.
+    """
+    with h5py.File(file_path, "r") as f:
+        data = f[container_name][slices]
+    return data
