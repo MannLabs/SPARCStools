@@ -3,40 +3,41 @@ import dask
 import dask.array as da
 import h5py
 
-
-def dask_array_from_path(file_path, container_name = "array"):
-    """Create a memory-mapped Dask array from a HDF5 file.
+def dask_array_from_path(file_path, container_name="array"):
+    """Create a Dask array from a HDF5 file, supporting both contiguous and chunked datasets.
 
     Parameters
     ----------
     file_path : str
-        Path pointing to the HDF5 file compatible with memory mapping.
+        Path pointing to the HDF5 file.
 
     Returns
     -------
     dask.array.Array
-        Dask array that is memory-mapped to disk.
+        Dask array representing the dataset.
     """
-    # Load the memory-mapped array from the file
+    # Load the dataset from the file
     with h5py.File(file_path, "r") as hdf_file:
         array = hdf_file[container_name]
         shape = array.shape
         dtype = array.dtype
-        offset = array.id.get_offset()
-
-    # Calculate the chunk sizes
-    chunks = calculate_chunk_sizes(shape, dtype)
-
-    # Create a Dask array from the memory-mapped file
-    dask_array = mmap_dask_array(file_path, shape, dtype, offset=offset, chunks=chunks)
+        
+        # Check if the dataset is chunked or contiguous
+        if array.chunks is None:
+            # Contiguous dataset
+            offset = array.id.get_offset()
+            chunks = calculate_chunk_sizes(shape, dtype)
+            dask_array = mmap_dask_array(file_path, shape, dtype, offset=offset, chunks=chunks)
+        else:
+            # Chunked dataset
+            chunks = array.chunks
+            dask_array = da.from_array(array, chunks=chunks)
+    
     return dask_array
-
 
 def calculate_chunk_sizes(shape, dtype, target_size_gb=5):
     """
     Calculate chunk sizes that result in chunks of approximately the target size in GB.
-
-    XY dimensions are divided by 2 until the target size is reached to keep chunks as square as possible. The chunk sizes for all higher dimensions are set to 1.
 
     Parameters
     ----------
@@ -69,7 +70,6 @@ def calculate_chunk_sizes(shape, dtype, target_size_gb=5):
         chunk_sizes[-2] = chunk_sizes[-2] // 2
 
     return tuple(chunk_sizes)
-
 
 def mmap_dask_array(filename, shape, dtype, offset=0, chunks=(5,)):
     """
@@ -120,7 +120,6 @@ def mmap_dask_array(filename, shape, dtype, offset=0, chunks=(5,)):
             channel_chunks.append(da.concatenate(row_chunks, axis=2))
         chunk_arrays.append(da.concatenate(channel_chunks, axis=1))
     return da.concatenate(chunk_arrays, axis=0)
-
 
 def mmap_load_chunk(filename, shape, dtype, offset, slices):
     """
