@@ -565,10 +565,10 @@ class CombinedPhenixParser(PhenixParser):
     directory_combined_measurements = "experiments_to_combine" 
 
     def __init__(self, experiment_dir, flatfield_exported=True, export_symlinks=True, compress_rows=False, compress_cols=False) -> None:
-        
+        super().__init__(experiment_dir, flatfield_exported, export_symlinks, compress_rows, compress_cols)   
+
         self.get_datasets_to_combine()
 
-        super().__init__(experiment_dir, flatfield_exported, export_symlinks, compress_rows, compress_cols)   
 
     def get_xml_path(self):
         #directory depends on if flatfield images were exported or not
