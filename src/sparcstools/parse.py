@@ -518,7 +518,7 @@ class PhenixParser:
 
         Parameters
         ----------
-        sort_wellss : bool, optional
+        sort_wells : bool, optional
             if the images should be sorted into individual directories according to well in addition to timepoint, by default False
         """
 
