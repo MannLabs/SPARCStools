@@ -484,17 +484,17 @@ class PhenixParser:
         metadata["tiles"] = [self.get_tile_id(x) for x in metadata.new_file_name.to_list()]
 
         #get unique rows, wells and tiles
+        timepoints = list(set(metadata.Timepoint.to_list()))
         rows = list(set(metadata.Row.to_list()))
         wells = list(set(metadata.Well.to_list()))
         tiles = list(set(metadata.tiles.to_list()))
 
         print("Found the following image specs: ")
-        print("\t Timepoints: ", rows)
+        print("\t Timepoints: ", timepoints)
         print("\t Rows: ", rows)
         print("\t Wells: ", wells)
-        print("\t Tiles: ", tiles)
-
         if sort_tiles:
+            print("\t Tiles: ", tiles) #only print if these folders should be created
             #update metadata to include destination for each tile
             metadata["dest"] = [os.path.join(getattr(self, f"outdir_sorted_wells"), row + "_" + well, tile) for row, well, tile in zip(metadata.Row, metadata.Well, metadata.tiles)]
         else:
