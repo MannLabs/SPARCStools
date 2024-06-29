@@ -269,7 +269,7 @@ class PhenixParser:
 
         return(metadata)
     
-    def get_tile_id(string):
+    def get_tile_id(self, string):
         pattern = r"_r(\d+)_c(\d+)\.tif"
         match = re.search(pattern, string)
         if match:
