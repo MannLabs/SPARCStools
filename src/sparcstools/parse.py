@@ -496,9 +496,9 @@ class PhenixParser:
         if sort_tiles:
             print("\t Tiles: ", tiles) #only print if these folders should be created
             #update metadata to include destination for each tile
-            metadata["dest"] = [os.path.join(getattr(self, f"outdir_sorted_wells"), row + "_" + well, tile) for row, well, tile in zip(metadata.Row, metadata.Well, metadata.tiles)]
+            metadata["dest"] = [os.path.join(getattr(self, f"outdir_sorted_wells"), f"row{row}_well{well}", tile) for row, well, tile in zip(metadata.Row, metadata.Well, metadata.tiles)]
         else:
-            metadata["dest"] = [os.path.join(getattr(self, f"outdir_sorted_wells"), row + "_" + well) for row, well in zip(metadata.Row, metadata.Well)]
+            metadata["dest"] = [os.path.join(getattr(self, f"outdir_sorted_wells"), f"row{row}_well{well}") for row, well in zip(metadata.Row, metadata.Well)]
         
         #unique directories for each tile
         unique_dirs = list(set(metadata.dest.to_list()))
