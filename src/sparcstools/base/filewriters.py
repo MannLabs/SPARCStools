@@ -12,6 +12,11 @@ from ome_zarr.scale import Scaler
 
 from yattag import Doc, indent
 
+from spatialdata import SpatialData
+
+from spatialdata.models import Image2DModel
+from spatialdata.transformations.transformations import Identity
+
 def write_tif(image_path: str, image: np.array, dtype = "uint16"):
     """_summary_
 
@@ -162,3 +167,38 @@ def write_xml(image_paths: List[str],
     
     with open(write_path, mode ="w") as f:
         f.write(result)
+
+def write_spatialdata(image_path: str, 
+                       image: np.array, 
+                       channel_names: List[str] = None,
+                       scale_factors: List[int] = [2, 4, 8],
+                       overwrite: bool = False):
+
+    #check if the file exists and delete if overwrite is set to True
+    if os.path.exists(image_path):
+        if overwrite:
+            os.remove(image_path)
+        else:
+            raise ValueError(f"File {image_path} already exists. Set overwrite to True to delete it.")
+    
+    #check channel names
+    if channel_names is None:
+        channel_names = [f"channel_{i}" for i in range(image.shape[0])]
+    else:
+        if len(channel_names) != image.shape[0]:
+            raise ValueError("Number of channel names does not match number of channels in image")
+    
+    
+    #setup transforms
+    transform_original = Identity()
+
+    #convert image to an Image2DModel
+    image = Image2DModel.parse(image, 
+                               dims=["c", "y", "x"], 
+                               c_coords = channel_names, 
+                               scale_factors=scale_factors, 
+                               transformations={'global': transform_original},
+                               rgb = False)
+    
+    sdata = SpatialData(images={"input_image": image}) # memory bottleneck? 
+    sdata.write(image_path) 

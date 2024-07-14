@@ -23,7 +23,7 @@ from sparcstools.base.filereaders import (
     FilePatternReaderRescale,
     BioformatsReaderRescale,
 )
-from sparcstools.base.filewriters import write_xml, write_tif, write_ome_zarr
+from sparcstools.base.filewriters import write_xml, write_tif, write_ome_zarr, write_spatialdata
 from sparcstools.base.daskmmap import dask_array_from_path
 
 
@@ -484,6 +484,25 @@ class Stitcher:
         )
         write_tif(filename, self.thumbnail)
 
+    def write_spatialdata(self, scale_factors = [2, 4, 8]):
+        """
+        Write the assembled mosaic as a SpatialData object.
+
+        Parameters:
+        -----------
+        scale_factors : list, optional
+            List of scale factors for the generated SpatialData object (default is [2, 4, 8]).
+            The scale factors are used to generate downsampled versions of the image for faster visualization at lower resolutions.
+        """
+        
+        filepath = os.path.join(self.outdir, f"{self.slidename}.spatialdata")
+
+        #create spatialdata object
+        write_spatialdata(filepath, 
+                          image = self.assembled_mosaic, 
+                          channel_names = self.channels, 
+                          scale_factors= scale_factors,
+                          overwrite = self.overwrite)
 
 class ParallelStitcher(Stitcher):
     """
