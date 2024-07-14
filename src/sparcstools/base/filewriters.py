@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import shutil
+from typing import List, Tuple
 
 from tifffile import imsave
 
@@ -28,12 +29,12 @@ def write_tif(image_path: str, image: np.array, dtype = "uint16"):
             
 def write_ome_zarr(filepath: str, 
                    image: np.array, 
-                   channels: [str], 
+                   channels: List[str], 
                    slidename: str, 
-                   channel_colors: [str] = None, 
+                   channel_colors: List[str] = None, 
                    downscaling_size: int = 4, 
                    n_downscaling_layers: int = 4,
-                   chunk_size: (int, int, int) = (1, 1024, 1024),
+                   chunk_size: Tuple[int] = (1, 1024, 1024),
                    overwrite: bool = False, 
                    ):
     """write out an image as an OME-Zarr file compatible with napari
@@ -95,8 +96,8 @@ def write_ome_zarr(filepath: str,
     scaler = Scaler(copy_metadata=False, downscale=downscaling_size, in_place=False, labeled=False, max_layer=n_downscaling_layers, method='nearest') #increase downscale so that large slides can also be opened in napari
     write_image(image, group = group, axes = axes, storage_options=dict(chunks=chunk_size), scaler = scaler)
    
-def write_xml(image_paths: [str], 
-              channels: [str], 
+def write_xml(image_paths: List[str], 
+              channels: List[str], 
               slidename: str, 
               outdir: str = None):
     
