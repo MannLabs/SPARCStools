@@ -177,7 +177,7 @@ def write_spatialdata(image_path: str,
     #check if the file exists and delete if overwrite is set to True
     if os.path.exists(image_path):
         if overwrite:
-            os.remove(image_path)
+            shutil.rmtree(image_path)
         else:
             raise ValueError(f"File {image_path} already exists. Set overwrite to True to delete it.")
     
