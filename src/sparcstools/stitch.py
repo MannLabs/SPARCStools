@@ -143,7 +143,9 @@ class Stitcher:
         """
         Clear the temporary cache directory.
         """
-        shutil.rmtree(self.TEMP_DIR_NAME)
+        if "TEMP_DIR_NAME" in self.__dict__:
+            if os.path.exists(self.TEMP_DIR_NAME):
+                shutil.rmtree(self.TEMP_DIR_NAME)
 
     def initialize_outdir(self):
         """
