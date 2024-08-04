@@ -18,3 +18,4 @@ rasterio
 alphabase
 xarray
 networkx
+spatialdata
