@@ -1,6 +1,8 @@
 import sys
 import shutil
 import os
+from typing import Union
+
 import numpy as np
 
 from ashlar import thumbnail
@@ -38,7 +40,7 @@ class Stitcher:
         overlap: float = 0.1,
         max_shift: float = 30,
         filter_sigma: int = 0,
-        do_intensity_rescale: bool | str = True,
+        do_intensity_rescale: Union(bool, str) = True,
         rescale_range: tuple = (1, 99),
         channel_order: [str] = None,
         reader_type=FilePatternReaderRescale,
